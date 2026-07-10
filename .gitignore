@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+# Sources lourdes (non versionnées)
+assets-source/photos/
+# Divers
+*.log
+.DS_Store
+Thumbs.db
+.env*
+!.env.example
