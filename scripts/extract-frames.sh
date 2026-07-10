@@ -12,7 +12,7 @@ SRC="${1:?Usage: extract-frames.sh <video-source> [out-dir]}"
 OUT="${2:-public/frames}"
 FRAMES=96
 
-mkdir -p "$OUT/desktop"
+mkdir -p "$OUT/desktop" "$OUT/mobile"
 
 DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$SRC")
 FPS=$(python3 -c "print($FRAMES/$DUR)")
@@ -24,12 +24,14 @@ ffmpeg -y -v error -i "$SRC" -vf "fps=$FPS,scale=1600:900:flags=lanczos" \
   -frames:v $FRAMES -c:v libwebp -quality 62 -start_number 0 \
   "$OUT/desktop/frame_%03d.webp"
 
-# NB : plus de set mobile — le cadrage portrait est fait au rendu (canvas),
-# à partir des frames 16:9 (contain → cover pendant le dézoom).
+# Mobile : crop 9:14 centré (suit le topper puis le gâteau), 780px de large
+ffmpeg -y -v error -i "$SRC" -vf "fps=$FPS,crop=ih*(9/14):ih:(iw-ih*(9/14))/2:0,scale=780:1213:flags=lanczos" \
+  -frames:v $FRAMES -c:v libwebp -quality 62 -start_number 0 \
+  "$OUT/mobile/frame_%03d.webp"
 
 # Posters (première et dernière frame en qualité supérieure, pour LCP/fallback)
 ffmpeg -y -v error -i "$SRC" -vf "select=eq(n\,0),scale=1600:900:flags=lanczos" -frames:v 1 "$OUT/poster-first.webp"
 ffmpeg -y -v error -sseof -0.1 -i "$SRC" -vf "scale=1600:900:flags=lanczos" -frames:v 1 -update 1 "$OUT/poster-last.webp"
 
-echo "✓ $(ls "$OUT/desktop" | wc -l) frames desktop → $OUT"
+echo "✓ $(ls "$OUT/desktop" | wc -l) frames desktop, $(ls "$OUT/mobile" | wc -l) frames mobile → $OUT"
 du -sh "$OUT"

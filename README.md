@@ -19,7 +19,7 @@ npm run build      # build de production
 ## L'expérience
 
 1. **Préloader** — wordmark script + progression réelle du chargement des frames
-2. **Hero** — dézoom « topper → gâteau » : 96 frames WebP 16:9 peintes sur canvas, pilotées au scroll ; en portrait, cadrage dynamique contain→cover sur fond ambiant flouté (topper entier au chargement). `prefers-reduced-motion` → image fixe
+2. **Hero** — dézoom « topper → gâteau » : 96 frames WebP peintes sur canvas, pilotées au scroll (desktop 16:9 + crop portrait mobile dédié). `prefers-reduced-motion` → image fixe
 3. **Histoire** — timeline en 5 temps, fil d'or dessiné au scroll
 4. **Rencontre** — écrin sombre pour la future interview vidéo (poussière d'or three.js)
 5. **La différence** — manifeste en 3 piliers

@@ -2,14 +2,9 @@
 
 /* ---------------------------------------------------------------------------
    Hero — « du topper au gâteau »
-   Séquence d'images 16:9 peinte sur <canvas>, pilotée par le scroll
-   (technique Apple) : dézoom du wordmark doré jusqu'au gâteau entier.
-
-   Cadrage intelligent en portrait : au départ la frame est ajustée à la
-   largeur (topper visible en entier) sur un fond ambiant flouté issu de la
-   frame elle-même ; pendant le dézoom, un zoom progressif resserre le cadre
-   jusqu'au gâteau. Aucune frame dédiée mobile : un seul set, deux mises en
-   scène.
+   Séquence d'images peinte sur <canvas>, pilotée par le scroll (technique
+   Apple) : dézoom du wordmark doré jusqu'au gâteau entier. Frame-accurate,
+   identique sur mobile (crop portrait dédié) et desktop.
 
    · Chargement par vagues (1re, dernière, puis densité croissante)
    · Le préloader écoute "mg:hero-progress" (progression du set critique)
@@ -17,16 +12,18 @@
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef } from "react";
-import { gsap, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 
 const FRAME_COUNT = 96;
 const DEZOOM_END = 0.78; // le dézoom occupe 78 % du pin, le titre prend le relais
 
-const framePath = (i: number) => `/frames/desktop/frame_${String(i).padStart(3, "0")}.webp`;
+const framePath = (set: "desktop" | "mobile", i: number) =>
+  `/frames/${set}/frame_${String(i).padStart(3, "0")}.webp`;
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const posterRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const cueRef = useRef<HTMLDivElement>(null);
 
@@ -34,23 +31,26 @@ export default function Hero() {
     const reduced = prefersReducedMotion();
     const section = sectionRef.current!;
     const canvas = canvasRef.current!;
-    const posters = section.querySelectorAll<HTMLImageElement>("[data-poster]");
 
     if (reduced) {
       /* Version apaisée : gâteau entier + titre, pas d'animation */
-      posters.forEach((p) => (p.src = "/frames/poster-last.webp"));
+      if (posterRef.current) posterRef.current.src = "/frames/poster-last.webp";
       canvas.style.display = "none";
       window.dispatchEvent(new CustomEvent("mg:hero-progress", { detail: 100 }));
       return;
     }
 
     const ctx = canvas.getContext("2d")!;
+    const isPortrait =
+      window.matchMedia("(orientation: portrait)").matches || window.innerWidth < 768;
+    const set: "desktop" | "mobile" = isPortrait ? "mobile" : "desktop";
 
     const images: (HTMLImageElement | null)[] = Array(FRAME_COUNT).fill(null);
     const loaded: boolean[] = Array(FRAME_COUNT).fill(false);
     let disposed = false;
 
     /* ------------------------------------------------------ chargement */
+    // Set critique : assez de frames pour un scrub fluide immédiat.
     const critical = new Set<number>([0, FRAME_COUNT - 1]);
     for (let i = 0; i < FRAME_COUNT; i += 4) critical.add(i);
     let criticalLoaded = 0;
@@ -60,7 +60,7 @@ export default function Hero() {
         if (loaded[i] || disposed) return resolve();
         const img = new Image();
         img.decoding = "async";
-        img.src = framePath(i);
+        img.src = framePath(set, i);
         img.onload = () => {
           images[i] = img;
           loaded[i] = true;
@@ -98,14 +98,6 @@ export default function Hero() {
     const state = { frame: 0 };
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    /* Deux passes de réduction pour l'ambiance floutée (portrait) */
-    const ambA = document.createElement("canvas");
-    ambA.width = 32; ambA.height = 18;
-    const ambACtx = ambA.getContext("2d")!;
-    const ambB = document.createElement("canvas");
-    ambB.width = 128; ambB.height = 72;
-    const ambBCtx = ambB.getContext("2d")!;
-
     function size() {
       canvas.width = Math.round(window.innerWidth * dpr);
       canvas.height = Math.round(window.innerHeight * dpr);
@@ -131,43 +123,12 @@ export default function Hero() {
       if (!img) return;
       const cw = canvas.width;
       const ch = canvas.height;
-      const iw = img.naturalWidth;
-      const ih = img.naturalHeight;
-      const cover = Math.max(cw / iw, ch / ih);
-      const portrait = ch / cw > 1.15;
-
-      let s = cover;
-      let oy = 0;
-
+      const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+      const w = img.naturalWidth * scale;
+      const h = img.naturalHeight * scale;
       ctx.clearRect(0, 0, cw, ch);
-
-      if (portrait) {
-        /* Progression du dézoom (0 → 1), adoucie */
-        const raw = state.frame / (FRAME_COUNT - 1);
-        const p = raw * raw * (3 - 2 * raw); // smoothstep
-
-        const fitW = cw / iw;                       // topper entier
-        const end = Math.min(cover, fitW * 2.05);   // gâteau mis en valeur
-        s = fitW + (end - fitW) * p;
-        oy = -ch * 0.14 * p;                        // remonte un peu le sujet
-
-        /* Ambiance : la frame elle-même, très floutée, en fond */
-        ambACtx.drawImage(img, 0, 0, ambA.width, ambA.height);
-        ambBCtx.drawImage(ambA, 0, 0, ambB.width, ambB.height);
-        const as = Math.max(cw / ambB.width, ch / ambB.height);
-        ctx.drawImage(
-          ambB,
-          (cw - ambB.width * as) / 2,
-          (ch - ambB.height * as) / 2,
-          ambB.width * as,
-          ambB.height * as
-        );
-      }
-
-      const w = iw * s;
-      const h = ih * s;
-      ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2 + oy, w, h);
-      if (idx > 0) posters.forEach((p) => (p.style.opacity = "0"));
+      ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+      if (posterRef.current && idx > 0) posterRef.current.style.opacity = "0";
     }
 
     /* --------------------------------------------------------- timeline */
@@ -207,6 +168,7 @@ export default function Hero() {
     let lastW = window.innerWidth;
     let lastH = window.innerHeight;
     const onResize = () => {
+      // Ignore les micro-variations de hauteur (barre d'adresse mobile)
       if (window.innerWidth === lastW && Math.abs(window.innerHeight - lastH) < 130) return;
       lastW = window.innerWidth;
       lastH = window.innerHeight;
@@ -228,38 +190,30 @@ export default function Hero() {
       id="top"
       ref={sectionRef}
       aria-label="Maman Gâteau — créatrice de souvenirs"
-      className="relative h-svh overflow-hidden bg-[#e3dad3]"
+      className="relative h-svh overflow-hidden bg-[#dbd2cc]"
     >
-      {/* Posters LCP : ambiance floutée + première frame (contain en portrait) */}
+      {/* Poster LCP : première frame visible instantanément */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        data-poster
-        src="/frames/poster-first.webp"
-        alt=""
-        className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl transition-opacity duration-300 md:hidden"
-        aria-hidden
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        data-poster
+        ref={posterRef}
         src="/frames/poster-first.webp"
         alt=""
         fetchPriority="high"
-        className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300 md:object-cover"
+        className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
         aria-hidden
       />
       <canvas ref={canvasRef} className="absolute inset-0" aria-hidden />
 
       {/* Fondu vers la section suivante : aucune couture visible */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[26rem] bg-gradient-to-b from-transparent via-cream/45 to-cream md:h-44 md:via-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-b from-transparent via-cream/60 to-cream md:h-44 md:via-transparent" />
 
-      {/* Titre & CTA — apparaissent en fin de dézoom, volontairement minimal */}
+      {/* Titre & CTAs — apparaissent en fin de dézoom */}
       <div
         ref={titleRef}
-        className="absolute inset-x-0 bottom-0 z-10 px-6 pb-12 text-center md:inset-x-auto md:left-[6vw] md:top-1/2 md:max-w-lg md:-translate-y-1/2 md:px-0 md:pb-0 md:text-left"
+        className="absolute inset-x-0 bottom-0 z-10 px-6 pb-14 text-center md:inset-x-auto md:left-[6vw] md:top-1/2 md:max-w-lg md:-translate-y-1/2 md:px-0 md:pb-0 md:text-left"
       >
         <h1 data-hero-fade className="mb-5">
-          <span className="font-script block text-[clamp(2.9rem,10vw,5.6rem)] leading-[1.05] text-chocolate">
+          <span className="font-script block text-[clamp(2.9rem,10vw,5.8rem)] leading-[1.05] text-chocolate [text-shadow:0_1px_18px_rgba(253,251,247,0.95),0_0_44px_rgba(253,251,247,0.75)] md:[text-shadow:none]">
             Créatrice
             <br />
             de souvenirs
