@@ -205,7 +205,7 @@ export default function Hero() {
       <canvas ref={canvasRef} className="absolute inset-0" aria-hidden />
 
       {/* Fondu vers la section suivante : aucune couture visible */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-b from-transparent via-cream/55 to-cream md:h-44 md:via-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-b from-transparent via-cream/60 to-cream md:h-44 md:via-transparent" />
 
       {/* Titre & CTAs — apparaissent en fin de dézoom */}
       <div
@@ -216,7 +216,7 @@ export default function Hero() {
           Cake design sur mesure — Pully · Lausanne · Riviera
         </p>
         <h1 data-hero-fade className="mb-4">
-          <span className="font-script block text-[clamp(2.9rem,10vw,5.8rem)] leading-[1.05] text-chocolate">
+          <span className="font-script block text-[clamp(2.9rem,10vw,5.8rem)] leading-[1.05] text-chocolate [text-shadow:0_1px_18px_rgba(253,251,247,0.95),0_0_44px_rgba(253,251,247,0.75)] md:[text-shadow:none]">
             Créatrice
             <br />
             de souvenirs
