@@ -1,0 +1,336 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Maman Gâteau — Design System
+   Palette & typographie issues de docs/BRAND.md
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Palette de marque */
+  --color-vanilla: #fdfbf7;
+  --color-cream: #f7efe3;
+  --color-blush: #f6c9d4;
+  --color-blush-deep: #eeaebe;
+  --color-mint: #b7ddc2;
+  --color-aqua: #8fd0cf;
+  --color-strawberry: #d9534f;
+  --color-gold: #c9a24b;
+  --color-gold-soft: #dbbf7e;
+  --color-chocolate: #4a2c20;
+  --color-chocolate-deep: #352017;
+  --color-cocoa: #6b4a39;
+  --color-grey-studio: #9a9a9a;
+
+  /* Typographie (chargée via next/font dans app/layout.tsx) */
+  --font-script: var(--font-purgatory);
+  --font-display: var(--font-gatte);
+  --font-body: var(--font-quicksand);
+
+  /* Courbes d'animation maison */
+  --ease-silk: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-butter: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ------------------------------------------------------------------ base */
+
+html {
+  scroll-behavior: auto; /* Lenis pilote le scroll */
+}
+
+body {
+  background-color: var(--color-vanilla);
+  color: var(--color-chocolate);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-blush);
+  color: var(--color-chocolate);
+}
+
+/* Scrollbar discrète, aux couleurs de la maison */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-gold-soft);
+    border-radius: 8px;
+    border: 2px solid var(--color-cream);
+  }
+}
+
+/* ------------------------------------------------------- grain de papier */
+/* Léger bruit photographique : évite l'effet "aplat numérique" (voir BRAND :
+   exécution léchée, pas de décor sans fonction — ici il unifie les fonds). */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 9s steps(6) infinite;
+}
+
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  17% { transform: translate(-2%, 1%); }
+  33% { transform: translate(1%, -2%); }
+  50% { transform: translate(-1%, 2%); }
+  67% { transform: translate(2%, 1%); }
+  83% { transform: translate(-2%, -1%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain::after {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------- typographie */
+
+.font-script {
+  font-family: var(--font-script);
+}
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+/* Titre de section : GatteModern, généreux, resserré verticalement */
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 6vw, 4.2rem);
+  line-height: 1.04;
+  color: var(--color-chocolate);
+}
+
+/* Ligne émotionnelle : Purgatory, toujours en accent — jamais en corps */
+.script-accent {
+  font-family: var(--font-script);
+  color: var(--color-gold);
+}
+
+/* Étiquette de section (petites capitales dorées) */
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+/* --------------------------------------------------------------- boutons */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-strawberry);
+  color: var(--color-vanilla);
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.9rem 1.7rem;
+  transition: transform 0.45s var(--ease-silk), box-shadow 0.45s var(--ease-silk), background 0.3s;
+  box-shadow: 0 10px 30px -12px rgba(217, 83, 79, 0.55);
+  will-change: transform;
+}
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 16px 36px -12px rgba(217, 83, 79, 0.6);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-chocolate);
+  font-weight: 600;
+  border: 1.5px solid color-mix(in srgb, var(--color-gold) 55%, transparent);
+  border-radius: 999px;
+  padding: 0.9rem 1.7rem;
+  transition: border-color 0.3s, background 0.3s, transform 0.45s var(--ease-silk);
+  background: color-mix(in srgb, var(--color-vanilla) 65%, transparent);
+  backdrop-filter: blur(6px);
+}
+.btn-ghost:hover {
+  border-color: var(--color-gold);
+  background: var(--color-vanilla);
+  transform: translateY(-2px);
+}
+
+/* --------------------------------------------------------------- marquee */
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Texte en contour (marquee) : chocolat très dilué */
+.text-outline {
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--color-chocolate) 26%, transparent);
+  color: transparent;
+}
+.text-outline-fill {
+  color: color-mix(in srgb, var(--color-blush) 85%, transparent);
+  -webkit-text-stroke: 0px;
+}
+
+/* -------------------------------------------------------------- reveals */
+/* États initiaux appliqués seulement quand GSAP est actif (html.gsap) pour
+   ne jamais masquer le contenu sans JavaScript. */
+
+html.gsap [data-reveal] {
+  opacity: 0;
+  transform: translateY(34px);
+}
+html.gsap [data-reveal="left"] {
+  transform: translateX(-40px) translateY(0);
+}
+html.gsap [data-reveal="right"] {
+  transform: translateX(40px) translateY(0);
+}
+html.gsap [data-reveal="scale"] {
+  transform: scale(0.92);
+}
+
+/* ----------------------------------------------------- carte "mot doux" */
+
+.love-note {
+  position: relative;
+  background: var(--color-vanilla);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(74, 44, 32, 0.06),
+    0 18px 40px -22px rgba(74, 44, 32, 0.28);
+}
+.love-note::before {
+  /* ruban adhésif */
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 92px;
+  height: 26px;
+  transform: translateX(-50%) rotate(var(--tape-rotate, -2deg));
+  background: color-mix(in srgb, var(--color-blush) 55%, rgba(255, 255, 255, 0.4));
+  opacity: 0.85;
+  border-left: 1px dashed rgba(255, 255, 255, 0.8);
+  border-right: 1px dashed rgba(255, 255, 255, 0.8);
+}
+
+/* ---------------------------------------------------------- ticket devis */
+
+.ticket {
+  background: var(--color-vanilla);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px -30px rgba(74, 44, 32, 0.35);
+}
+.ticket-edge {
+  --r: 9px;
+  height: calc(var(--r) * 2);
+  background:
+    radial-gradient(circle at calc(var(--r) * 1) 0, transparent var(--r), var(--color-vanilla) calc(var(--r) + 0.5px)) top left / calc(var(--r) * 3.2) 100% repeat-x;
+}
+.dashed-sep {
+  border-top: 2px dashed color-mix(in srgb, var(--color-chocolate) 18%, transparent);
+}
+
+/* -------------------------------------------------- curseur personnalisé */
+
+@media (pointer: fine) {
+  html.custom-cursor,
+  html.custom-cursor a,
+  html.custom-cursor button,
+  html.custom-cursor [role="button"],
+  html.custom-cursor label,
+  html.custom-cursor input[type="range"] {
+    cursor: none;
+  }
+}
+
+/* --------------------------------------------------------------- range */
+
+input[type="range"].mg-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--color-gold) 0%,
+    var(--color-gold) var(--fill, 30%),
+    var(--color-cream) var(--fill, 30%),
+    var(--color-cream) 100%
+  );
+  outline: none;
+}
+input[type="range"].mg-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-vanilla);
+  border: 2.5px solid var(--color-gold);
+  box-shadow: 0 4px 14px -4px rgba(74, 44, 32, 0.4);
+  transition: transform 0.2s var(--ease-silk);
+}
+input[type="range"].mg-range::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+input[type="range"].mg-range::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-vanilla);
+  border: 2.5px solid var(--color-gold);
+  box-shadow: 0 4px 14px -4px rgba(74, 44, 32, 0.4);
+}
+
+/* ------------------------------------------------------------- divers */
+
+.gold-rule {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-gold-soft), transparent);
+}
+
+/* Cadre doré du portrait / vidéo */
+.gilded {
+  border: 1.5px solid color-mix(in srgb, var(--color-gold) 65%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
+  outline-offset: 6px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
