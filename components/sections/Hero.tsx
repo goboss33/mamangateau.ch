@@ -263,15 +263,9 @@ export default function Hero() {
             d'événement sur mesure à Lausanne, Pully et sur la Riviera vaudoise.
           </span>
         </h1>
-        <div id="hero-cta-row" data-hero-fade className="relative mb-7 flex items-center justify-center gap-3 md:justify-start">
-          <span
-            data-fusion-core
-            className="pointer-events-none absolute left-0 top-0 h-14 w-14 rounded-full border border-gold/40 bg-chocolate shadow-[0_16px_38px_-16px_rgba(74,44,32,0.65)]"
-            style={{ opacity: 0 }}
-            aria-hidden
-          />
+        <div id="hero-cta-row" data-hero-fade className="mb-7 flex items-center justify-center gap-3 md:justify-start">
           <a data-cta-pill href="#configurateur" className="btn-primary relative overflow-hidden !py-3">
-            <span data-pill-label>Devis gratuit</span>
+            <span data-pill-label className="whitespace-nowrap">Devis gratuit</span>
           </a>
           <a
             data-cta

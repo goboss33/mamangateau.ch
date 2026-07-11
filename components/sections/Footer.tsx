@@ -6,7 +6,6 @@
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import { ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 import { SITE, WA_DEFAULT, EMAIL_LINK } from "@/lib/data";
 
@@ -90,20 +89,11 @@ export default function Footer() {
         {/* Bas de page */}
         <div className="mt-20 border-t border-vanilla/10 pt-8 md:mt-24">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/images/logo-kawaii.png"
-                alt="Logo Maman Gâteau"
-                width={40}
-                height={40}
-                className="h-10 w-10 object-contain"
-              />
-              <div className="text-left">
-                <p className="font-script text-xl leading-none text-vanilla">Maman Gâteau</p>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-vanilla/40">
-                  {SITE.tagline}
-                </p>
-              </div>
+            <div className="text-center md:text-left">
+              <p className="font-script text-2xl leading-none text-vanilla">Maman Gâteau</p>
+              <p className="mt-1.5 text-[11px] uppercase tracking-[0.22em] text-vanilla/40">
+                {SITE.tagline}
+              </p>
             </div>
 
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-vanilla/60">
