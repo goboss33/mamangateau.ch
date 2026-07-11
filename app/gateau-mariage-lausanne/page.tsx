@@ -31,10 +31,10 @@ export const metadata: Metadata = {
 /* Styles proposés — visuels d'inspiration en attendant les premières
    réalisations photographiées (voir décision : direction artistique). */
 const STYLES_MARIAGE = [
-  { src: "/images/mariage/mariage-01.webp", w: 893, h: 1600, title: "Le classique perlé", desc: "Deux étages immaculés, perles de sucre et roses fraîches — l'intemporel." },
-  { src: "/images/mariage/mariage-03.webp", w: 1600, h: 893, title: "Le botanique", desc: "Crème délicate, eucalyptus et fleurs de saison, posé sur son présentoir doré." },
-  { src: "/images/mariage/mariage-04.webp", w: 893, h: 1600, title: "Le drapé fleuri", desc: "Volutes de crème comme un voile, cascade de roses poudrées." },
-  { src: "/images/mariage/mariage-02.webp", w: 893, h: 1600, title: "Le vintage doré", desc: "Volants à l'ancienne, lettrage or « Just Married », charme rétro." },
+  { src: "/images/mariage/mariage-01.webp", w: 893, h: 1600, title: "Esprit classique perlé", desc: "Deux étages immaculés, perles de sucre et roses fraîches — l'intemporel." },
+  { src: "/images/mariage/mariage-03.webp", w: 1600, h: 893, title: "Esprit botanique", desc: "Crème délicate, eucalyptus et fleurs de saison, posé sur son présentoir doré." },
+  { src: "/images/mariage/mariage-04.webp", w: 893, h: 1600, title: "Esprit drapé fleuri", desc: "Volutes de crème comme un voile, cascade de roses poudrées." },
+  { src: "/images/mariage/mariage-02.webp", w: 893, h: 1600, title: "Esprit vintage doré", desc: "Volants à l'ancienne, lettrage or « Just Married », charme rétro." },
 ];
 
 const FAQ: FaqItem[] = [
@@ -45,6 +45,10 @@ const FAQ: FaqItem[] = [
   {
     q: "Peut-on goûter avant de commander ?",
     a: "Bien sûr — c'est même recommandé ! Dès l'acompte versé, une dégustation vous est offerte pour choisir vos parfums en toute sérénité. Vous préférez goûter avant de vous engager ? Optez pour la box dégustation à CHF 40 : quatre associations biscuit-fourrage à savourer à deux, et son montant est intégralement déduit de votre commande.",
+  },
+  {
+    q: "Réalisez-vous d'autres styles que ceux présentés sur cette page ?",
+    a: "Bien sûr — ces univers ne sont que des inspirations pour vous aider à rêver. Chaque wedding cake est une création sur mesure : partez de vos couleurs, de votre décoration, d'un tableau Pinterest ou d'une idée un peu folle, et je dessine un gâteau unique, créé pour votre mariage et pour lui seul.",
   },
   {
     q: "Combien de temps à l'avance réserver ?",
@@ -90,10 +94,10 @@ export default function Page() {
       <section className="bg-cream py-20 md:py-28">
         <div className="mx-auto max-w-6xl px-6">
           <SectionHead
-            eyebrow="Les univers"
-            title="Quel style pour"
-            script="votre wedding cake ?"
-            lead="Quatre directions pour rêver — chaque gâteau est ensuite dessiné pour vous, dans vos couleurs, avec vos fleurs, à votre image."
+            eyebrow="Quelques inspirations"
+            title="Votre wedding cake sera unique"
+            script="comme votre histoire"
+            lead="Ces quatre ambiances donnent le ton — mais ce ne sont que des points de départ. Comme pour toutes mes créations, votre gâteau est dessiné sur mesure : vos couleurs, vos fleurs, votre décoration, votre thème."
           />
           <div className="grid gap-5 sm:grid-cols-2">
             {STYLES_MARIAGE.map((s) => (
@@ -113,6 +117,18 @@ export default function Page() {
                 </figcaption>
               </figure>
             ))}
+          </div>
+          <div
+            data-reveal
+            className="mt-6 rounded-3xl border border-dashed border-gold/50 bg-vanilla/70 px-8 py-8 text-center md:px-12"
+          >
+            <p className="script-accent text-2xl md:text-3xl">vous imaginez tout autre chose ?</p>
+            <p className="mx-auto mt-3 max-w-2xl leading-relaxed text-cocoa">
+              Tant mieux — c'est exactement mon métier. Bohème, minimaliste, coloré, clin
+              d'œil à votre rencontre… Envoyez-moi vos inspirations (Pinterest, Instagram,
+              une photo de votre décoration) et je dessine un gâteau qui n'existera
+              qu'une seule fois : le vôtre.
+            </p>
           </div>
         </div>
       </section>
