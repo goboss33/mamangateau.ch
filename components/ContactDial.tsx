@@ -84,11 +84,11 @@ export default function ContactDial() {
     const hero = document.getElementById("top");
     const row = document.getElementById("hero-cta-row");
     const pill = row?.querySelector<HTMLElement>("[data-cta-pill]");
-    const label = pill?.querySelector<HTMLElement>("[data-pill-label]");
+    const core = row?.querySelector<HTMLElement>("[data-fusion-core]");
     const rounds = row ? Array.from(row.querySelectorAll<HTMLElement>("[data-cta]")) : [];
 
     /* Fallback (motion réduit ou hero absent) : simple apparition */
-    if (reduced || !hero || !row || !pill) {
+    if (reduced || !hero || !row || !pill || !core) {
       gsap.set(root, { autoAlpha: 0 });
       const st = ScrollTrigger.create({
         trigger: hero ?? document.body,
@@ -105,8 +105,6 @@ export default function ContactDial() {
     /* Deltas recalculés à chaque refresh (resize, orientation…) */
     let dx = 0;
     let dy = 0;
-    let pillScaleX = 0.35;
-    let pillScaleY = 1;
 
     const measure = (self?: ScrollTrigger) => {
       const st = self ?? tl.scrollTrigger;
@@ -116,17 +114,21 @@ export default function ContactDial() {
       /* centre du pill (coordonnées document, hors transforms) */
       const pillCx = rowRect.left + pill.offsetLeft + pill.offsetWidth / 2;
       const pillDocCy = rowDocTop + pill.offsetTop + pill.offsetHeight / 2;
+      /* le noyau circulaire se cale sur ce centre */
+      gsap.set(core, {
+        left: pill.offsetLeft + pill.offsetWidth / 2,
+        top: pill.offsetTop + pill.offsetHeight / 2,
+        xPercent: -50,
+        yPercent: -50,
+      });
       /* centre du bouton bulle (fixe) */
-      const btnRect = { x: 0, y: 0 };
       const rootRect = root.getBoundingClientRect();
-      btnRect.x = rootRect.left + btn.offsetLeft + btn.offsetWidth / 2;
-      btnRect.y = rootRect.top + btn.offsetTop + btn.offsetHeight / 2;
+      const btnCx = rootRect.left + btn.offsetLeft + btn.offsetWidth / 2;
+      const btnCy = rootRect.top + btn.offsetTop + btn.offsetHeight / 2;
       /* scroll au moment du hand-off (55 % de la fenêtre) */
       const sStar = st.start + (st.end - st.start) * 0.55;
-      dx = pillCx - btnRect.x;
-      dy = pillDocCy - sStar - btnRect.y;
-      pillScaleX = btn.offsetWidth / pill.offsetWidth;
-      pillScaleY = btn.offsetHeight / pill.offsetHeight;
+      dx = pillCx - btnCx;
+      dy = pillDocCy - sStar - btnCy;
     };
 
     gsap.set(root, { autoAlpha: 1 });
@@ -166,19 +168,16 @@ export default function ContactDial() {
       );
     });
 
-    /* 2. Le pill se contracte en cercle chocolat, son label s'efface */
-    tl.to(label ?? pill, { opacity: 0, duration: 0.18 }, 0.1)
-      .to(
-        pill,
-        {
-          scaleX: () => pillScaleX,
-          scaleY: () => pillScaleY,
-          duration: 0.34,
-        },
+    /* 2. Le pill fond pendant qu'un cercle parfait grandit à sa place */
+    tl.to(pill, { scale: 0.68, autoAlpha: 0, duration: 0.32, ease: "power2.in" }, 0.14)
+      .fromTo(
+        core,
+        { scale: 0.35, autoAlpha: 0 },
+        { scale: 1, autoAlpha: 1, duration: 0.34, ease: "power2.out", immediateRender: false },
         0.2
       )
       /* 3. Hand-off : le cercle fusionné devient la bulle fixe */
-      .set(pill, { autoAlpha: 0 }, 0.55)
+      .set(core, { autoAlpha: 0 }, 0.55)
       .set(row, { pointerEvents: "none" }, 0.55)
       .fromTo(
         btn,

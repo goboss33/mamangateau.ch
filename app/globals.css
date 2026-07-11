@@ -35,6 +35,7 @@
 
 html {
   scroll-behavior: auto; /* Lenis pilote le scroll */
+  overflow-x: clip; /* la bande marquee inclinée ne doit jamais élargir le viewport */
 }
 
 body {

@@ -24,7 +24,7 @@ export default function Marquee({ items }: { items: readonly string[] }) {
   );
 
   return (
-    <div className="relative z-20 -my-10 md:-my-14" aria-hidden>
+    <div className="relative z-20 -my-10 overflow-x-clip md:-my-14" aria-hidden>
       <div className="-rotate-2 scale-x-110 overflow-hidden border-y border-gold/20 bg-vanilla py-6 shadow-[0_18px_50px_-32px_rgba(74,44,32,0.4)] md:py-8">
         <div className="marquee-track">
           <div className="flex items-center">{row}</div>
