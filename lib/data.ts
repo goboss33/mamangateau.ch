@@ -103,48 +103,73 @@ export const STYLES = [
   { id: "floral", label: "Élégant & floral", desc: "fleurs fraîches ou en sucre, lignes épurées" },
   { id: "kawaii", label: "Mignon & ludique", desc: "personnages, couleurs douces, sourires garantis" },
   { id: "minimal", label: "Minimaliste chic", desc: "lignes nettes, palette sobre, effet couture" },
-  { id: "gourmand", label: "Généreusement gourmand", desc: "coulis, fruits, chocolat — l'appel direct" },
-  { id: "theme", label: "Thème sur mesure", desc: "votre univers, fidèlement recréé" },
+  { id: "drip", label: "Drip gourmand", desc: "coulures de chocolat, généreux et spectaculaire" },
+  { id: "semi-naked", label: "Semi-naked", desc: "crème fine, biscuit apparent, esprit champêtre" },
+  { id: "theme", label: "Thème personnalisé", desc: "votre univers — décrivez-le, montrez-le" },
 ] as const;
 
-export const FLAVOURS = [
-  { id: "vanille-framboise", label: "Vanille & framboise" },
-  { id: "chocolat-praline", label: "Chocolat & praliné" },
-  { id: "citron-meringue", label: "Citron meringué" },
-  { id: "fraise", label: "Fraises & crème" },
-  { id: "exotique", label: "Passion & mangue" },
-  { id: "a-definir", label: "À définir ensemble" },
+/* ------------------------------------------------------------- goûts */
+
+export const BISCUITS = [
+  { id: "vanille", label: "Vanille" },
+  { id: "chocolat", label: "Chocolat" },
+  { id: "citron", label: "Citron" },
+  { id: "cannelle", label: "Cannelle" },
+  { id: "orange", label: "Orange" },
+  { id: "nature", label: "Nature" },
 ] as const;
 
-/** Estimation indicative : CHF 80–150 pour 15–20 parts (voir BRAND.md). */
-export function estimatePrice(guests: number): { from: number; to: number } {
-  const base = 80;
-  const from = Math.max(base, Math.round((guests * 5.2) / 5) * 5);
-  const to = Math.round((from * 1.45) / 5) * 5;
-  return { from, to };
+export type Fourrage = { id: string; label: string; sup: number };
+
+export const FOURRAGES: readonly Fourrage[] = [
+  { id: "ganache-noir", label: "Ganache chocolat noir", sup: 0 },
+  { id: "ganache-lait", label: "Ganache chocolat lait", sup: 0 },
+  { id: "ganache-blanc", label: "Ganache chocolat blanc", sup: 0 },
+  { id: "creme-vanille", label: "Crème vanille", sup: 0 },
+  { id: "creme-fruits-rouges", label: "Crème fruits rouges", sup: 0 },
+  { id: "creme-fraise", label: "Crème fraise", sup: 0 },
+  { id: "creme-framboise", label: "Crème framboise", sup: 8 },
+  { id: "creme-noisettes", label: "Crème noisettes", sup: 8 },
+  { id: "creme-oreo", label: "Crème Oreo & mascarpone", sup: 8 },
+  { id: "creme-caramel", label: "Crème caramel beurre salé", sup: 8 },
+  { id: "coulis", label: "Coulis fraise, framboise ou fruits rouges", sup: 10 },
+  { id: "fruits-frais", label: "Fruits frais (selon saison)", sup: 10 },
+];
+
+export const MAX_FOURRAGES = 2;
+
+/* ------------------------------------------------------- tarification */
+
+export const TIER2 = { surcharge: 50, floor: 180, minParts: 26 } as const;
+
+export const DELIVERY = {
+  origin: "Pully, Suisse",
+  freeKm: 10,
+  chfPerKm: 1,
+} as const;
+
+/** Base gâteau : CHF 80–150 pour 15–20 parts (voir BRAND.md). */
+export function cakeBase(parts: number, tiers: 1 | 2): number {
+  const round5 = (n: number) => Math.round(n / 5) * 5;
+  let base = Math.max(80, round5(parts * 5.2));
+  if (tiers === 2) base = Math.max(TIER2.floor, base + TIER2.surcharge);
+  return base;
 }
 
-export function buildWhatsAppMessage(opts: {
-  occasion?: string;
-  guests: number;
-  style?: string;
-  flavour?: string;
-  glutenFree: boolean;
-  date?: string;
-}): string {
-  const lines = [
-    "Bonjour Annie ! 🎂",
-    "Je viens de composer mon gâteau sur mamangateau.ch :",
-    opts.occasion ? `• Occasion : ${opts.occasion}` : null,
-    `• Invités : environ ${opts.guests}`,
-    opts.style ? `• Style : ${opts.style}` : null,
-    opts.flavour ? `• Parfum : ${opts.flavour}` : null,
-    opts.glutenFree ? "• Version sans gluten souhaitée" : null,
-    opts.date ? `• Date envisagée : ${opts.date}` : null,
-    "",
-    "Pouvez-vous me dire si c'est réalisable et m'envoyer une estimation ?",
-  ].filter(Boolean);
-  return lines.join("\n");
+export function estimateTotal(opts: {
+  parts: number;
+  tiers: 1 | 2;
+  fourrages: string[];
+  deliveryFee: number | null; // null = à confirmer
+}): { from: number; to: number; sup: number } {
+  const round5 = (n: number) => Math.round(n / 5) * 5;
+  const base = cakeBase(opts.parts, opts.tiers);
+  const sup = opts.fourrages.reduce(
+    (acc, id) => acc + (FOURRAGES.find((f) => f.id === id)?.sup ?? 0),
+    0
+  );
+  const fee = opts.deliveryFee ?? 0;
+  return { from: base + sup + fee, to: round5(base * 1.35) + sup + fee, sup };
 }
 
 /* -------------------------------------------------------- témoignages */

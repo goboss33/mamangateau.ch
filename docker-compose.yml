@@ -11,6 +11,14 @@ services:
     container_name: mamangateau
     restart: unless-stopped
     mem_limit: 512m
+    environment:
+      # E-mail des devis (Brevo) — requis pour le configurateur
+      - BREVO_API_KEY=${BREVO_API_KEY:-}
+      - DEVIS_TO=${DEVIS_TO:-mamangateau.ch@gmail.com}
+      - DEVIS_FROM_EMAIL=${DEVIS_FROM_EMAIL:-mamangateau.ch@gmail.com}
+      - DEVIS_FROM_NAME=${DEVIS_FROM_NAME:-Maman Gâteau — Site}
+      # Calcul de distance de livraison (Google Routes API) — optionnel
+      - GOOGLE_MAPS_SERVER_KEY=${GOOGLE_MAPS_SERVER_KEY:-}
     networks:
       - proxy
 

@@ -48,6 +48,15 @@ NPM_NETWORK=<nom_du_réseau> docker compose up -d --build
 Puis dans Nginx Proxy Manager : Proxy Host `mamangateau.ch` (+ `www`) →
 `http://mamangateau:3000`, SSL Let's Encrypt + Force SSL + HTTP/2.
 
+Variables d'environnement (fichier `.env` à côté du compose, ou env du stack Portainer) :
+
+| Variable | Rôle |
+|---|---|
+| `BREVO_API_KEY` | **Requis** — envoi des devis par e-mail (clé API Brevo `xkeysib-…`) |
+| `DEVIS_FROM_EMAIL` | Expéditeur vérifié dans Brevo (défaut : mamangateau.ch@gmail.com) |
+| `DEVIS_TO` | Boîte qui reçoit les devis (défaut : mamangateau.ch@gmail.com) |
+| `GOOGLE_MAPS_SERVER_KEY` | Optionnel — calcul auto des km de livraison (Routes API). Sans clé : « distance à confirmer » |
+
 Redéployer après un changement :
 
 ```bash
