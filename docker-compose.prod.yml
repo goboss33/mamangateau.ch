@@ -1,0 +1,18 @@
+# ---------------------------------------------------------------------------
+# Variante "image pré-construite" (GitHub Actions → GHCR) : aucun build sur
+# le VPS. Remplacer OWNER par le compte GitHub. Utilisée pour le déploiement
+# piloté par MCP (stack Portainer).
+# ---------------------------------------------------------------------------
+services:
+  mamangateau:
+    image: ghcr.io/OWNER/mamangateau:latest
+    container_name: mamangateau
+    restart: unless-stopped
+    mem_limit: 512m
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: ${NPM_NETWORK:-npm_default}
