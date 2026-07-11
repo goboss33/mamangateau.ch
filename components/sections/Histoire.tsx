@@ -131,8 +131,8 @@ export default function Histoire() {
             </span>
           </h2>
           <p data-reveal className="mt-6 max-w-xl leading-relaxed text-cocoa">
-            Derrière chaque création, dix ans de cuisine exigeante — et une petite fille
-            qui a tout changé.
+            Derrière chacune de mes créations : dix ans de cuisine exigeante — et une
+            petite fille qui a tout changé.
           </p>
         </div>
 

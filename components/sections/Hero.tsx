@@ -246,7 +246,7 @@ export default function Hero() {
       {/* Titre & CTA — révélés en fin de dézoom */}
       <div
         ref={titleRef}
-        className="absolute inset-x-0 bottom-0 z-10 px-6 pb-14 text-center md:inset-x-auto md:left-[6vw] md:top-1/2 md:max-w-xl md:-translate-y-1/2 md:px-0 md:pb-0 md:text-left"
+        className="absolute inset-x-0 bottom-0 z-10 px-6 pb-14 text-center md:inset-x-auto md:bottom-[7vh] md:left-[6vw] md:max-w-xl md:px-0 md:pb-0 md:text-left"
       >
         <p data-hero-fade className="mb-3 hidden text-xs font-bold uppercase tracking-[0.3em] text-chocolate/80 md:block">
           Cake design sur mesure — Lausanne · Riviera

@@ -129,9 +129,10 @@ export default function Rencontre() {
           </div>
 
           <p data-reveal className="mx-auto mt-10 max-w-xl leading-relaxed text-vanilla/70">
-            Une interview face caméra est en préparation : Annie vous racontera son parcours,
-            son atelier et ce qui se joue vraiment quand on lui confie votre fête. En
-            attendant, son histoire est juste au-dessus — et ses créations, juste en dessous.
+            Une interview face caméra est en préparation : je vous y raconterai mon
+            parcours, mon atelier et ce qui se joue vraiment quand vous me confiez votre
+            fête. En attendant, mon histoire est juste au-dessus — et mes créations, juste
+            en dessous.
           </p>
         </div>
       </div>

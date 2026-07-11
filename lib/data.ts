@@ -39,31 +39,31 @@ export const TIMELINE: Milestone[] = [
   {
     years: "2014 — 2016",
     title: "L'école de la rigueur",
-    text: "Formation de cheffe de cuisine au Pérou, son pays natal. La technique d'abord, la passion toujours.",
+    text: "Je me forme comme cheffe de cuisine au Pérou, mon pays natal. La technique d'abord, la passion toujours.",
     icon: "toque",
   },
   {
     years: "2017 — 2019",
     title: "Les grandes maisons",
-    text: "Cuisinière au Meliá de Punta Cana, puis à l'AC Marriott de Lima. L'exigence des palaces, service après service.",
+    text: "Cuisinière au Meliá de Punta Cana, puis à l'AC Marriott de Lima : j'y apprends l'exigence des palaces, service après service.",
     icon: "hotel",
   },
   {
     years: "2020 — 2021",
     title: "Aux côtés d'un chef étoilé",
-    text: "Dans le Sud-Ouest de la France, elle affine son geste auprès d'un chef étoilé. Le goût du détail devient une seconde nature.",
+    text: "Dans le Sud-Ouest de la France, j'affine mon geste auprès d'un chef étoilé. Le goût du détail devient une seconde nature.",
     icon: "star",
   },
   {
     years: "2022",
     title: "La révélation",
-    text: "Sa fille naît. Pour son premier anniversaire, Annie crée son tout premier gâteau — et découvre, par amour, une nouvelle façon d'exercer son art.",
+    text: "Ma fille naît. Pour son premier anniversaire, je crée mon tout premier gâteau — et je découvre, par amour, une nouvelle façon d'exercer mon art.",
     icon: "heart",
   },
   {
     years: "2023 — aujourd'hui",
     title: "Maman Gâteau",
-    text: "À Pully, elle crée des pièces uniques pour vos plus beaux moments. Une cheffe devenue créatrice de souvenirs.",
+    text: "À Pully, je crée aujourd'hui des pièces uniques pour vos plus beaux moments. Cheffe un jour, créatrice de souvenirs pour toujours.",
     icon: "cake",
   },
 ];
