@@ -467,22 +467,22 @@ export default function Configurateur() {
       />
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <div className="mb-10 max-w-2xl md:mb-14">
-          <p data-reveal className="eyebrow mb-4">L'atelier</p>
-          <h2 data-reveal className="section-title">
-            Composez votre gâteau
-            <span className="script-accent block pt-2 text-[clamp(2.4rem,6vw,4.4rem)]">
-              en quelques gestes
-            </span>
-          </h2>
-          <p data-reveal className="mt-6 leading-relaxed text-cocoa">
-            Un geste après l'autre, votre gâteau prend forme sous vos yeux — et le devis
-            arrive directement chez Annie.
-          </p>
-        </div>
-
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-16">
           <div data-reveal className="min-w-0">
+            <div className="mb-10 max-w-2xl md:mb-14">
+              <p data-reveal className="eyebrow mb-4">L'atelier</p>
+              <h2 data-reveal className="section-title">
+                Composez votre gâteau
+                <span className="script-accent block pt-2 text-[clamp(2.4rem,6vw,4.4rem)]">
+                  en quelques gestes
+                </span>
+              </h2>
+              <p data-reveal className="mt-6 leading-relaxed text-cocoa">
+                Un geste après l'autre, votre gâteau prend forme sous vos yeux — et le devis
+                arrive directement chez Annie.
+              </p>
+            </div>
+
             {/* Aperçu (mobile) */}
             <div className="mx-auto mb-4 w-36 lg:hidden">
               <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
@@ -876,15 +876,18 @@ export default function Configurateur() {
                   Vos coordonnées servent uniquement à répondre à votre demande — jamais de
                   publicité, promis.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => (window.innerWidth < 1024 ? goTo(6) : submit())}
-                  className="btn-primary mt-6 w-full justify-center sm:w-auto"
-                >
-                  <span className="lg:hidden">Voir mon récap →</span>
-                  <span className="max-lg:hidden">{sending ? "Envoi en cours…" : "Demander mon devis"}</span>
-                </button>
-                {error && <p className="mt-3 text-xs font-semibold text-strawberry lg:hidden">{error}</p>}
+                <div className="mt-6 lg:hidden">
+                  <button
+                    type="button"
+                    onClick={() => goTo(6)}
+                    className="btn-primary w-full justify-center sm:w-auto"
+                  >
+                    Voir mon récap →
+                  </button>
+                </div>
+                <p className="mt-6 hidden text-sm font-semibold text-chocolate/75 lg:block">
+                  Tout y est ? Envoyez votre demande depuis le récapitulatif ci-contre&nbsp;→
+                </p>
               </div>
 
               {/* 07 — Récap (mobile) */}
@@ -918,7 +921,7 @@ export default function Configurateur() {
           </div>
 
           {/* Ticket (desktop) */}
-          <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start lg:-mt-9">
+          <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
             <div className="mx-auto mb-2 w-40">
               <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
             </div>
