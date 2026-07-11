@@ -1,27 +1,31 @@
 "use client";
 
 /* ---------------------------------------------------------------------------
-   Hero — « du topper au gâteau »
-   Séquence d'images peinte sur <canvas>, pilotée par le scroll (technique
-   Apple) : dézoom du wordmark doré jusqu'au gâteau entier. Frame-accurate,
-   identique sur mobile (crop portrait dédié) et desktop.
+   Hero — « du topper au gâteau », en autoplay
+   Le dézoom (96 frames canvas, crop portrait dédié sur mobile) se joue tout
+   seul en ~2,6 s dès la sortie du préloader : geste « marque → produit »
+   préservé, mais AUCUN scroll-jacking — la page défile normalement dès la
+   première seconde, et scroller pendant l'animation l'accélère jusqu'au
+   reveal. Ensuite, le gâteau garde un léger parallax au scroll.
 
    · Chargement par vagues (1re, dernière, puis densité croissante)
-   · Le préloader écoute "mg:hero-progress" (progression du set critique)
-   · prefers-reduced-motion → dernière frame statique, aucun pin
+   · Le préloader écoute "mg:hero-progress" et répond "mg:ready"
+   · prefers-reduced-motion → dernière frame statique, rien ne bouge
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 
 const FRAME_COUNT = 96;
-const DEZOOM_END = 0.78; // le dézoom occupe 78 % du pin, le titre prend le relais
+const PLAY_DURATION = 2.6; // secondes de dézoom
+const SKIP_SPEED = 3.6;    // accélération si l'utilisateur interagit
 
 const framePath = (set: "desktop" | "mobile", i: number) =>
   `/frames/${set}/frame_${String(i).padStart(3, "0")}.webp`;
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const posterRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -50,7 +54,6 @@ export default function Hero() {
     let disposed = false;
 
     /* ------------------------------------------------------ chargement */
-    // Set critique : assez de frames pour un scrub fluide immédiat.
     const critical = new Set<number>([0, FRAME_COUNT - 1]);
     for (let i = 0; i < FRAME_COUNT; i += 4) critical.add(i);
     let criticalLoaded = 0;
@@ -91,7 +94,6 @@ export default function Hero() {
       draw();
       await loadWave(2);
       await loadWave(1);
-      draw();
     })();
 
     /* ----------------------------------------------------------- dessin */
@@ -131,44 +133,69 @@ export default function Hero() {
       if (posterRef.current && idx > 0) posterRef.current.style.opacity = "0";
     }
 
-    /* --------------------------------------------------------- timeline */
+    /* ------------------------------------------------ timeline autoplay */
     const titleEls = titleRef.current!.querySelectorAll("[data-hero-fade]");
     gsap.set(titleEls, { autoAlpha: 0, y: 44 });
+    gsap.set(cueRef.current, { autoAlpha: 0 });
 
-    const tl = gsap.timeline({
+    const tl = gsap.timeline({ paused: true });
+    tl.to(state, {
+      frame: FRAME_COUNT - 1,
+      duration: PLAY_DURATION,
+      ease: "power2.inOut",
+      onUpdate: draw,
+    })
+      .to(
+        titleEls,
+        { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.09, ease: "power3.out" },
+        PLAY_DURATION - 0.55
+      )
+      .to(cueRef.current, { autoAlpha: 1, duration: 0.6 }, "-=0.3");
+
+    /* Scroller ou toucher pendant l'animation → on accélère jusqu'au reveal */
+    const skip = () => {
+      if (tl.isActive()) tl.timeScale(SKIP_SPEED);
+      removeSkip();
+    };
+    const skipEvents: (keyof WindowEventMap)[] = ["wheel", "touchmove", "keydown"];
+    const removeSkip = () =>
+      skipEvents.forEach((e) => window.removeEventListener(e, skip));
+    skipEvents.forEach((e) => window.addEventListener(e, skip, { passive: true }));
+
+    let started = false;
+    const start = () => {
+      if (started || disposed) return;
+      started = true;
+      /* Si on arrive déjà scrollé (restauration navigateur), pas de cinéma */
+      if (window.scrollY > window.innerHeight * 0.4) tl.progress(1);
+      tl.play();
+    };
+    const onReady = () => start();
+    window.addEventListener("mg:ready", onReady);
+    const failsafe = setTimeout(start, 7500);
+
+    /* -------------------------------------------- micro-parallax média */
+    const parallax = gsap.to(mediaRef.current, {
+      yPercent: 20,
+      ease: "none",
       scrollTrigger: {
         trigger: section,
         start: "top top",
-        end: "+=180%",
-        pin: true,
-        scrub: 0.6,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
+        end: "bottom top",
+        scrub: true,
       },
     });
 
-    tl.to(
-      state,
-      {
-        frame: FRAME_COUNT - 1,
-        duration: DEZOOM_END,
-        ease: "none",
-        onUpdate: draw,
-      },
-      0
-    )
-      .to(cueRef.current, { autoAlpha: 0, duration: 0.04 }, 0.01)
-      .to(
-        titleEls,
-        { autoAlpha: 1, y: 0, duration: 0.2, stagger: 0.035, ease: "power2.out" },
-        DEZOOM_END - 0.04
-      );
+    /* L'indice de scroll s'efface dès que l'on quitte le sommet */
+    const cueFade = ScrollTrigger.create({
+      start: 8,
+      onEnter: () => gsap.to(cueRef.current, { autoAlpha: 0, duration: 0.3 }),
+    });
 
     /* --------------------------------------------------------- resize */
     let lastW = window.innerWidth;
     let lastH = window.innerHeight;
     const onResize = () => {
-      // Ignore les micro-variations de hauteur (barre d'adresse mobile)
       if (window.innerWidth === lastW && Math.abs(window.innerHeight - lastH) < 130) return;
       lastW = window.innerWidth;
       lastH = window.innerHeight;
@@ -179,8 +206,13 @@ export default function Hero() {
 
     return () => {
       disposed = true;
+      clearTimeout(failsafe);
+      removeSkip();
+      window.removeEventListener("mg:ready", onReady);
       window.removeEventListener("resize", onResize);
-      tl.scrollTrigger?.kill();
+      parallax.scrollTrigger?.kill();
+      parallax.kill();
+      cueFade.kill();
       tl.kill();
     };
   }, []);
@@ -192,28 +224,30 @@ export default function Hero() {
       aria-label="Maman Gâteau — créatrice de souvenirs"
       className="relative h-svh overflow-hidden bg-[#dbd2cc]"
     >
-      {/* Poster LCP : première frame visible instantanément */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        ref={posterRef}
-        src="/frames/poster-first.webp"
-        alt=""
-        fetchPriority="high"
-        className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
-        aria-hidden
-      />
-      <canvas ref={canvasRef} className="absolute inset-0" aria-hidden />
+      {/* Média (poster LCP + canvas) — seul ce calque prend le parallax */}
+      <div ref={mediaRef} className="absolute inset-0 will-change-transform">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          ref={posterRef}
+          src="/frames/poster-first.webp"
+          alt=""
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
+          aria-hidden
+        />
+        <canvas ref={canvasRef} className="absolute inset-0" aria-hidden />
+      </div>
 
       {/* Fondu vers la section suivante : aucune couture visible */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-80 bg-gradient-to-b from-transparent via-cream/60 to-cream md:h-44 md:via-transparent" />
 
-      {/* Titre & CTAs — apparaissent en fin de dézoom */}
+      {/* Titre & CTA — révélés en fin de dézoom */}
       <div
         ref={titleRef}
         className="absolute inset-x-0 bottom-0 z-10 px-6 pb-14 text-center md:inset-x-auto md:left-[6vw] md:top-1/2 md:max-w-lg md:-translate-y-1/2 md:px-0 md:pb-0 md:text-left"
       >
         <h1 data-hero-fade className="mb-5">
-          <span className="font-script block text-[clamp(2.9rem,10vw,5.8rem)] leading-[1.05] text-chocolate [text-shadow:0_1px_18px_rgba(253,251,247,0.95),0_0_44px_rgba(253,251,247,0.75)] md:[text-shadow:none]">
+          <span className="font-script block text-[clamp(2.9rem,10vw,5.6rem)] leading-[1.05] text-chocolate [text-shadow:0_1px_18px_rgba(253,251,247,0.95),0_0_44px_rgba(253,251,247,0.75)] md:[text-shadow:none]">
             Créatrice
             <br />
             de souvenirs
@@ -242,14 +276,11 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Indice de scroll */}
+      {/* Indice de scroll — apparaît après le reveal, s'efface au 1er scroll */}
       <div
         ref={cueRef}
-        className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-chocolate/60"
+        className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-chocolate/60 max-md:hidden"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-[0.28em]">
-          Faites défiler
-        </span>
         <span className="block h-9 w-px overflow-hidden bg-chocolate/15">
           <span className="block h-3 w-px animate-[cue_1.6s_ease-in-out_infinite] bg-gold" />
         </span>
