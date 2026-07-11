@@ -36,19 +36,17 @@ export default function Experience({ children }: { children: React.ReactNode }) 
       /* ----------------------------------------------- reveals génériques */
       const targets = gsap.utils.toArray<HTMLElement>("[data-reveal]");
       targets.forEach((el) => {
-        const delay = parseFloat(el.dataset.revealDelay ?? "0");
         gsap.to(el, {
           opacity: 1,
           x: 0,
           y: 0,
           scale: 1,
-          duration: 1.15,
-          delay,
-          ease: "power3.out",
+          ease: "power2.out",
           scrollTrigger: {
             trigger: el,
-            start: "top 88%",
-            toggleActions: "play none none reverse",
+            start: "clamp(top 94%)",
+            end: "clamp(top 72%)",
+            scrub: 0.5,
           },
         });
       });

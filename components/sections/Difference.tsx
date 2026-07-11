@@ -25,12 +25,12 @@ export default function Difference() {
       { backgroundSize: "0% 42%" },
       {
         backgroundSize: "100% 42%",
-        duration: 1.1,
-        ease: "power3.inOut",
+        ease: "power2.inOut",
         scrollTrigger: {
           trigger: highlightRef.current,
-          start: "top 78%",
-          toggleActions: "play none none reverse",
+          start: "clamp(top 84%)",
+          end: "clamp(top 58%)",
+          scrub: 0.5,
         },
       }
     );
@@ -46,12 +46,12 @@ export default function Difference() {
         { scaleX: 0 },
         {
           scaleX: 1,
-          duration: 1.2,
-          ease: "power4.out",
+          ease: "power2.out",
           scrollTrigger: {
             trigger: rule,
-            start: "top 85%",
-            toggleActions: "play none none reverse",
+            start: "clamp(top 92%)",
+            end: "clamp(top 68%)",
+            scrub: 0.5,
           },
         }
       );

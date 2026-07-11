@@ -39,13 +39,12 @@ export default function Temoignages() {
           autoAlpha: 1,
           scale: 1,
           rotation: finalRotate,
-          duration: 1.05,
-          delay: (i % 2) * 0.12,
-          ease: "back.out(1.35)",
+          ease: "back.out(1.2)",
           scrollTrigger: {
             trigger: note,
-            start: "top 88%",
-            toggleActions: "play none none reverse",
+            start: `clamp(top ${94 - (i % 2) * 4}%)`,
+            end: `clamp(top ${64 - (i % 2) * 4}%)`,
+            scrub: 0.55,
           },
         }
       );

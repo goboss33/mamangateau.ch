@@ -19,13 +19,14 @@ export default function Livraison() {
     gsap.set(pins, { scale: 0, transformOrigin: "center bottom" });
     const tween = gsap.to(pins, {
       scale: 1,
-      duration: 0.7,
-      stagger: 0.12,
-      ease: "back.out(2.2)",
+      duration: 0.6,
+      stagger: 0.14,
+      ease: "back.out(2)",
       scrollTrigger: {
         trigger: mapRef.current,
-        start: "top 75%",
-        toggleActions: "play none none reverse",
+        start: "clamp(top 80%)",
+        end: "clamp(top 42%)",
+        scrub: 0.5,
       },
     });
     return () => {

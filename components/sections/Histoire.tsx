@@ -95,10 +95,11 @@ export default function Histoire() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: li,
-          start: "top 58%",
-          toggleActions: "play none none reverse",
+          start: "clamp(top 64%)",
+          end: "clamp(top 44%)",
+          scrub: 0.45,
         },
-        defaults: { duration: 0.55, ease: "power3.out" },
+        defaults: { duration: 0.55, ease: "power2.out" },
       });
       tl.to(dotOuter, { borderColor: "#d9534f", scale: 1.15, ease: "back.out(2.5)" }, 0)
         .to(dotInner, { backgroundColor: "#d9534f", scale: 1.5 }, 0)

@@ -32,15 +32,16 @@ export default function Portfolio() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: fig,
-          start: "top 88%",
-          toggleActions: "play none none reverse",
+          start: `clamp(top ${96 - (i % 3) * 2}%)`,
+          end: "clamp(top 62%)",
+          scrub: 0.5,
         },
-        defaults: { ease: "expo.out", duration: 1.25 },
+        defaults: { ease: "power2.out", duration: 1 },
       });
       tl.fromTo(
         fig,
         { clipPath: "inset(100% 0% 0% 0%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", delay: (i % 3) * 0.09 },
+        { clipPath: "inset(0% 0% 0% 0%)" },
         0
       ).fromTo(img, { scale: 1.32, yPercent: 8 }, { scale: 1, yPercent: 0 }, 0);
       killers.push(() => {

@@ -16,6 +16,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
+import { SITE, WA_DEFAULT } from "@/lib/data";
 
 const FRAME_COUNT = 96;
 const PLAY_DURATION = 2.6; // secondes de dézoom
@@ -31,6 +32,8 @@ export default function Hero() {
   const posterRef = useRef<HTMLImageElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const cueRef = useRef<HTMLDivElement>(null);
+  const ctaRowRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reduced = prefersReducedMotion();
@@ -42,7 +45,15 @@ export default function Hero() {
       if (posterRef.current) posterRef.current.src = "/frames/poster-last.webp";
       canvas.style.display = "none";
       window.dispatchEvent(new CustomEvent("mg:hero-progress", { detail: 100 }));
-      return;
+      const dock = dockRef.current!;
+      gsap.set(dock, { autoAlpha: 0 });
+      const st = ScrollTrigger.create({
+        trigger: section,
+        start: "bottom 60%",
+        onEnter: () => gsap.set(dock, { autoAlpha: 1 }),
+        onLeaveBack: () => gsap.set(dock, { autoAlpha: 0 }),
+      });
+      return () => st.kill();
     }
 
     const ctx = canvas.getContext("2d")!;
@@ -193,6 +204,59 @@ export default function Hero() {
       onEnter: () => gsap.to(cueRef.current, { autoAlpha: 0, duration: 0.3 }),
     });
 
+    /* ------------------------- dock sticky : le trio vole vers le coin */
+    const dock = dockRef.current!;
+    const row = ctaRowRef.current!;
+    const dockBtns = Array.from(dock.querySelectorAll<HTMLElement>("[data-dock-btn]"));
+    const rowBtns = Array.from(row.querySelectorAll<HTMLElement>("[data-cta]"));
+    const dockLabel = dock.querySelector<HTMLElement>("[data-dock-label]");
+    const dockIcon = dock.querySelector<HTMLElement>("[data-dock-icon]");
+    gsap.set(dock, { autoAlpha: 0 });
+
+    let flight: gsap.core.Timeline | null = null;
+
+    const dockST = ScrollTrigger.create({
+      trigger: row,
+      start: "top 14%",
+      onEnter: () => {
+        flight?.kill();
+        /* état de repos du dock avant mesure */
+        gsap.set(dockBtns, { clearProps: "x,y,width" });
+        gsap.set(dock, { autoAlpha: 1 });
+
+        const tl = gsap.timeline();
+        dockBtns.forEach((btn, i) => {
+          const from = rowBtns[i]?.getBoundingClientRect();
+          const to = btn.getBoundingClientRect();
+          if (!from) return;
+          tl.fromTo(
+            btn,
+            { x: from.left - to.left, y: from.top - to.top },
+            { x: 0, y: 0, duration: 0.7, ease: "power3.inOut" },
+            i * 0.055
+          );
+        });
+        /* le pill « Devis gratuit » se morphe en rond pendant le vol */
+        const pillW = rowBtns[0]?.getBoundingClientRect().width ?? 48;
+        tl.fromTo(dockBtns[0], { width: pillW }, { width: 48, duration: 0.7, ease: "power3.inOut" }, 0)
+          .fromTo(dockLabel, { opacity: 1 }, { opacity: 0, duration: 0.22 }, 0)
+          .fromTo(dockIcon, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, 0.28);
+
+        gsap.set(row, { autoAlpha: 0, pointerEvents: "none" });
+        flight = tl;
+      },
+      onLeaveBack: () => {
+        if (!flight) return;
+        flight.eventCallback("onReverseComplete", () => {
+          gsap.set(dock, { autoAlpha: 0 });
+          gsap.set(row, { autoAlpha: 1, pointerEvents: "auto" });
+          /* rends la main au reveal du titre (autoAlpha posé par la timeline d'intro) */
+          gsap.set(row, { clearProps: "opacity,visibility,pointerEvents" });
+        });
+        flight.reverse();
+      },
+    });
+
     /* --------------------------------------------------------- resize */
     let lastW = window.innerWidth;
     let lastH = window.innerHeight;
@@ -214,6 +278,8 @@ export default function Hero() {
       parallax.scrollTrigger?.kill();
       parallax.kill();
       cueFade.kill();
+      dockST.kill();
+      flight?.kill();
       tl.kill();
     };
   }, []);
@@ -262,18 +328,39 @@ export default function Hero() {
             d'événement sur mesure à Lausanne, Pully et sur la Riviera vaudoise.
           </span>
         </h1>
-        <div data-hero-fade className="mb-7 flex flex-col items-center gap-5 md:flex-row md:justify-start">
-          <a href="#configurateur" className="btn-primary">
+        <div
+          ref={ctaRowRef}
+          data-hero-fade
+          className="mb-7 flex items-center justify-center gap-3 md:justify-start"
+        >
+          <a data-cta href="#configurateur" className="btn-primary !py-3">
             Devis gratuit
           </a>
           <a
-            href="#creations"
-            className="group inline-flex items-center gap-2 text-[15px] font-semibold text-chocolate/70 transition-colors duration-300 hover:text-chocolate"
+            data-cta
+            href={WA_DEFAULT}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Écrire sur WhatsApp"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-vanilla/85 text-[#25D366] shadow-[0_10px_26px_-14px_rgba(74,44,32,0.4)] backdrop-blur-sm transition-transform duration-300 hover:scale-110"
           >
-            Voir ses créations
-            <span className="relative top-px transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
-              →
-            </span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.16L2.1 21.9l4.87-1.5A9.9 9.9 0 1 0 12.04 2Zm0 1.67a8.23 8.23 0 1 1-4.2 15.3l-.3-.18-2.89.89.9-2.82-.2-.31a8.23 8.23 0 0 1 6.7-12.88Zm-3.1 3.83c-.2 0-.5.07-.77.36-.26.29-1 .98-1 2.4 0 1.4 1.03 2.77 1.17 2.96.14.19 2 3.05 4.83 4.15 2.35.93 2.83.74 3.34.7.5-.05 1.63-.67 1.86-1.32.23-.64.23-1.2.16-1.31-.07-.12-.26-.19-.55-.33-.28-.14-1.63-.8-1.88-.9-.25-.09-.44-.14-.62.14-.19.29-.72.9-.88 1.09-.16.19-.32.21-.6.07a7.5 7.5 0 0 1-2.2-1.36 8.27 8.27 0 0 1-1.53-1.9c-.16-.28-.02-.43.12-.57.13-.13.29-.33.43-.5.14-.16.19-.28.28-.47.1-.19.05-.36-.02-.5-.07-.14-.62-1.5-.86-2.06-.22-.53-.45-.65-.62-.65h-.66Z" />
+            </svg>
+          </a>
+          <a
+            data-cta
+            href={SITE.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Voir le compte Instagram"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gold/35 bg-vanilla/85 text-chocolate shadow-[0_10px_26px_-14px_rgba(74,44,32,0.4)] backdrop-blur-sm transition-transform duration-300 hover:scale-110"
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="currentColor" strokeWidth="1.7" />
+              <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.7" />
+              <circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" />
+            </svg>
           </a>
         </div>
         <a
@@ -301,6 +388,62 @@ export default function Hero() {
               les mots doux de ses clients
             </span>
           </span>
+        </a>
+      </div>
+
+      {/* Dock sticky — le trio du hero atterrit ici (coin opposé au burger) */}
+      <div
+        ref={dockRef}
+        className="fixed left-4 top-4 z-60 flex items-center gap-2.5 md:left-6 md:top-6"
+        style={{ visibility: "hidden" }}
+      >
+        <a
+          data-dock-btn
+          href="#configurateur"
+          aria-label="Devis gratuit"
+          className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-gold/40 bg-chocolate text-vanilla shadow-[0_10px_30px_-14px_rgba(74,44,32,0.55)] transition-transform duration-300 hover:scale-110"
+        >
+          <span
+            data-dock-label
+            className="pointer-events-none absolute whitespace-nowrap text-[15px] font-semibold opacity-0"
+            aria-hidden
+          >
+            Devis gratuit
+          </span>
+          <span data-dock-icon className="flex" aria-hidden>
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 20v-6.5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2V20" />
+              <path d="M3.5 20h17" />
+              <path d="M5 15.2c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0" />
+              <path d="M12 11.5V9M12 9a1.5 1.5 0 0 0 1.5-1.5C13.5 6 12 4.5 12 4.5S10.5 6 10.5 7.5A1.5 1.5 0 0 0 12 9Z" />
+            </svg>
+          </span>
+        </a>
+        <a
+          data-dock-btn
+          href={WA_DEFAULT}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Écrire sur WhatsApp"
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-gold/35 bg-vanilla/90 text-[#25D366] shadow-[0_10px_26px_-14px_rgba(74,44,32,0.4)] backdrop-blur-md transition-transform duration-300 hover:scale-110"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.16L2.1 21.9l4.87-1.5A9.9 9.9 0 1 0 12.04 2Zm0 1.67a8.23 8.23 0 1 1-4.2 15.3l-.3-.18-2.89.89.9-2.82-.2-.31a8.23 8.23 0 0 1 6.7-12.88Zm-3.1 3.83c-.2 0-.5.07-.77.36-.26.29-1 .98-1 2.4 0 1.4 1.03 2.77 1.17 2.96.14.19 2 3.05 4.83 4.15 2.35.93 2.83.74 3.34.7.5-.05 1.63-.67 1.86-1.32.23-.64.23-1.2.16-1.31-.07-.12-.26-.19-.55-.33-.28-.14-1.63-.8-1.88-.9-.25-.09-.44-.14-.62.14-.19.29-.72.9-.88 1.09-.16.19-.32.21-.6.07a7.5 7.5 0 0 1-2.2-1.36 8.27 8.27 0 0 1-1.53-1.9c-.16-.28-.02-.43.12-.57.13-.13.29-.33.43-.5.14-.16.19-.28.28-.47.1-.19.05-.36-.02-.5-.07-.14-.62-1.5-.86-2.06-.22-.53-.45-.65-.62-.65h-.66Z" />
+          </svg>
+        </a>
+        <a
+          data-dock-btn
+          href={SITE.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Voir le compte Instagram"
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-gold/35 bg-vanilla/90 text-chocolate shadow-[0_10px_26px_-14px_rgba(74,44,32,0.4)] backdrop-blur-md transition-transform duration-300 hover:scale-110"
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="currentColor" strokeWidth="1.7" />
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.7" />
+            <circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" />
+          </svg>
         </a>
       </div>
 
