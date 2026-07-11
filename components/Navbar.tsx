@@ -9,20 +9,25 @@
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { SITE, WA_DEFAULT, EMAIL_LINK } from "@/lib/data";
 
 const LINKS = [
   { href: "#histoire", label: "L'histoire" },
-  { href: "#rencontre", label: "La rencontre" },
   { href: "#creations", label: "Créations" },
+  { href: "/gateau-anniversaire-lausanne", label: "Anniversaires" },
+  { href: "/gateau-mariage-lausanne", label: "Mariage" },
+  { href: "/cupcakes-lausanne", label: "Cupcakes" },
   { href: "#configurateur", label: "Composer mon gâteau" },
-  { href: "#temoignages", label: "Mots doux" },
   { href: "#livraison", label: "Livraison" },
   { href: "#contact", label: "Contact" },
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const linkHref = (href: string) =>
+    href.startsWith("#") && pathname !== "/" ? `/${href}` : href;
   const [open, setOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const veilRef = useRef<HTMLDivElement>(null);
@@ -166,7 +171,7 @@ export default function Navbar() {
               {LINKS.map((l, i) => (
                 <li key={l.href} className="overflow-hidden">
                   <a
-                    href={l.href}
+                    href={linkHref(l.href)}
                     onClick={() => toggle(false)}
                     data-menu-item
                     className="group flex items-baseline gap-4 py-[0.55rem] will-change-transform md:gap-6"

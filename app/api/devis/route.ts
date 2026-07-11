@@ -20,7 +20,8 @@ type Payload = {
   parts: number;
   biscuit: string;
   fourrages: string[];
-  glutenFree: boolean;
+  lactoseFree: boolean;
+  extras?: { label: string; qty: number; price: number }[];
   style: string;
   themeNote?: string;
   delivery: { mode: string; address?: string; km?: number; fee?: number | null };
@@ -118,7 +119,10 @@ export async function POST(req: NextRequest) {
       ${p.celebrant ? row("Pour", p.celebrant + (p.age ? ` (${p.age} ans)` : "")) : ""}
       ${row("Format", `${p.tiers} étage${p.tiers > 1 ? "s" : ""} · ${p.parts} parts`)}
       ${row("Biscuit", p.biscuit)}
-      ${row("Fourrage", p.fourrages.join(" + ") + (p.glutenFree ? " · SANS GLUTEN" : ""))}
+      ${row("Fourrage", p.fourrages.join(" + ") + (p.lactoseFree ? " · SANS LACTOSE" : ""))}
+      ${(p.extras ?? [])
+        .map((x) => row("Extra", `${x.label}${x.qty > 1 ? ` × ${x.qty}` : ""} — CHF ${x.price * x.qty}`))
+        .join("")}
       ${row("Style", p.style + (p.themeNote ? ` — « ${p.themeNote} »` : ""))}
       ${row("Remise", deliveryTxt)}
       ${row("Estimation", `CHF ${p.estimate.from}–${p.estimate.to}`)}

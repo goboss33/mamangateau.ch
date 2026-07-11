@@ -35,7 +35,22 @@ export default function Experience({ children }: { children: React.ReactNode }) 
 
       /* ----------------------------------------------- reveals génériques */
       const targets = gsap.utils.toArray<HTMLElement>("[data-reveal]");
+      let aboveFold = 0;
       targets.forEach((el) => {
+        /* Déjà visible au chargement (pages sans hero plein écran) :
+           entrée en cascade, pas de scrub — il n'y a pas de scroll à jouer. */
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.98) {
+          gsap.to(el, {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            duration: 0.9,
+            delay: 0.15 + 0.07 * aboveFold++,
+            ease: "power3.out",
+          });
+          return;
+        }
         gsap.to(el, {
           opacity: 1,
           x: 0,

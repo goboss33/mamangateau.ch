@@ -138,6 +138,15 @@ export const FOURRAGES: readonly Fourrage[] = [
 
 export const MAX_FOURRAGES = 2;
 
+/* ------------------------------------------------------------- extras */
+
+export type Extra = { id: string; label: string; price: number; hint: string };
+
+export const EXTRAS: readonly Extra[] = [
+  { id: "cupcakes-6", label: "Boîte de 6 cupcakes", price: 24, hint: "assortis à votre gâteau" },
+  { id: "mini-cupcakes-12", label: "Boîte de 12 mini-cupcakes", price: 28, hint: "format bouchée, parfait en sweet table" },
+];
+
 /* ------------------------------------------------------- tarification */
 
 export const TIER2 = { surcharge: 50, floor: 180, minParts: 26 } as const;
@@ -148,10 +157,19 @@ export const DELIVERY = {
   chfPerKm: 1,
 } as const;
 
+/** Tarif à la part : mariage plus travaillé (8–10 CHF), autres occasions 5–7 CHF. */
+export const PART_RATE = {
+  default: { base: 5.2, top: 1.35 },
+  mariage: { base: 8, top: 1.25 },
+} as const;
+
+const rateOf = (occasion?: string | null) =>
+  occasion === "mariage" ? PART_RATE.mariage : PART_RATE.default;
+
 /** Base gâteau : CHF 80–150 pour 15–20 parts (voir BRAND.md). */
-export function cakeBase(parts: number, tiers: 1 | 2): number {
+export function cakeBase(parts: number, tiers: 1 | 2, occasion?: string | null): number {
   const round5 = (n: number) => Math.round(n / 5) * 5;
-  let base = Math.max(80, round5(parts * 5.2));
+  let base = Math.max(80, round5(parts * rateOf(occasion).base));
   if (tiers === 2) base = Math.max(TIER2.floor, base + TIER2.surcharge);
   return base;
 }
@@ -161,15 +179,26 @@ export function estimateTotal(opts: {
   tiers: 1 | 2;
   fourrages: string[];
   deliveryFee: number | null; // null = à confirmer
-}): { from: number; to: number; sup: number } {
+  occasion?: string | null;
+  extras?: Record<string, number>; // id -> quantité
+}): { from: number; to: number; sup: number; extrasTotal: number } {
   const round5 = (n: number) => Math.round(n / 5) * 5;
-  const base = cakeBase(opts.parts, opts.tiers);
+  const base = cakeBase(opts.parts, opts.tiers, opts.occasion);
   const sup = opts.fourrages.reduce(
     (acc, id) => acc + (FOURRAGES.find((f) => f.id === id)?.sup ?? 0),
     0
   );
+  const extrasTotal = Object.entries(opts.extras ?? {}).reduce(
+    (acc, [id, qty]) => acc + (EXTRAS.find((e) => e.id === id)?.price ?? 0) * qty,
+    0
+  );
   const fee = opts.deliveryFee ?? 0;
-  return { from: base + sup + fee, to: round5(base * 1.35) + sup + fee, sup };
+  return {
+    from: base + sup + extrasTotal + fee,
+    to: round5(base * rateOf(opts.occasion).top) + sup + extrasTotal + fee,
+    sup,
+    extrasTotal,
+  };
 }
 
 /* -------------------------------------------------------- témoignages */

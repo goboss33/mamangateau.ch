@@ -13,6 +13,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import CakePreview from "@/components/CakePreview";
 import {
+  EXTRAS,
   OCCASIONS,
   STYLES,
   BISCUITS,
@@ -102,7 +103,8 @@ export default function Configurateur() {
   const [parts, setParts] = useState(20);
   const [biscuit, setBiscuit] = useState<string | null>(null);
   const [fourrages, setFourrages] = useState<string[]>([]);
-  const [glutenFree, setGlutenFree] = useState(false);
+  const [lactoseFree, setLactoseFree] = useState(false);
+  const [extras, setExtras] = useState<Record<string, number>>({});
   const [style, setStyle] = useState<string | null>(null);
   const [themeNote, setThemeNote] = useState("");
   const [photos, setPhotos] = useState<{ name: string; dataUrl: string }[]>([]);
@@ -124,8 +126,8 @@ export default function Configurateur() {
   const deliveryFee =
     deliveryMode === "retrait" ? 0 : dist.status === "ok" ? (dist.fee ?? 0) : null;
   const estimate = useMemo(
-    () => estimateTotal({ parts, tiers, fourrages, deliveryFee }),
-    [parts, tiers, fourrages, deliveryFee]
+    () => estimateTotal({ parts, tiers, fourrages, deliveryFee, occasion, extras }),
+    [parts, tiers, fourrages, deliveryFee, occasion, extras]
   );
 
   const labelOf = (list: readonly Chip[], id: string | null) =>
@@ -155,6 +157,12 @@ export default function Configurateur() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, [step]);
+
+  /* Pré-remplissage depuis les pages ciblées : /?occasion=mariage#configurateur */
+  useEffect(() => {
+    const o = new URLSearchParams(window.location.search).get("occasion");
+    if (o && OCCASIONS.some((x) => x.id === o)) setOccasion(o);
+  }, []);
 
   const advance = (from: number) => window.setTimeout(() => goTo(from + 1), 280);
 
@@ -304,7 +312,12 @@ export default function Configurateur() {
           parts,
           biscuit: labelOf(BISCUITS, biscuit),
           fourrages: fourrages.map((f) => labelOf(FOURRAGES, f)),
-          glutenFree,
+          lactoseFree,
+          extras: EXTRAS.filter((x) => (extras[x.id] ?? 0) > 0).map((x) => ({
+            label: x.label,
+            qty: extras[x.id],
+            price: x.price,
+          })),
           style: labelOf(STYLES, style),
           themeNote: style === "theme" ? themeNote.trim() : "",
           delivery:
@@ -339,7 +352,7 @@ export default function Configurateur() {
   };
 
   /* ------------------------------------------------------------ ticket */
-  const base = cakeBase(parts, tiers);
+  const base = cakeBase(parts, tiers, occasion);
   const ticket = (
     <>
       <div className="ticket relative px-7 pb-2 pt-7">
@@ -357,7 +370,7 @@ export default function Configurateur() {
             [
               "Fourrage",
               fourrages.length
-                ? fourrages.map((f) => labelOf(FOURRAGES, f)).join(" + ") + (glutenFree ? " · sans gluten" : "")
+                ? fourrages.map((f) => labelOf(FOURRAGES, f)).join(" + ") + (lactoseFree ? " · sans lactose" : "")
                 : "—",
             ],
             ["Style", labelOf(STYLES, style)],
@@ -365,9 +378,8 @@ export default function Configurateur() {
               "Remise",
               deliveryMode === "retrait"
                 ? "Retrait à l'atelier"
-                : dist.status === "ok"
-                  ? `Livraison · ${dist.km} km`
-                  : "Livraison",
+                : (dist.status === "ok" ? `Livraison · ${dist.km} km` : "Livraison") +
+                  (occasion === "mariage" ? " · installation offerte" : ""),
             ],
           ].map(([k, v]) => (
             <div key={k as string} className="flex items-baseline justify-between gap-4">
@@ -388,6 +400,15 @@ export default function Configurateur() {
               <span>+ CHF {estimate.sup}</span>
             </div>
           )}
+          {EXTRAS.filter((x) => (extras[x.id] ?? 0) > 0).map((x) => (
+            <div key={x.id} className="flex justify-between text-cocoa">
+              <span>
+                {x.label}
+                {(extras[x.id] ?? 0) > 1 ? ` × ${extras[x.id]}` : ""}
+              </span>
+              <span>+ CHF {x.price * (extras[x.id] ?? 0)}</span>
+            </div>
+          ))}
           <div className="flex justify-between text-cocoa">
             <span>Livraison</span>
             <span>
@@ -683,12 +704,72 @@ export default function Configurateur() {
                 <label className="mt-5 flex w-fit cursor-pointer items-center gap-3 text-sm text-cocoa">
                   <input
                     type="checkbox"
-                    checked={glutenFree}
-                    onChange={(e) => setGlutenFree(e.target.checked)}
+                    checked={lactoseFree}
+                    onChange={(e) => setLactoseFree(e.target.checked)}
                     className="h-4 w-4 accent-gold"
                   />
-                  Version sans gluten (sur demande)
+                  Version sans lactose (sur demande)
                 </label>
+
+                <p className="mb-2.5 mt-7 text-xs font-semibold uppercase tracking-wider text-grey-studio">
+                  Envie d'un peu plus ? (optionnel)
+                </p>
+                <div className="space-y-2.5">
+                  {EXTRAS.map((x) => {
+                    const qty = extras[x.id] ?? 0;
+                    return (
+                      <div
+                        key={x.id}
+                        className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 transition-all duration-300 ${
+                          qty > 0
+                            ? "border-chocolate bg-chocolate text-vanilla shadow-[0_12px_28px_-14px_rgba(74,44,32,0.6)]"
+                            : "border-chocolate/15 bg-vanilla text-chocolate"
+                        }`}
+                      >
+                        <div className="min-w-0">
+                          <p className="flex flex-wrap items-center gap-2 text-[15px] font-semibold">
+                            {x.label}
+                            <span
+                              className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${
+                                qty > 0 ? "bg-vanilla/20 text-vanilla" : "bg-blush/50 text-chocolate"
+                              }`}
+                            >
+                              CHF {x.price}
+                            </span>
+                          </p>
+                          <p className={`mt-0.5 text-xs ${qty > 0 ? "text-vanilla/70" : "text-grey-studio"}`}>
+                            {x.hint}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <button
+                            type="button"
+                            aria-label={`Retirer une ${x.label}`}
+                            disabled={qty === 0}
+                            onClick={() => setExtras((e) => ({ ...e, [x.id]: Math.max(0, qty - 1) }))}
+                            className={`flex h-8 w-8 items-center justify-center rounded-full border text-lg leading-none transition-opacity disabled:opacity-30 ${
+                              qty > 0 ? "border-vanilla/40" : "border-chocolate/25"
+                            }`}
+                          >
+                            −
+                          </button>
+                          <span className="w-4 text-center text-[15px] font-bold tabular-nums">{qty}</span>
+                          <button
+                            type="button"
+                            aria-label={`Ajouter une ${x.label}`}
+                            disabled={qty >= 9}
+                            onClick={() => setExtras((e) => ({ ...e, [x.id]: Math.min(9, qty + 1) }))}
+                            className={`flex h-8 w-8 items-center justify-center rounded-full border text-lg leading-none transition-opacity disabled:opacity-30 ${
+                              qty > 0 ? "border-vanilla/40" : "border-chocolate/25"
+                            }`}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
                 <button type="button" onClick={() => goTo(3)} className="btn-primary mt-6 w-full justify-center sm:w-auto">
                   Continuer →
                 </button>
@@ -781,6 +862,11 @@ export default function Configurateur() {
                     </button>
                   ))}
                 </div>
+                {occasion === "mariage" && deliveryMode === "livraison" && (
+                  <p className="-mt-1 mb-4 text-sm font-semibold text-gold">
+                    Mariage : l'installation sur place est offerte. 💛
+                  </p>
+                )}
                 {deliveryMode === "livraison" && (
                   <div className="rounded-2xl border border-chocolate/10 bg-cream/50 p-5">
                     <label className="relative block">

@@ -97,10 +97,12 @@ export default function Footer() {
             </div>
 
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-vanilla/60">
-              <a href="#histoire" className="transition-colors hover:text-gold-soft">L'histoire</a>
-              <a href="#creations" className="transition-colors hover:text-gold-soft">Créations</a>
-              <a href="#configurateur" className="transition-colors hover:text-gold-soft">Composer</a>
-              <a href="#livraison" className="transition-colors hover:text-gold-soft">Livraison</a>
+              <a href="/gateau-anniversaire-lausanne" className="transition-colors hover:text-gold-soft">Anniversaires</a>
+              <a href="/gateau-mariage-lausanne" className="transition-colors hover:text-gold-soft">Mariage</a>
+              <a href="/cupcakes-lausanne" className="transition-colors hover:text-gold-soft">Cupcakes</a>
+              <a href="/#creations" className="transition-colors hover:text-gold-soft">Créations</a>
+              <a href="/#configurateur" className="transition-colors hover:text-gold-soft">Composer</a>
+              <a href="/#livraison" className="transition-colors hover:text-gold-soft">Livraison</a>
             </nav>
           </div>
 

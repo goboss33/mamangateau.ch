@@ -138,6 +138,24 @@ export default function Portfolio() {
             </svg>
             Suivre {SITE.instagramHandle}
           </a>
+          <nav
+            aria-label="Créations par occasion"
+            className="mt-2 flex flex-wrap items-center justify-center gap-2.5 text-sm"
+          >
+            {[
+              ["/gateau-anniversaire-lausanne", "Gâteaux d'anniversaire"],
+              ["/gateau-mariage-lausanne", "Gâteaux de mariage"],
+              ["/cupcakes-lausanne", "Cupcakes"],
+            ].map(([href, label]) => (
+              <a
+                key={href}
+                href={href}
+                className="rounded-full border border-chocolate/15 bg-vanilla px-4 py-2 font-semibold text-cocoa transition-all duration-300 hover:border-gold hover:text-chocolate"
+              >
+                {label} →
+              </a>
+            ))}
+          </nav>
         </div>
       </div>
     </section>
