@@ -10,7 +10,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
-import { SITE, WA_DEFAULT } from "@/lib/data";
+import { SITE, WA_DEFAULT, EMAIL_LINK } from "@/lib/data";
 
 const LINKS = [
   { href: "#histoire", label: "L'histoire" },
@@ -213,6 +213,13 @@ export default function Navbar() {
                 >
                   <span className="h-2 w-2 rounded-full bg-blush-deep" aria-hidden />
                   Instagram
+                </a>
+                <a
+                  href={EMAIL_LINK}
+                  className="inline-flex items-center gap-2 text-[15px] font-semibold text-chocolate transition-colors hover:text-cocoa"
+                >
+                  <span className="h-2 w-2 rounded-full bg-gold" aria-hidden />
+                  E-mail
                 </a>
                 <span className="text-sm text-grey-studio">Pully · Lausanne · Riviera</span>
               </div>

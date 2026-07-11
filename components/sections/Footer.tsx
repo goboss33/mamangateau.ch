@@ -8,7 +8,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
-import { SITE, WA_DEFAULT } from "@/lib/data";
+import { SITE, WA_DEFAULT, EMAIL_LINK } from "@/lib/data";
 
 export default function Footer() {
   const ref = useRef<HTMLElement>(null);
@@ -70,6 +70,16 @@ export default function Footer() {
               <circle cx="17.2" cy="6.8" r="1.15" fill="currentColor" />
             </svg>
             {SITE.instagramHandle}
+          </a>
+          <a
+            href={EMAIL_LINK}
+            className="inline-flex items-center gap-2.5 rounded-full border border-vanilla/25 px-7 py-3.5 font-semibold text-vanilla transition-all duration-300 hover:border-gold hover:text-gold-soft"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="2.5" y="5" width="19" height="14" rx="3" />
+              <path d="m3.5 7 7.2 5.4a2.2 2.2 0 0 0 2.6 0L20.5 7" />
+            </svg>
+            {SITE.email}
           </a>
         </div>
 

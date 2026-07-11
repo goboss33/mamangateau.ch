@@ -76,6 +76,7 @@ const jsonLd = {
     "Lausanne", "Pully", "Vevey", "Montreux", "Morges", "Renens",
     "Lutry", "Cully", "Écublens", "Crissier", "La Tour-de-Peilz",
   ].map((name) => ({ "@type": "City", name })),
+  email: SITE.email,
   sameAs: [SITE.instagram],
   priceRange: "CHF 80 - CHF 150",
   servesCuisine: "Pâtisserie sur mesure",

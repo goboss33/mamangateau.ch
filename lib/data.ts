@@ -10,12 +10,17 @@ export const SITE = {
   instagram: "https://www.instagram.com/maman.gateau.suisse/",
   instagramHandle: "@maman.gateau.suisse",
   whatsappNumber: "41774401829", // format international sans +
+  email: "mamangateau.ch@gmail.com",
   city: "Pully",
   region: "Lausanne & Riviera vaudoise",
 } as const;
 
 export const waLink = (text: string) =>
   `https://wa.me/${SITE.whatsappNumber}?text=${encodeURIComponent(text)}`;
+
+export const EMAIL_LINK = `mailto:${SITE.email}?subject=${encodeURIComponent(
+  "Demande de gâteau sur mesure"
+)}`;
 
 export const WA_DEFAULT = waLink(
   "Bonjour Annie ! Je découvre mamangateau.ch et j'aimerais discuter d'un gâteau sur mesure. 🎂"

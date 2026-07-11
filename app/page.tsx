@@ -1,6 +1,7 @@
 import Experience from "@/components/Experience";
 import Preloader from "@/components/Preloader";
 import Navbar from "@/components/Navbar";
+import ContactDial from "@/components/ContactDial";
 import CustomCursor from "@/components/CustomCursor";
 import SugarDust from "@/components/SugarDust";
 import Marquee from "@/components/Marquee";
@@ -21,6 +22,7 @@ export default function Home() {
       <CustomCursor />
       <SugarDust />
       <Navbar />
+      <ContactDial />
       <main>
         <Hero />
         <Histoire />
