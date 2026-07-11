@@ -1,0 +1,20 @@
+# ---------------------------------------------------------------------------
+# Maman Gâteau — déploiement derrière Nginx Proxy Manager
+# Le site n'expose AUCUN port sur l'hôte : NPM le joint via le réseau docker.
+# Variable NPM_NETWORK = nom du réseau de Nginx Proxy Manager
+# (docker network ls | grep -i npm pour le trouver ; souvent "npm_default").
+# ---------------------------------------------------------------------------
+services:
+  mamangateau:
+    build: .
+    image: mamangateau:latest
+    container_name: mamangateau
+    restart: unless-stopped
+    mem_limit: 512m
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: ${NPM_NETWORK:-npm_default}

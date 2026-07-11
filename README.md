@@ -34,6 +34,26 @@ npm run build      # build de production
 ./scripts/extract-frames.sh assets-source/video/hero-2k.mp4 public/frames
 ```
 
+## Déploiement (VPS + Docker + Nginx Proxy Manager)
+
+Le site est conteneurisé (Next standalone, ~150 Mo, non-root, healthcheck).
+
+```bash
+# Sur le VPS
+git clone <url-du-repo> mamangateau && cd mamangateau
+docker network ls | grep -i npm            # repérer le réseau de NPM
+NPM_NETWORK=<nom_du_réseau> docker compose up -d --build
+```
+
+Puis dans Nginx Proxy Manager : Proxy Host `mamangateau.ch` (+ `www`) →
+`http://mamangateau:3000`, SSL Let's Encrypt + Force SSL + HTTP/2.
+
+Redéployer après un changement :
+
+```bash
+git pull && NPM_NETWORK=<nom_du_réseau> docker compose up -d --build
+```
+
 ## ⚠️ Avant la mise en ligne
 
 - [ ] **Témoignages** : `lib/data.ts` → `TESTIMONIALS` contient des PLACEHOLDERS à remplacer par de vrais avis clients
