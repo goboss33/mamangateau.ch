@@ -65,6 +65,7 @@ export default function Temoignages() {
             <span className="script-accent block text-[clamp(3rem,9vw,5.4rem)]">
               Mots doux
             </span>
+            <span className="sr-only">— les avis de nos clients</span>
           </h2>
           <p data-reveal className="mx-auto mt-5 max-w-md leading-relaxed text-cocoa">
             Reçus par message, gardés précieusement — comme les recettes qui marchent.

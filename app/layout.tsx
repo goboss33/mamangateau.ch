@@ -25,9 +25,9 @@ const gatte = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.domain),
-  title: "Maman Gâteau — Gâteaux d'anniversaire sur mesure à Lausanne, Pully & Riviera",
+  title: "Cake design à Lausanne : gâteaux sur mesure | Maman Gâteau",
   description:
-    "Annie, cheffe formée en gastronomie et passée par une maison étoilée, crée des gâteaux aussi beaux que délicieux : anniversaires, mariages, baby showers. Lausanne, Pully, Vevey, Montreux, Morges, Renens.",
+    "Gâteaux d'anniversaire, de mariage et baby showers sur mesure par Annie, cheffe passée par une maison étoilée. Pully, Lausanne, Vevey, Montreux. Devis gratuit en ligne.",
   keywords: [
     "gâteau anniversaire Lausanne",
     "cake designer Lausanne",
@@ -45,7 +45,14 @@ export const metadata: Metadata = {
     title: "Maman Gâteau — Créatrice de souvenirs",
     description:
       "Des gâteaux aussi beaux que délicieux, créés sur mesure à Pully pour Lausanne et la Riviera vaudoise.",
-    images: [{ url: "/images/og-cover.jpg", width: 1200, height: 630, alt: "Maman Gâteau — gâteau signature au topper doré" }],
+    images: [{ url: "/images/og-logo.png", width: 1200, height: 630, alt: "Maman Gâteau — cake design à Lausanne" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Maman Gâteau — Créatrice de souvenirs",
+    description:
+      "Des gâteaux aussi beaux que délicieux, créés sur mesure à Pully pour Lausanne et la Riviera vaudoise.",
+    images: ["/images/og-logo.png"],
   },
   robots: { index: true, follow: true },
 };
@@ -63,7 +70,9 @@ const jsonLd = {
   description:
     "Cake designer sur mesure : gâteaux d'anniversaire, de mariage et d'événement, aussi beaux que délicieux.",
   url: SITE.domain,
-  image: `${SITE.domain}/images/og-cover.jpg`,
+  logo: `${SITE.domain}/images/logo-carre.png`,
+  image: [`${SITE.domain}/images/og-logo.png`, `${SITE.domain}/images/og-cover.jpg`],
+  telephone: "+41774401829",
   slogan: SITE.tagline,
   founder: { "@type": "Person", name: "Annie" },
   address: {

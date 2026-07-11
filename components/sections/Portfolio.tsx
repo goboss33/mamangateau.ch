@@ -89,6 +89,7 @@ export default function Portfolio() {
               <span className="script-accent block pt-2 text-[clamp(2.4rem,6vw,4.4rem)]">
                 une première fois
               </span>
+              <span className="sr-only">— nos créations de gâteaux personnalisés</span>
             </h2>
           </div>
           <p data-reveal className="max-w-sm leading-relaxed text-cocoa">

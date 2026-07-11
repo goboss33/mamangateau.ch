@@ -259,8 +259,8 @@ export default function Hero() {
           <br className="max-md:hidden" />
           que délicieux.
           <span className="sr-only">
-            Maman Gâteau, créatrice de souvenirs — gâteaux d'anniversaire, de mariage et
-            d'événement sur mesure à Lausanne, Pully et sur la Riviera vaudoise.
+            {" "}— cake design à Lausanne et Pully : gâteaux d'anniversaire, de mariage et
+            d'événement sur mesure par Maman Gâteau.
           </span>
         </h1>
         <div id="hero-cta-row" data-hero-fade className="mb-7 flex items-center justify-center gap-3 md:justify-start">
