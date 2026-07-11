@@ -2,12 +2,13 @@
 
 /* ---------------------------------------------------------------------------
    Histoire — la timeline d'Annie en 5 temps
-   Un fil d'or se dessine au fil du scroll et relie les étapes, du Pérou
-   jusqu'à Maman Gâteau. Fond crème dans la continuité exacte du hero.
+   Un fil d'or se dessine au fil du scroll. Chaque jalon « s'allume » quand le
+   fil l'atteint : pastille fraise, année qui rosit, soulignement blush qui
+   s'étire. Tout se rejoue à l'envers quand on remonte.
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef } from "react";
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { TIMELINE, type Milestone } from "@/lib/data";
 
 function MilestoneIcon({ icon }: { icon: Milestone["icon"] }) {
@@ -63,26 +64,61 @@ export default function Histoire() {
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
+    const section = sectionRef.current!;
     const thread = threadRef.current!;
+    const killers: (() => void)[] = [];
+
+    /* Fil d'or dessiné au scroll */
     gsap.set(thread, { scaleY: 0, transformOrigin: "top center" });
-    const tween = gsap.to(thread, {
+    const threadTween = gsap.to(thread, {
       scaleY: 1,
       ease: "none",
       scrollTrigger: {
-        trigger: sectionRef.current,
+        trigger: section,
         start: "top 62%",
-        end: "bottom 78%",
+        end: "bottom 85%",
         scrub: 0.4,
       },
     });
-    return () => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
-    };
+    killers.push(() => {
+      threadTween.scrollTrigger?.kill();
+      threadTween.kill();
+    });
+
+    /* Activation de chaque jalon quand le fil l'atteint — réversible */
+    section.querySelectorAll<HTMLElement>("[data-milestone]").forEach((li) => {
+      const dotOuter = li.querySelector("[data-dot]");
+      const dotInner = li.querySelector("[data-dot-inner]");
+      const year = li.querySelector("[data-year]");
+      const underline = li.querySelector("[data-underline]");
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: li,
+          start: "top 58%",
+          toggleActions: "play none none reverse",
+        },
+        defaults: { duration: 0.55, ease: "power3.out" },
+      });
+      tl.to(dotOuter, { borderColor: "#d9534f", scale: 1.15, ease: "back.out(2.5)" }, 0)
+        .to(dotInner, { backgroundColor: "#d9534f", scale: 1.5 }, 0)
+        .to(year, { color: "#d9534f", letterSpacing: "0.24em" }, 0.05)
+        .to(underline, { scaleX: 1, duration: 0.7, ease: "power4.out" }, 0.12);
+      killers.push(() => {
+        tl.scrollTrigger?.kill();
+        tl.kill();
+      });
+    });
+
+    return () => killers.forEach((k) => k());
   }, []);
 
   return (
-    <section id="histoire" ref={sectionRef} className="relative bg-cream pb-28 pt-24 md:pb-36 md:pt-28">
+    <section
+      id="histoire"
+      ref={sectionRef}
+      className="relative bg-cream pb-52 pt-24 md:pb-64 md:pt-28"
+    >
       <div className="mx-auto max-w-6xl px-6">
         {/* En-tête */}
         <div className="mb-16 max-w-2xl md:mb-24">
@@ -110,14 +146,15 @@ export default function Histoire() {
             {TIMELINE.map((m, i) => {
               const left = i % 2 === 0; // desktop : alternance
               return (
-                <li key={m.years} className="relative">
+                <li key={m.years} data-milestone className="relative">
                   {/* Pastille sur le fil */}
                   <span
+                    data-dot
                     data-reveal="scale"
                     className="absolute left-0 top-1 flex h-[27px] w-[27px] items-center justify-center rounded-full border border-gold/50 bg-vanilla shadow-[0_4px_14px_-6px_rgba(201,162,75,0.6)] md:left-1/2 md:-translate-x-1/2"
                     aria-hidden
                   >
-                    <span className="h-2 w-2 rounded-full bg-gold" />
+                    <span data-dot-inner className="h-2 w-2 rounded-full bg-gold" />
                   </span>
 
                   <article
@@ -128,13 +165,23 @@ export default function Histoire() {
                   >
                     <div className={`mb-3 flex items-center gap-3 ${left ? "md:flex-row-reverse" : ""}`}>
                       <MilestoneIcon icon={m.icon} />
-                      <span className="font-display text-sm tracking-[0.18em] text-gold">
+                      <span
+                        data-year
+                        className="font-display text-sm tracking-[0.18em] text-gold"
+                      >
                         {m.years}
                       </span>
                     </div>
                     <h3 className="font-display text-2xl text-chocolate md:text-[1.7rem]">
                       {m.title}
                     </h3>
+                    <span
+                      data-underline
+                      className={`mt-2 block h-1.5 w-16 origin-left scale-x-0 rounded-full bg-blush ${
+                        left ? "md:ml-auto md:origin-right" : ""
+                      }`}
+                      aria-hidden
+                    />
                     <p className="mt-3 leading-relaxed text-cocoa">{m.text}</p>
                   </article>
                 </li>

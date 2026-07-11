@@ -1,9 +1,10 @@
 "use client";
 
 /* ---------------------------------------------------------------------------
-   Créations — galerie éditoriale parallax
-   Vraies créations d'Annie. Trois colonnes qui respirent à des vitesses
-   différentes (desktop), deux colonnes en mobile. Renvoi vers Instagram.
+   Créations — galerie éditoriale
+   Chaque visuel se révèle comme un rideau (clip-path) pendant que la photo
+   dézoome à l'intérieur — réversible au scroll inverse. Les colonnes gardent
+   des vitesses de parallax différentes sur desktop.
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef } from "react";
@@ -22,13 +23,37 @@ export default function Portfolio() {
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    if (window.innerWidth < 768) return; // parallax réservé au desktop
-    const items = gridRef.current!.querySelectorAll<HTMLElement>("[data-speed]");
-    const tweens: gsap.core.Tween[] = [];
-    items.forEach((el) => {
-      const speed = parseFloat(el.dataset.speed ?? "1");
-      tweens.push(
-        gsap.fromTo(
+    const killers: (() => void)[] = [];
+    const figures = gridRef.current!.querySelectorAll<HTMLElement>("[data-curtain]");
+
+    /* Révélation rideau + dézoom interne, réversible */
+    figures.forEach((fig, i) => {
+      const img = fig.querySelector("img");
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: fig,
+          start: "top 88%",
+          toggleActions: "play none none reverse",
+        },
+        defaults: { ease: "expo.out", duration: 1.25 },
+      });
+      tl.fromTo(
+        fig,
+        { clipPath: "inset(100% 0% 0% 0%)" },
+        { clipPath: "inset(0% 0% 0% 0%)", delay: (i % 3) * 0.09 },
+        0
+      ).fromTo(img, { scale: 1.32, yPercent: 8 }, { scale: 1, yPercent: 0 }, 0);
+      killers.push(() => {
+        tl.scrollTrigger?.kill();
+        tl.kill();
+      });
+    });
+
+    /* Parallax par colonne (desktop) */
+    if (window.innerWidth >= 768) {
+      gridRef.current!.querySelectorAll<HTMLElement>("[data-speed]").forEach((el) => {
+        const speed = parseFloat(el.dataset.speed ?? "1");
+        const t = gsap.fromTo(
           el,
           { y: (1 - speed) * -90 },
           {
@@ -41,17 +66,19 @@ export default function Portfolio() {
               scrub: 0.6,
             },
           }
-        )
-      );
-    });
-    return () => tweens.forEach((t) => {
-      t.scrollTrigger?.kill();
-      t.kill();
-    });
+        );
+        killers.push(() => {
+          t.scrollTrigger?.kill();
+          t.kill();
+        });
+      });
+    }
+
+    return () => killers.forEach((k) => k());
   }, []);
 
   return (
-    <section id="creations" className="bg-cream py-24 md:py-32">
+    <section id="creations" className="bg-cream pb-24 pt-32 md:pb-32 md:pt-40">
       <div className="mx-auto max-w-6xl px-6">
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6 md:mb-20">
           <div>
@@ -71,28 +98,26 @@ export default function Portfolio() {
 
         <div ref={gridRef} className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
           {PORTFOLIO.map((item, i) => (
-            <figure
-              key={item.src}
-              data-reveal
-              data-speed={item.speed}
-              data-reveal-delay={String((i % 3) * 0.08)}
-              className={`group relative overflow-hidden rounded-2xl bg-vanilla shadow-[0_18px_44px_-26px_rgba(74,44,32,0.4)] ${
-                RATIO_CLASS[item.ratio]
-              } ${i % 3 === 1 ? "md:mt-14" : ""}`}
-            >
-              <Image
-                src={item.src}
-                alt={item.alt}
-                fill
-                sizes="(max-width: 768px) 46vw, 30vw"
-                className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
-              />
-              <figcaption className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                <span className="rounded-full bg-vanilla/90 px-3 py-1.5 text-xs font-semibold text-chocolate backdrop-blur-sm">
-                  {item.label}
-                </span>
-              </figcaption>
-            </figure>
+            <div key={item.src} data-speed={item.speed} className={i % 3 === 1 ? "md:mt-14" : ""}>
+              <figure
+                data-curtain
+                className={`group relative overflow-hidden rounded-2xl bg-vanilla shadow-[0_18px_44px_-26px_rgba(74,44,32,0.4)] ${RATIO_CLASS[item.ratio]}`}
+                style={{ clipPath: "inset(100% 0% 0% 0%)" }}
+              >
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  sizes="(max-width: 768px) 46vw, 30vw"
+                  className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                />
+                <figcaption className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                  <span className="rounded-full bg-vanilla/90 px-3 py-1.5 text-xs font-semibold text-chocolate backdrop-blur-sm">
+                    {item.label}
+                  </span>
+                </figcaption>
+              </figure>
+            </div>
           ))}
         </div>
 

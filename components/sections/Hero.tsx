@@ -14,6 +14,7 @@
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 
 const FRAME_COUNT = 96;
@@ -61,7 +62,7 @@ export default function Hero() {
     const load = (i: number) =>
       new Promise<void>((resolve) => {
         if (loaded[i] || disposed) return resolve();
-        const img = new Image();
+        const img = new window.Image();
         img.decoding = "async";
         img.src = framePath(set, i);
         img.onload = () => {
@@ -244,25 +245,26 @@ export default function Hero() {
       {/* Titre & CTA — révélés en fin de dézoom */}
       <div
         ref={titleRef}
-        className="absolute inset-x-0 bottom-0 z-10 px-6 pb-14 text-center md:inset-x-auto md:left-[6vw] md:top-1/2 md:max-w-lg md:-translate-y-1/2 md:px-0 md:pb-0 md:text-left"
+        className="absolute inset-x-0 bottom-0 z-10 px-6 pb-14 text-center md:inset-x-auto md:left-[6vw] md:top-1/2 md:max-w-xl md:-translate-y-1/2 md:px-0 md:pb-0 md:text-left"
       >
-        <h1 data-hero-fade className="mb-5">
-          <span className="font-script block text-[clamp(2.9rem,10vw,5.6rem)] leading-[1.05] text-chocolate [text-shadow:0_1px_18px_rgba(253,251,247,0.95),0_0_44px_rgba(253,251,247,0.75)] md:[text-shadow:none]">
-            Créatrice
-            <br />
-            de souvenirs
-          </span>
+        <p data-hero-fade className="mb-3 hidden text-xs font-bold uppercase tracking-[0.3em] text-chocolate/80 md:block">
+          Cake design sur mesure — Lausanne · Riviera
+        </p>
+        <h1
+          data-hero-fade
+          className="font-display mb-6 text-[clamp(1.9rem,6.6vw,3.5rem)] leading-[1.1] text-chocolate [text-shadow:0_1px_16px_rgba(253,251,247,0.95),0_0_36px_rgba(253,251,247,0.7)] md:[text-shadow:none]"
+        >
+          Des gâteaux aussi beaux{" "}
+          <br className="max-md:hidden" />
+          que délicieux.
           <span className="sr-only">
-            Maman Gâteau — gâteaux d'anniversaire, de mariage et d'événement sur mesure à
-            Lausanne, Pully et sur la Riviera vaudoise.
+            Maman Gâteau, créatrice de souvenirs — gâteaux d'anniversaire, de mariage et
+            d'événement sur mesure à Lausanne, Pully et sur la Riviera vaudoise.
           </span>
         </h1>
-        <p data-hero-fade className="mx-auto mb-8 max-w-xs text-[15px] leading-relaxed text-chocolate/75 md:mx-0 md:max-w-sm md:text-base">
-          Des gâteaux aussi beaux que délicieux, pour les moments qui comptent.
-        </p>
-        <div data-hero-fade className="flex flex-col items-center gap-5 md:flex-row md:justify-start">
+        <div data-hero-fade className="mb-7 flex flex-col items-center gap-5 md:flex-row md:justify-start">
           <a href="#configurateur" className="btn-primary">
-            Composer mon gâteau
+            Devis gratuit
           </a>
           <a
             href="#creations"
@@ -274,6 +276,32 @@ export default function Hero() {
             </span>
           </a>
         </div>
+        <a
+          data-hero-fade
+          href="#temoignages"
+          className="group inline-flex items-center gap-3 rounded-full bg-vanilla/55 py-1.5 pl-2 pr-4 backdrop-blur-[2px] transition-colors duration-300 hover:bg-vanilla/80"
+        >
+          <span className="flex -space-x-2.5">
+            {["creation-01", "creation-03", "creation-07"].map((img) => (
+              <Image
+                key={img}
+                src={`/images/portfolio/${img}.webp`}
+                alt=""
+                width={30}
+                height={30}
+                className="h-[30px] w-[30px] rounded-full border-2 border-vanilla object-cover"
+              />
+            ))}
+          </span>
+          <span className="flex flex-col items-start">
+            <span className="text-[13px] leading-none tracking-[0.15em] text-gold" aria-hidden>
+              ★★★★★
+            </span>
+            <span className="mt-1 text-xs font-semibold leading-none text-chocolate/70 transition-colors group-hover:text-chocolate">
+              les mots doux de ses clients
+            </span>
+          </span>
+        </a>
       </div>
 
       {/* Indice de scroll — apparaît après le reveal, s'efface au 1er scroll */}

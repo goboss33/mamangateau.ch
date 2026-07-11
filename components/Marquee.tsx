@@ -1,6 +1,7 @@
 /* ---------------------------------------------------------------------------
-   Marquee — bandeau défilant entre deux sections.
-   Texte en contour, séparé d'étoiles dorées. Pure CSS (voir globals.css).
+   Marquee — couture diagonale entre deux sections.
+   Bande inclinée qui chevauche la section précédente et la suivante,
+   texte en contour séparé d'étoiles dorées. Pure CSS (voir globals.css).
 --------------------------------------------------------------------------- */
 
 export default function Marquee({ items }: { items: readonly string[] }) {
@@ -8,9 +9,7 @@ export default function Marquee({ items }: { items: readonly string[] }) {
     <>
       {items.map((item, i) => (
         <span key={i} className="flex items-center">
-          <span
-            className="font-display text-outline whitespace-nowrap px-6 text-[clamp(2.6rem,7vw,5rem)] leading-none"
-          >
+          <span className="font-display text-outline whitespace-nowrap px-6 text-[clamp(2.6rem,7vw,5rem)] leading-none">
             {item}
           </span>
           <svg width="22" height="22" viewBox="0 0 24 24" className="shrink-0 text-gold" aria-hidden>
@@ -25,10 +24,12 @@ export default function Marquee({ items }: { items: readonly string[] }) {
   );
 
   return (
-    <div className="relative overflow-hidden bg-vanilla py-8 md:py-10" aria-hidden>
-      <div className="marquee-track">
-        <div className="flex items-center">{row}</div>
-        <div className="flex items-center">{row}</div>
+    <div className="relative z-20 -my-10 md:-my-14" aria-hidden>
+      <div className="-rotate-2 scale-x-110 overflow-hidden border-y border-gold/20 bg-vanilla py-6 shadow-[0_18px_50px_-32px_rgba(74,44,32,0.4)] md:py-8">
+        <div className="marquee-track">
+          <div className="flex items-center">{row}</div>
+          <div className="flex items-center">{row}</div>
+        </div>
       </div>
     </div>
   );

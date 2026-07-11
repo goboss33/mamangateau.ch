@@ -1,13 +1,62 @@
+"use client";
+
 /* ---------------------------------------------------------------------------
-   Mots doux — les avis comme des petites notes scotchées au frigo de
-   l'atelier. Pas de carousel : une constellation de mots reçus.
-   ⚠️ Contenus PLACEHOLDER (voir lib/data.ts) — à remplacer par de vrais
-   avis clients avant mise en ligne.
+   Mots doux — les avis comme des notes scotchées au frigo de l'atelier.
+   Chaque note « se pose » : elle arrive d'en bas, tourne un peu trop, puis
+   se cale sur son inclinaison finale avec un léger rebond. Réversible.
+   ⚠️ Contenus PLACEHOLDER (voir lib/data.ts) — à remplacer par de vrais avis.
 --------------------------------------------------------------------------- */
 
+import { useEffect, useRef } from "react";
+import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { TESTIMONIALS } from "@/lib/data";
 
 export default function Temoignages() {
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const notes = gridRef.current!.querySelectorAll<HTMLElement>("[data-note]");
+
+    if (prefersReducedMotion()) {
+      /* Inclinaison finale sans animation */
+      notes.forEach((n) => gsap.set(n, { rotation: parseFloat(n.dataset.rotate ?? "0") }));
+      return;
+    }
+
+    const killers: (() => void)[] = [];
+    notes.forEach((note, i) => {
+      const finalRotate = parseFloat(note.dataset.rotate ?? "0");
+      const tl = gsap.fromTo(
+        note,
+        {
+          y: 110,
+          autoAlpha: 0,
+          scale: 0.86,
+          rotation: finalRotate * 3.2 + (i % 2 === 0 ? -4 : 4),
+        },
+        {
+          y: 0,
+          autoAlpha: 1,
+          scale: 1,
+          rotation: finalRotate,
+          duration: 1.05,
+          delay: (i % 2) * 0.12,
+          ease: "back.out(1.35)",
+          scrollTrigger: {
+            trigger: note,
+            start: "top 88%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
+      killers.push(() => {
+        tl.scrollTrigger?.kill();
+        tl.kill();
+      });
+    });
+    return () => killers.forEach((k) => k());
+  }, []);
+
   return (
     <section id="temoignages" className="overflow-hidden bg-cream py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
@@ -23,21 +72,16 @@ export default function Temoignages() {
           </p>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 md:gap-10 lg:px-10">
+        <div ref={gridRef} className="grid gap-8 sm:grid-cols-2 md:gap-10 lg:px-10">
           {TESTIMONIALS.map((t, i) => (
             <figure
               key={t.author}
-              data-reveal
-              data-reveal-delay={String((i % 2) * 0.12)}
-              className={`love-note px-7 py-8 md:px-9 md:py-10 ${
+              data-note
+              data-rotate={t.rotate}
+              className={`love-note px-7 py-8 will-change-transform md:px-9 md:py-10 ${
                 i % 2 === 1 ? "sm:translate-y-10" : ""
               }`}
-              style={
-                {
-                  transform: `rotate(${t.rotate}deg)`,
-                  "--tape-rotate": `${-t.rotate * 1.4}deg`,
-                } as React.CSSProperties
-              }
+              style={{ "--tape-rotate": `${-t.rotate * 1.4}deg` } as React.CSSProperties}
             >
               <svg width="26" height="20" viewBox="0 0 26 20" className="mb-4 text-blush" aria-hidden>
                 <path

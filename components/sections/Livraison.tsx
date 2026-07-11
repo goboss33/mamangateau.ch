@@ -22,7 +22,11 @@ export default function Livraison() {
       duration: 0.7,
       stagger: 0.12,
       ease: "back.out(2.2)",
-      scrollTrigger: { trigger: mapRef.current, start: "top 75%", once: true },
+      scrollTrigger: {
+        trigger: mapRef.current,
+        start: "top 75%",
+        toggleActions: "play none none reverse",
+      },
     });
     return () => {
       tween.scrollTrigger?.kill();
