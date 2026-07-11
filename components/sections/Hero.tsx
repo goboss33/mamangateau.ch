@@ -263,9 +263,9 @@ export default function Hero() {
             d'événement sur mesure à Lausanne, Pully et sur la Riviera vaudoise.
           </span>
         </h1>
-        <div data-hero-fade className="mb-7 flex items-center justify-center gap-3 md:justify-start">
-          <a data-cta href="#configurateur" className="btn-primary !py-3">
-            Devis gratuit
+        <div id="hero-cta-row" data-hero-fade className="mb-7 flex items-center justify-center gap-3 md:justify-start">
+          <a data-cta-pill href="#configurateur" className="btn-primary relative overflow-hidden !py-3">
+            <span data-pill-label>Devis gratuit</span>
           </a>
           <a
             data-cta

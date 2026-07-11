@@ -2,10 +2,12 @@
 
 /* ---------------------------------------------------------------------------
    ContactDial — la bulle de contact (speed-dial)
-   Un seul bouton chocolat en bas à droite (zone du pouce), qui apparaît
-   d'un pop quand le hero sort de l'écran. Au tap, il déploie en éventail :
-   Devis gratuit · WhatsApp · Instagram · E-mail, avec étiquettes.
-   Le haut de l'écran reste au burger — chacun son coin.
+   La naissance de la bulle est un geste continu piloté par le scroll :
+   en quittant le hero, les trois ronds (WhatsApp, Instagram, E-mail)
+   convergent et fusionnent dans le pill « Devis gratuit », qui se contracte
+   en cercle chocolat — puis ce cercle vole vers le coin bas-droit et devient
+   la bulle. Remonter rejoue toute la fusion à l'envers, image par image.
+   Au tap : éventail Devis gratuit · WhatsApp · Instagram · E-mail.
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef, useState } from "react";
@@ -71,36 +73,134 @@ export default function ContactDial() {
   const listRef = useRef<HTMLUListElement>(null);
   const openRef = useRef(false);
 
-  /* Apparition quand le hero sort de l'écran */
+  /* Fusion scrubbée : les CTA du hero deviennent la bulle */
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const pulseRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => {
     const root = rootRef.current!;
+    const btn = btnRef.current!;
     const reduced = prefersReducedMotion();
-    gsap.set(root, { autoAlpha: 0, scale: reduced ? 1 : 0.4, y: reduced ? 0 : 18 });
-
     const hero = document.getElementById("top");
-    const st = ScrollTrigger.create({
-      trigger: hero ?? document.body,
-      start: hero ? "bottom 72%" : () => window.innerHeight,
-      onEnter: () =>
-        gsap.to(root, {
-          autoAlpha: 1,
-          scale: 1,
-          y: 0,
-          duration: reduced ? 0 : 0.55,
-          ease: "back.out(2.2)",
-        }),
-      onLeaveBack: () => {
-        close();
-        gsap.to(root, {
-          autoAlpha: 0,
-          scale: reduced ? 1 : 0.4,
-          y: reduced ? 0 : 18,
-          duration: reduced ? 0 : 0.35,
-          ease: "power2.in",
-        });
+    const row = document.getElementById("hero-cta-row");
+    const pill = row?.querySelector<HTMLElement>("[data-cta-pill]");
+    const label = pill?.querySelector<HTMLElement>("[data-pill-label]");
+    const rounds = row ? Array.from(row.querySelectorAll<HTMLElement>("[data-cta]")) : [];
+
+    /* Fallback (motion réduit ou hero absent) : simple apparition */
+    if (reduced || !hero || !row || !pill) {
+      gsap.set(root, { autoAlpha: 0 });
+      const st = ScrollTrigger.create({
+        trigger: hero ?? document.body,
+        start: hero ? "bottom 72%" : () => window.innerHeight,
+        onEnter: () => gsap.set(root, { autoAlpha: 1 }),
+        onLeaveBack: () => {
+          close();
+          gsap.set(root, { autoAlpha: 0 });
+        },
+      });
+      return () => st.kill();
+    }
+
+    /* Deltas recalculés à chaque refresh (resize, orientation…) */
+    let dx = 0;
+    let dy = 0;
+    let pillScaleX = 0.35;
+    let pillScaleY = 1;
+
+    const measure = (self?: ScrollTrigger) => {
+      const st = self ?? tl.scrollTrigger;
+      if (!st) return;
+      const rowRect = row.getBoundingClientRect();
+      const rowDocTop = rowRect.top + window.scrollY;
+      /* centre du pill (coordonnées document, hors transforms) */
+      const pillCx = rowRect.left + pill.offsetLeft + pill.offsetWidth / 2;
+      const pillDocCy = rowDocTop + pill.offsetTop + pill.offsetHeight / 2;
+      /* centre du bouton bulle (fixe) */
+      const btnRect = { x: 0, y: 0 };
+      const rootRect = root.getBoundingClientRect();
+      btnRect.x = rootRect.left + btn.offsetLeft + btn.offsetWidth / 2;
+      btnRect.y = rootRect.top + btn.offsetTop + btn.offsetHeight / 2;
+      /* scroll au moment du hand-off (55 % de la fenêtre) */
+      const sStar = st.start + (st.end - st.start) * 0.55;
+      dx = pillCx - btnRect.x;
+      dy = pillDocCy - sStar - btnRect.y;
+      pillScaleX = btn.offsetWidth / pill.offsetWidth;
+      pillScaleY = btn.offsetHeight / pill.offsetHeight;
+    };
+
+    gsap.set(root, { autoAlpha: 1 });
+    gsap.set(btn, { autoAlpha: 0, pointerEvents: "none" });
+    gsap.set(pill, { transformOrigin: "50% 50%" });
+    gsap.set(pulseRef.current, { opacity: 0 });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: hero,
+        start: "bottom 88%",
+        end: "bottom 20%",
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+        onRefresh: (self) => measure(self),
       },
+      defaults: { ease: "power2.inOut" },
     });
-    return () => st.kill();
+
+    /* 1. Les ronds convergent dans le pill et s'y fondent */
+    rounds.forEach((r, i) => {
+      tl.to(
+        r,
+        {
+          x: () => {
+            const rowRect = row.getBoundingClientRect();
+            const pillCx = pill.offsetLeft + pill.offsetWidth / 2;
+            const selfCx = r.offsetLeft + r.offsetWidth / 2;
+            void rowRect;
+            return pillCx - selfCx;
+          },
+          scale: 0.25,
+          autoAlpha: 0,
+          duration: 0.42,
+        },
+        0.04 * (rounds.length - i)
+      );
+    });
+
+    /* 2. Le pill se contracte en cercle chocolat, son label s'efface */
+    tl.to(label ?? pill, { opacity: 0, duration: 0.18 }, 0.1)
+      .to(
+        pill,
+        {
+          scaleX: () => pillScaleX,
+          scaleY: () => pillScaleY,
+          duration: 0.34,
+        },
+        0.2
+      )
+      /* 3. Hand-off : le cercle fusionné devient la bulle fixe */
+      .set(pill, { autoAlpha: 0 }, 0.55)
+      .set(row, { pointerEvents: "none" }, 0.55)
+      .fromTo(
+        btn,
+        { x: () => dx, y: () => dy, autoAlpha: 1 },
+        { x: 0, y: 0, autoAlpha: 1, duration: 0.45, ease: "power2.out", immediateRender: false },
+        0.55
+      )
+      /* 4. Atterrissage : pulsation + interactivité */
+      .set(btn, { pointerEvents: "auto" }, 0.97)
+      .to(pulseRef.current, { opacity: 1, duration: 0.03 }, 0.97);
+
+    const onLeaveBack = ScrollTrigger.create({
+      trigger: hero,
+      start: "bottom 88%",
+      onLeaveBack: () => close(),
+    });
+
+    return () => {
+      onLeaveBack.kill();
+      tl.scrollTrigger?.kill();
+      tl.kill();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -188,14 +288,16 @@ export default function ContactDial() {
 
       {/* Bouton principal */}
       <button
+        ref={btnRef}
         type="button"
         onClick={() => toggle()}
         aria-expanded={open}
         aria-label={open ? "Fermer le menu de contact" : "Ouvrir le menu de contact"}
-        className="relative flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-chocolate text-vanilla shadow-[0_16px_38px_-16px_rgba(74,44,32,0.65)] transition-transform duration-300 hover:scale-105"
+        className="relative flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-chocolate text-vanilla shadow-[0_16px_38px_-16px_rgba(74,44,32,0.65)] transition-[box-shadow] duration-300 will-change-transform"
       >
-        {/* Pulsation douce */}
+        {/* Pulsation douce — activée à l'atterrissage */}
         <span
+          ref={pulseRef}
           className="pointer-events-none absolute inset-0 rounded-full bg-gold/25 motion-safe:animate-[dialpulse_3.2s_ease-out_infinite]"
           aria-hidden
         />
