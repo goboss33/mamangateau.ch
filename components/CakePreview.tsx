@@ -54,7 +54,7 @@ export default function CakePreview({
 
   return (
     <svg
-      viewBox="0 0 200 150"
+      viewBox="0 0 200 158"
       className={className}
       role="img"
       aria-label={`Aperçu : gâteau ${tiers} étage${tiers > 1 ? "s" : ""}`}
@@ -169,15 +169,17 @@ export default function CakePreview({
         />
       )}
 
-      {/* prénom sur l'assiette */}
+      {/* prénom sous l'assiette, bien lisible */}
       {name && (
         <text
           x="100"
-          y="147"
+          y="152"
           textAnchor="middle"
-          fontSize="10"
-          fill="#4A2C20"
-          fontFamily="var(--font-purgatory), cursive"
+          fontSize="9"
+          fontWeight="600"
+          letterSpacing="0.06em"
+          fill="#6B4A39"
+          fontFamily="var(--font-quicksand), sans-serif"
         >
           {name}
         </text>

@@ -34,15 +34,21 @@ function ChipGrid({
   onToggle,
   name,
   multi = false,
+  cols = false,
 }: {
   options: readonly Chip[];
   selected: string[];
   onToggle: (id: string) => void;
   name: string;
   multi?: boolean;
+  cols?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap gap-2.5" role={multi ? "group" : "radiogroup"} aria-label={name}>
+    <div
+      className={cols ? "grid grid-cols-2 gap-2.5" : "flex flex-wrap gap-2.5"}
+      role={multi ? "group" : "radiogroup"}
+      aria-label={name}
+    >
       {options.map((o) => {
         const active = selected.includes(o.id);
         return (
@@ -114,6 +120,7 @@ export default function Configurateur() {
   const isBirthday = occasion === "anniversaire-enfant" || occasion === "anniversaire-adulte";
 
   const minParts = tiers === 2 ? TIER2.minParts : 6;
+  const maxParts = tiers === 2 ? 80 : 30;
   const deliveryFee =
     deliveryMode === "retrait" ? 0 : dist.status === "ok" ? (dist.fee ?? 0) : null;
   const estimate = useMemo(
@@ -125,11 +132,9 @@ export default function Configurateur() {
     list.find((o) => o.id === id)?.label ?? "—";
 
   /* --------------------------------------------------------- carousel */
-  const maxIndex = () => {
-    const t = trackRef.current;
-    if (!t) return 5;
-    return t.querySelectorAll("[data-slide]:not(.hidden)").length - 1;
-  };
+  /* 7 slides sur mobile (récap inclus), 6 sur desktop (ticket épinglé) */
+  const maxIndex = () =>
+    typeof window !== "undefined" && window.innerWidth < 1024 ? 6 : 5;
 
   const goTo = (i: number) => {
     const t = trackRef.current;
@@ -273,10 +278,7 @@ export default function Configurateur() {
   const base = cakeBase(parts, tiers);
   const ticket = (
     <>
-      <div className="ticket relative px-7 pb-2 pt-6">
-        <div className="mx-auto -mt-2 mb-2 w-40">
-          <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
-        </div>
+      <div className="ticket relative px-7 pb-2 pt-7">
         <p className="script-accent text-3xl">Votre gâteau</p>
         <p className="mt-1 text-xs uppercase tracking-[0.24em] text-grey-studio">Récapitulatif</p>
 
@@ -531,6 +533,7 @@ export default function Configurateur() {
                       onClick={() => {
                         setTiers(t as 1 | 2);
                         if (t === 2 && parts < TIER2.minParts) setParts(TIER2.minParts);
+                        if (t === 1 && parts > 30) setParts(30);
                       }}
                       className={`flex-1 rounded-2xl border px-4 py-4 text-center transition-all duration-300 ${
                         tiers === t
@@ -554,23 +557,23 @@ export default function Configurateur() {
                   <div className="mb-5 flex items-baseline justify-between">
                     <span className="font-display text-4xl text-chocolate">
                       {parts}
-                      {parts >= 80 && "+"}
+                      {parts >= maxParts && "+"}
                     </span>
                     <span className="text-sm font-semibold text-cocoa">parts</span>
                   </div>
                   <input
                     type="range"
                     min={minParts}
-                    max={80}
+                    max={maxParts}
                     value={parts}
                     onChange={(e) => setParts(parseInt(e.target.value, 10))}
                     className="mg-range"
-                    style={{ "--fill": `${((parts - minParts) / (80 - minParts)) * 100}%` } as React.CSSProperties}
+                    style={{ "--fill": `${((parts - minParts) / (maxParts - minParts)) * 100}%` } as React.CSSProperties}
                     aria-label="Nombre de parts"
                   />
                   <div className="mt-2 flex justify-between text-xs text-grey-studio">
                     <span>{minParts}</span>
-                    <span>80+</span>
+                    <span>{maxParts}+</span>
                   </div>
                   {tiers === 2 && (
                     <p className="mt-3 text-xs text-cocoa">
@@ -630,6 +633,7 @@ export default function Configurateur() {
               <div data-slide className="w-full shrink-0 snap-center px-1" aria-label="Étape 4 : le style">
                 <ChipGrid
                   name="Style"
+                  cols
                   options={STYLES}
                   selected={style ? [style] : []}
                   onToggle={(id) => setStyle(id)}
@@ -827,6 +831,9 @@ export default function Configurateur() {
 
           {/* Ticket (desktop) */}
           <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start" data-reveal="scale">
+            <div className="mx-auto mb-3 w-44">
+              <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
+            </div>
             {ticket}
           </aside>
         </div>
