@@ -119,7 +119,7 @@ export default function Configurateur() {
   const trackRef = useRef<HTMLDivElement>(null);
   const isBirthday = occasion === "anniversaire-enfant" || occasion === "anniversaire-adulte";
 
-  const minParts = tiers === 2 ? TIER2.minParts : 6;
+  const minParts = tiers === 2 ? TIER2.minParts : 12;
   const maxParts = tiers === 2 ? 80 : 30;
   const deliveryFee =
     deliveryMode === "retrait" ? 0 : dist.status === "ok" ? (dist.fee ?? 0) : null;
@@ -177,14 +177,14 @@ export default function Configurateur() {
         const img = new window.Image();
         const url = URL.createObjectURL(file);
         img.onload = () => {
-          const max = 1600;
+          const max = 1200;
           const ratio = Math.min(1, max / Math.max(img.width, img.height));
           const canvas = document.createElement("canvas");
           canvas.width = Math.round(img.width * ratio);
           canvas.height = Math.round(img.height * ratio);
           canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
           URL.revokeObjectURL(url);
-          resolve(canvas.toDataURL("image/jpeg", 0.8));
+          resolve(canvas.toDataURL("image/jpeg", 0.72));
         };
         img.onerror = reject;
         img.src = url;
@@ -194,21 +194,75 @@ export default function Configurateur() {
   };
 
   /* ---------------------------------------------------------- distance */
-  const computeDistance = async () => {
-    if (address.trim().length < 5) return;
+  const distReqId = useRef(0);
+  const computeDistance = async (addr?: string) => {
+    const target = (addr ?? address).trim();
+    if (target.length < 8) return;
+    const id = ++distReqId.current;
     setDist({ status: "loading" });
     try {
       const res = await fetch("/api/distance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify({ address: target }),
       });
       const data = await res.json();
+      if (id !== distReqId.current) return; // réponse obsolète
       if (data.ok) setDist({ status: "ok", km: data.km, fee: data.fee });
       else setDist({ status: "fallback" });
     } catch {
-      setDist({ status: "fallback" });
+      if (id === distReqId.current) setDist({ status: "fallback" });
     }
+  };
+
+  /* Calcul automatique pendant la frappe (800 ms après la dernière touche) */
+  useEffect(() => {
+    if (deliveryMode !== "livraison" || address.trim().length < 8) return;
+    const t = window.setTimeout(() => computeDistance(), 800);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, deliveryMode]);
+
+  /* ---------------------------------------------- autocomplétion adresse */
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSug, setShowSug] = useState(false);
+  const skipSugRef = useRef(false);
+
+  useEffect(() => {
+    if (deliveryMode !== "livraison") return;
+    if (skipSugRef.current) {
+      skipSugRef.current = false;
+      return;
+    }
+    const q = address.trim();
+    if (q.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    const t = window.setTimeout(async () => {
+      try {
+        const res = await fetch("/api/places", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: q }),
+        });
+        const data = await res.json();
+        setSuggestions(data.ok ? (data.suggestions ?? []) : []);
+        setShowSug(true);
+      } catch {
+        setSuggestions([]);
+      }
+    }, 350);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, deliveryMode]);
+
+  const pickSuggestion = (s: string) => {
+    skipSugRef.current = true;
+    setAddress(s);
+    setSuggestions([]);
+    setShowSug(false);
+    computeDistance(s);
   };
 
   /* ------------------------------------------------------------- envoi */
@@ -263,7 +317,17 @@ export default function Configurateur() {
           website: "", // honeypot
         }),
       });
-      const data = await res.json();
+      const raw = await res.text();
+      let data: { ok?: boolean; error?: string } = {};
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error(
+          res.status === 413
+            ? "Les photos sont trop volumineuses — retirez-en une et réessayez."
+            : `Le serveur n'a pas répondu correctement (${res.status}). Réessayez ou écrivez-nous sur WhatsApp.`
+        );
+      }
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Erreur d'envoi");
       setSent(true);
       window.dispatchEvent(new CustomEvent("mg:burst"));
@@ -417,8 +481,8 @@ export default function Configurateur() {
           </p>
         </div>
 
-        <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-16">
-          <div data-reveal>
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-16">
+          <div data-reveal className="min-w-0">
             {/* Aperçu (mobile) */}
             <div className="mx-auto mb-4 w-36 lg:hidden">
               <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
@@ -534,6 +598,7 @@ export default function Configurateur() {
                         setTiers(t as 1 | 2);
                         if (t === 2 && parts < TIER2.minParts) setParts(TIER2.minParts);
                         if (t === 1 && parts > 30) setParts(30);
+                        if (t === 1 && parts < 12) setParts(12);
                       }}
                       className={`flex-1 rounded-2xl border px-4 py-4 text-center transition-all duration-300 ${
                         tiers === t
@@ -718,7 +783,7 @@ export default function Configurateur() {
                 </div>
                 {deliveryMode === "livraison" && (
                   <div className="rounded-2xl border border-chocolate/10 bg-cream/50 p-5">
-                    <label className="block">
+                    <label className="relative block">
                       <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-grey-studio">
                         Adresse de livraison
                       </span>
@@ -729,13 +794,36 @@ export default function Configurateur() {
                           setAddress(e.target.value);
                           setDist({ status: "idle" });
                         }}
-                        onBlur={computeDistance}
+                        onFocus={() => suggestions.length && setShowSug(true)}
+                        onBlur={() => window.setTimeout(() => setShowSug(false), 180)}
                         placeholder="Rue, n°, NPA, localité"
+                        autoComplete="off"
                         className={inputCls}
                       />
+                      {showSug && suggestions.length > 0 && (
+                        <ul className="absolute inset-x-0 top-full z-20 mt-1.5 overflow-hidden rounded-xl border border-gold/30 bg-vanilla shadow-[0_18px_44px_-20px_rgba(74,44,32,0.4)]">
+                          {suggestions.map((s) => (
+                            <li key={s}>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => pickSuggestion(s)}
+                                className="w-full px-4 py-2.5 text-left text-sm font-medium text-chocolate transition-colors hover:bg-cream"
+                              >
+                                {s}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </label>
-                    <div className="mt-3 text-sm font-semibold">
-                      {dist.status === "loading" && <span className="text-grey-studio">Calcul de la distance…</span>}
+                    <div className="mt-3 text-sm font-semibold" aria-live="polite">
+                      {dist.status === "loading" && (
+                        <span className="inline-flex items-center gap-2 text-cocoa">
+                          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gold border-t-transparent" aria-hidden />
+                          Calcul de l'itinéraire depuis l'atelier…
+                        </span>
+                      )}
                       {dist.status === "ok" && (
                         <span className="text-chocolate">
                           {dist.km} km depuis l'atelier —{" "}
@@ -830,8 +918,8 @@ export default function Configurateur() {
           </div>
 
           {/* Ticket (desktop) */}
-          <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start" data-reveal="scale">
-            <div className="mx-auto mb-3 w-44">
+          <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start lg:-mt-9">
+            <div className="mx-auto mb-2 w-40">
               <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
             </div>
             {ticket}
