@@ -157,5 +157,47 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  /* ------------------------------------------------ Carnet (back-office)
+     Pousse la demande dans le hub — best-effort : ne bloque jamais le devis. */
+  if (process.env.CARNET_HOOK_URL && process.env.CARNET_HOOK_SECRET) {
+    try {
+      await fetch(process.env.CARNET_HOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-carnet-secret": process.env.CARNET_HOOK_SECRET,
+        },
+        signal: AbortSignal.timeout(4000),
+        body: JSON.stringify({
+          contact: {
+            firstName: contact.firstName,
+            lastName: contact.lastName ?? "",
+            phone: contact.phone ?? "",
+            email: contact.email ?? "",
+          },
+          order: {
+            occasion: p.occasion ?? "",
+            eventDate: p.eventDate ?? "",
+            celebrant: p.celebrant ?? "",
+            celebrantAge: p.age ? parseInt(p.age) || null : null,
+            parts: p.parts ?? null,
+            tiers: p.tiers ?? null,
+            biscuit: p.biscuit ?? "",
+            fourrages: p.fourrages ?? [],
+            style: p.style ?? "",
+            themeNote: p.themeNote ?? "",
+            deliveryMode: p.delivery?.mode ?? "retrait",
+            deliveryAddress: p.delivery?.mode === "livraison" ? (p.delivery.address ?? "") : "",
+            deliveryKm: p.delivery?.mode === "livraison" ? (p.delivery.km ?? null) : null,
+            priceQuoted: p.estimate?.from ?? null,
+            extras: p.extras ?? null,
+          },
+        }),
+      });
+    } catch (e) {
+      console.error("carnet hook error (non bloquant):", e);
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }

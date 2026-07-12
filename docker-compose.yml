@@ -14,6 +14,8 @@ services:
     environment:
       # E-mail des devis (Brevo) — requis pour le configurateur
       - BREVO_API_KEY=${BREVO_API_KEY:-}
+      - CARNET_HOOK_URL=${CARNET_HOOK_URL:-}
+      - CARNET_HOOK_SECRET=${CARNET_HOOK_SECRET:-}
       - DEVIS_TO=${DEVIS_TO:-mamangateau.ch@gmail.com}
       - DEVIS_FROM_EMAIL=${DEVIS_FROM_EMAIL:-mamangateau.ch@gmail.com}
       - DEVIS_FROM_NAME=${DEVIS_FROM_NAME:-Maman Gâteau — Site}
