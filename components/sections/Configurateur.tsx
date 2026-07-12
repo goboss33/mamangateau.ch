@@ -112,6 +112,7 @@ export default function Configurateur() {
   const [address, setAddress] = useState("");
   const [dist, setDist] = useState<{ status: "idle" | "loading" | "ok" | "fallback"; km?: number; fee?: number }>({ status: "idle" });
   const [contact, setContact] = useState({ firstName: "", lastName: "", phone: "", email: "" });
+  const [partnerCode, setPartnerCode] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -158,10 +159,22 @@ export default function Configurateur() {
     return () => window.removeEventListener("resize", onResize);
   }, [step]);
 
-  /* Pré-remplissage depuis les pages ciblées : /?occasion=mariage#configurateur */
+  /* Pré-remplissage depuis les pages ciblées : /?occasion=mariage#configurateur
+     + rattachement partenaire : /?ref=CODE (QR/flyers), mémorisé 90 jours */
   useEffect(() => {
-    const o = new URLSearchParams(window.location.search).get("occasion");
+    const params = new URLSearchParams(window.location.search);
+    const o = params.get("occasion");
     if (o && OCCASIONS.some((x) => x.id === o)) setOccasion(o);
+    try {
+      const ref = params.get("ref");
+      if (ref) {
+        localStorage.setItem("mg_ref", JSON.stringify({ code: ref.toUpperCase(), ts: Date.now() }));
+        setPartnerCode(ref.toUpperCase());
+      } else {
+        const saved = JSON.parse(localStorage.getItem("mg_ref") ?? "null");
+        if (saved?.code && Date.now() - (saved.ts ?? 0) < 90 * 86400000) setPartnerCode(saved.code);
+      }
+    } catch {}
   }, []);
 
   const advance = (from: number) => window.setTimeout(() => goTo(from + 1), 280);
@@ -326,6 +339,7 @@ export default function Configurateur() {
               : { mode: "livraison", address: address.trim(), km: dist.km, fee: deliveryFee },
           estimate: { from: estimate.from, to: estimate.to },
           contact,
+          partnerCode: partnerCode.trim().toUpperCase(),
           photos: photos.map((p) => ({ name: p.name, data: p.dataUrl.split(",")[1] ?? "" })),
           website: "", // honeypot
         }),
@@ -962,6 +976,18 @@ export default function Configurateur() {
                   Vos coordonnées servent uniquement à répondre à votre demande — jamais de
                   publicité, promis.
                 </p>
+                <label className="mt-4 block max-w-xs">
+                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-grey-studio">
+                    Code partenaire (optionnel)
+                  </span>
+                  <input
+                    type="text"
+                    value={partnerCode}
+                    onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                    placeholder="On vous a recommandé ?"
+                    className={inputCls}
+                  />
+                </label>
                 <div className="mt-6 lg:hidden">
                   <button
                     type="button"

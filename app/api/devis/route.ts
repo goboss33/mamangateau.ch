@@ -27,6 +27,7 @@ type Payload = {
   delivery: { mode: string; address?: string; km?: number; fee?: number | null };
   estimate: { from: number; to: number };
   contact: { firstName: string; lastName: string; phone: string; email: string };
+  partnerCode?: string;
   photos?: Photo[];
   website?: string; // honeypot
 };
@@ -126,6 +127,7 @@ export async function POST(req: NextRequest) {
       ${row("Style", p.style + (p.themeNote ? ` — « ${p.themeNote} »` : ""))}
       ${row("Remise", deliveryTxt)}
       ${row("Estimation", `CHF ${p.estimate.from}–${p.estimate.to}`)}
+      ${p.partnerCode ? row("Partenaire", p.partnerCode) : ""}
       ${row("Client", `${contact.firstName} ${contact.lastName}`)}
       ${row("Mobile", contact.phone)}
       ${row("E-mail", contact.email)}
@@ -191,6 +193,7 @@ export async function POST(req: NextRequest) {
             deliveryKm: p.delivery?.mode === "livraison" ? (p.delivery.km ?? null) : null,
             priceQuoted: p.estimate?.from ?? null,
             extras: p.extras ?? null,
+            partnerCode: p.partnerCode || null,
           },
         }),
       });
