@@ -265,7 +265,7 @@ export default function Hero() {
         </h1>
         <div id="hero-cta-row" data-hero-fade className="mb-7 flex items-center justify-center gap-3 md:justify-start">
           <a data-cta-pill href="#configurateur" className="btn-primary relative overflow-hidden !py-3">
-            <span data-pill-label className="whitespace-nowrap">Devis gratuit</span>
+            <span data-pill-label className="whitespace-nowrap">Composer mon gâteau</span>
           </a>
           <a
             data-cta
@@ -305,6 +305,10 @@ export default function Hero() {
             </svg>
           </a>
         </div>
+
+        <p data-hero-fade className="mb-5 -mt-3 text-xs font-medium text-chocolate/60 max-md:text-center">
+          Devis gratuit sous 24 h — sans engagement
+        </p>
         <a
           data-hero-fade
           href="#temoignages"
@@ -327,7 +331,7 @@ export default function Hero() {
               ★★★★★
             </span>
             <span className="mt-1 text-xs font-semibold leading-none text-chocolate/70 transition-colors group-hover:text-chocolate">
-              les mots doux de ses clients
+              les mots doux de mes clientes
             </span>
           </span>
         </a>

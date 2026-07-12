@@ -175,6 +175,13 @@ export default function Configurateur() {
         if (saved?.code && Date.now() - (saved.ts ?? 0) < 90 * 86400000) setPartnerCode(saved.code);
       }
     } catch {}
+    /* Arrivée directe avec ancre : re-caler une fois le layout stabilisé
+       (le hero qui se charge décale l'atterrissage natif du navigateur). */
+    if (window.location.hash === "#configurateur") {
+      window.setTimeout(() => {
+        document.getElementById("configurateur")?.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "start" });
+      }, 750);
+    }
   }, []);
 
   const advance = (from: number) => window.setTimeout(() => goTo(from + 1), 280);
@@ -466,8 +473,8 @@ export default function Configurateur() {
   /* ------------------------------------------------------------ succès */
   if (sent) {
     return (
-      <section id="configurateur" className="relative overflow-hidden bg-vanilla py-24 md:py-32">
-        <div className="mx-auto max-w-xl px-6 text-center">
+      <section id="atelier-devis" className="relative overflow-hidden bg-vanilla py-24 md:py-32">
+        <div id="configurateur" className="mx-auto max-w-xl px-6 text-center">
           <div className="ticket relative px-8 pb-10 pt-12">
             <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-mint/40">
               <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#4A2C20" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -494,7 +501,7 @@ export default function Configurateur() {
 
   /* -------------------------------------------------------------- rendu */
   return (
-    <section id="configurateur" className="relative overflow-hidden bg-vanilla py-24 md:py-32">
+    <section id="atelier-devis" className="relative overflow-hidden bg-vanilla py-24 md:py-32">
       <div
         className="pointer-events-none absolute -right-40 top-24 h-[520px] w-[520px] rounded-full opacity-50"
         style={{ background: "radial-gradient(circle, rgba(246,201,212,0.5) 0%, transparent 65%)" }}
@@ -502,7 +509,7 @@ export default function Configurateur() {
       />
 
       <div className="relative mx-auto max-w-6xl px-6">
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-16">
+        <div id="configurateur" className="scroll-mt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-16">
           <div data-reveal className="min-w-0">
             <div className="mb-10 max-w-2xl md:mb-14">
               <p data-reveal className="eyebrow mb-4">L'atelier</p>

@@ -53,7 +53,7 @@ const ITEMS = [
   },
   {
     href: "#configurateur",
-    label: "Devis gratuit",
+    label: "Composer mon gâteau",
     external: false,
     className: "border border-gold/40 bg-chocolate text-vanilla",
     icon: (
@@ -137,6 +137,15 @@ export default function ContactDial() {
     gsap.set(pill, { transformOrigin: "50% 50%" });
     gsap.set(pulseRef.current, { opacity: 0 });
 
+    /* Remise à zéro franche : au-dessus du start, aucun résidu de morph
+       (le scrub rapide laissait parfois les ronds figés à mi-course). */
+    const resetHero = () => {
+      gsap.set(rounds, { x: 0, scale: 1, autoAlpha: 1, clearProps: "transform,opacity,visibility" });
+      gsap.set(pill, { scaleX: 1, scaleY: 1, clearProps: "transform" });
+      pill.style.borderRadius = "";
+      if (label) gsap.set(label, { opacity: 1, clearProps: "opacity" });
+    };
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: hero,
@@ -145,6 +154,10 @@ export default function ContactDial() {
         scrub: 0.5,
         invalidateOnRefresh: true,
         onRefresh: (self) => measure(self),
+        onLeaveBack: () => resetHero(),
+        onUpdate: (self) => {
+          if (self.progress === 0) resetHero();
+        },
       },
       defaults: { ease: "power2.inOut" },
     });
