@@ -289,6 +289,7 @@ export default function ContactDial() {
   return (
     <div
       ref={rootRef}
+      data-contact-dial
       className="fixed bottom-4 right-4 z-60 flex flex-col items-end gap-3 md:bottom-6 md:right-6"
       style={{ visibility: "hidden" }}
     >

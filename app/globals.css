@@ -134,6 +134,7 @@ body {
 
 /* --------------------------------------------------------------- boutons */
 
+@layer components {
 .btn-primary {
   position: relative;
   display: inline-flex;
@@ -189,6 +190,7 @@ body {
   border-color: color-mix(in srgb, var(--color-gold) 70%, transparent);
   background: color-mix(in srgb, var(--color-vanilla) 80%, transparent);
   transform: translateY(-1px);
+}
 }
 
 /* --------------------------------------------------------------- marquee */
@@ -352,3 +354,20 @@ input[type="range"].mg-range::-moz-range-thumb {
 .no-scrollbar {
   scrollbar-width: none;
 }
+
+/* --- Configurateur : entrée d'étape (stepper) --- */
+@keyframes mg-step-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mg-step-in { animation: mg-step-in 0.32s ease-out both; }
+
+/* Bulle de contact masquée pendant la composition (mobile) */
+@media (max-width: 1023px) {
+  html.mg-in-config [data-contact-dial] {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+[data-contact-dial] { transition: opacity 0.25s ease; }

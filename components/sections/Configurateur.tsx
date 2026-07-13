@@ -119,7 +119,8 @@ export default function Configurateur() {
   const [celebrated, setCelebrated] = useState(false);
   const [step, setStep] = useState(0);
 
-  const trackRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
   const isBirthday = occasion === "anniversaire-enfant" || occasion === "anniversaire-adulte";
 
   const minParts = tiers === 2 ? TIER2.minParts : 12;
@@ -140,24 +141,34 @@ export default function Configurateur() {
     typeof window !== "undefined" && window.innerWidth < 1024 ? 6 : 5;
 
   const goTo = (i: number) => {
-    const t = trackRef.current;
-    if (!t) return;
-    t.scrollTo({ left: Math.max(0, Math.min(i, maxIndex())) * t.clientWidth, behavior: "smooth" });
+    setStep(Math.max(0, Math.min(i, maxIndex())));
+    /* revenir en haut de l'étape si on avait défilé plus bas */
+    requestAnimationFrame(() => {
+      const el = document.getElementById("configurateur");
+      if (el && el.getBoundingClientRect().top < -12) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
   };
 
-  const onScroll = () => {
-    const t = trackRef.current;
-    if (t) setStep(Math.round(t.scrollLeft / t.clientWidth));
-  };
-
+  /* Barre sticky mobile : visible seulement quand le configurateur est à l'écran ;
+     masque aussi la bulle de contact (classe globale, CSS mobile). */
   useEffect(() => {
-    const onResize = () => {
-      const t = trackRef.current;
-      if (t) t.scrollTo({ left: Math.min(step, maxIndex()) * t.clientWidth });
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setInView(e.isIntersecting);
+        document.documentElement.classList.toggle("mg-in-config", e.isIntersecting);
+      },
+      { rootMargin: "-140px 0px -100px 0px" }
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      document.documentElement.classList.remove("mg-in-config");
     };
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [step]);
+  }, [sent]);
 
   /* Pré-remplissage depuis les pages ciblées : /?occasion=mariage#configurateur
      + rattachement partenaire : /?ref=CODE (QR/flyers), mémorisé 90 jours */
@@ -184,7 +195,7 @@ export default function Configurateur() {
     }
   }, []);
 
-  const advance = (from: number) => window.setTimeout(() => goTo(from + 1), 280);
+  const advance = (from: number) => window.setTimeout(() => goTo(from + 1), 150);
 
   const maybeCelebrate = () => {
     if (!celebrated && occasion && biscuit && fourrages.length && style) {
@@ -457,7 +468,7 @@ export default function Configurateur() {
           type="button"
           onClick={submit}
           disabled={sending}
-          className="btn-primary mt-5 w-full justify-center disabled:opacity-60"
+          className="btn-primary mt-5 w-full justify-center max-lg:hidden disabled:opacity-60"
         >
           {sending ? "Envoi en cours…" : "Demander mon devis"}
         </button>
@@ -473,7 +484,7 @@ export default function Configurateur() {
   /* ------------------------------------------------------------ succès */
   if (sent) {
     return (
-      <section id="atelier-devis" className="relative overflow-hidden bg-vanilla py-24 md:py-32">
+      <section id="atelier-devis" ref={sectionRef} className="relative overflow-hidden bg-vanilla py-24 max-lg:pb-28 md:py-32">
         <div id="configurateur" className="mx-auto max-w-xl px-6 text-center">
           <div className="ticket relative px-8 pb-10 pt-12">
             <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-mint/40">
@@ -501,7 +512,7 @@ export default function Configurateur() {
 
   /* -------------------------------------------------------------- rendu */
   return (
-    <section id="atelier-devis" className="relative overflow-hidden bg-vanilla py-24 md:py-32">
+    <section id="atelier-devis" ref={sectionRef} className="relative overflow-hidden bg-vanilla py-24 max-lg:pb-28 md:py-32">
       <div
         className="pointer-events-none absolute -right-40 top-24 h-[520px] w-[520px] rounded-full opacity-50"
         style={{ background: "radial-gradient(circle, rgba(246,201,212,0.5) 0%, transparent 65%)" }}
@@ -511,7 +522,7 @@ export default function Configurateur() {
       <div className="relative mx-auto max-w-6xl px-6">
         <div id="configurateur" className="scroll-mt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-16">
           <div data-reveal className="min-w-0">
-            <div className="mb-10 max-w-2xl md:mb-14">
+            <div className="mb-10 max-w-2xl max-lg:hidden md:mb-14">
               <p data-reveal className="eyebrow mb-4">L'atelier</p>
               <h2 data-reveal className="section-title">
                 Composez votre gâteau
@@ -525,13 +536,29 @@ export default function Configurateur() {
               </p>
             </div>
 
-            {/* Aperçu (mobile) */}
-            <div className="mx-auto mb-4 w-36 lg:hidden">
-              <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
+            {/* En-tête compact (mobile) : titre discret + progression nommée */}
+            <div className="mb-5 flex items-center gap-3 lg:hidden">
+              <div className="w-16 shrink-0">
+                <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
+                  Composer mon gâteau
+                </p>
+                <p className="font-display truncate text-lg leading-tight text-chocolate">
+                  Étape {Math.min(step + 1, 7)}/7 · {step === 6 ? "Récapitulatif" : STEPS[Math.min(step, 5)]}
+                </p>
+                <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-chocolate/10">
+                  <div
+                    className="h-full rounded-full bg-gold transition-all duration-500 ease-out"
+                    style={{ width: `${((Math.min(step, 6) + 1) / 7) * 100}%` }}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Progression */}
-            <div className="mb-6">
+            {/* Progression (desktop) */}
+            <div className="mb-6 max-lg:hidden">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 {STEPS.map((s, i) => {
                   const active = Math.min(step, 5) === i;
@@ -560,18 +587,11 @@ export default function Configurateur() {
               </div>
             </div>
 
-            {/* Piste */}
-            <div
-              ref={trackRef}
-              onScroll={onScroll}
-              data-lenis-prevent
-              role="group"
-              aria-roledescription="carrousel"
-              aria-label="Étapes du configurateur"
-              className="no-scrollbar -mx-1 flex snap-x snap-mandatory overflow-x-auto"
-            >
+            {/* Étape courante */}
+            <div className="relative">
               {/* 01 — Occasion */}
-              <div data-slide className="w-full shrink-0 snap-center px-1" aria-label="Étape 1 : l'occasion">
+              {step === 0 && (
+              <div className="mg-step-in" aria-label="Étape 1 : l'occasion">
                 <ChipGrid
                   name="Occasion"
                   options={OCCASIONS}
@@ -624,13 +644,15 @@ export default function Configurateur() {
                     </label>
                   )}
                 </div>
-                <button type="button" onClick={() => goTo(1)} className="btn-primary mt-6 w-full justify-center sm:w-auto">
+                <button type="button" onClick={() => goTo(1)} className="btn-primary mt-6 w-full justify-center max-lg:hidden sm:w-auto">
                   Continuer →
                 </button>
               </div>
+              )}
 
               {/* 02 — Taille */}
-              <div data-slide className="w-full shrink-0 snap-center px-1" aria-label="Étape 2 : la taille">
+              {step === 1 && (
+              <div className="mg-step-in" aria-label="Étape 2 : la taille">
                 <div className="mb-5 flex gap-3">
                   {[1, 2].map((t) => (
                     <button
@@ -688,13 +710,15 @@ export default function Configurateur() {
                     </p>
                   )}
                 </div>
-                <button type="button" onClick={() => goTo(2)} className="btn-primary mt-6 w-full justify-center sm:w-auto">
+                <button type="button" onClick={() => goTo(2)} className="btn-primary mt-6 w-full justify-center max-lg:hidden sm:w-auto">
                   Continuer →
                 </button>
               </div>
+              )}
 
               {/* 03 — Goûts */}
-              <div data-slide className="w-full shrink-0 snap-center px-1" aria-label="Étape 3 : les goûts">
+              {step === 2 && (
+              <div className="mg-step-in" aria-label="Étape 3 : les goûts">
                 <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-grey-studio">
                   Le biscuit (1 choix)
                 </p>
@@ -791,13 +815,15 @@ export default function Configurateur() {
                     );
                   })}
                 </div>
-                <button type="button" onClick={() => goTo(3)} className="btn-primary mt-6 w-full justify-center sm:w-auto">
+                <button type="button" onClick={() => goTo(3)} className="btn-primary mt-6 w-full justify-center max-lg:hidden sm:w-auto">
                   Continuer →
                 </button>
               </div>
+              )}
 
               {/* 04 — Style */}
-              <div data-slide className="w-full shrink-0 snap-center px-1" aria-label="Étape 4 : le style">
+              {step === 3 && (
+              <div className="mg-step-in" aria-label="Étape 4 : le style">
                 <ChipGrid
                   name="Style"
                   cols
@@ -852,13 +878,15 @@ export default function Configurateur() {
                     )}
                   </div>
                 </div>
-                <button type="button" onClick={() => goTo(4)} className="btn-primary mt-6 w-full justify-center sm:w-auto">
+                <button type="button" onClick={() => goTo(4)} className="btn-primary mt-6 w-full justify-center max-lg:hidden sm:w-auto">
                   Continuer →
                 </button>
               </div>
+              )}
 
               {/* 05 — Remise */}
-              <div data-slide className="w-full shrink-0 snap-center px-1" aria-label="Étape 5 : la remise">
+              {step === 4 && (
+              <div className="mg-step-in" aria-label="Étape 5 : la remise">
                 <div className="mb-5 flex gap-3">
                   {(
                     [
@@ -949,13 +977,15 @@ export default function Configurateur() {
                     </div>
                   </div>
                 )}
-                <button type="button" onClick={() => goTo(5)} className="btn-primary mt-6 w-full justify-center sm:w-auto">
+                <button type="button" onClick={() => goTo(5)} className="btn-primary mt-6 w-full justify-center max-lg:hidden sm:w-auto">
                   Continuer →
                 </button>
               </div>
+              )}
 
               {/* 06 — Contact */}
-              <div data-slide className="w-full shrink-0 snap-center px-1" aria-label="Étape 6 : vos coordonnées">
+              {step === 5 && (
+              <div className="mg-step-in" aria-label="Étape 6 : vos coordonnées">
                 <div className="grid gap-3 sm:grid-cols-2">
                   {(
                     [
@@ -995,28 +1025,22 @@ export default function Configurateur() {
                     className={inputCls}
                   />
                 </label>
-                <div className="mt-6 lg:hidden">
-                  <button
-                    type="button"
-                    onClick={() => goTo(6)}
-                    className="btn-primary w-full justify-center sm:w-auto"
-                  >
-                    Voir mon récap →
-                  </button>
-                </div>
                 <p className="mt-6 hidden text-sm font-semibold text-chocolate/75 lg:block">
                   Tout y est ? Envoyez votre demande depuis le récapitulatif ci-contre&nbsp;→
                 </p>
               </div>
+              )}
 
               {/* 07 — Récap (mobile) */}
-              <div data-slide className="hidden w-full shrink-0 snap-center px-1 max-lg:block" aria-label="Récapitulatif">
+              {step === 6 && (
+              <div className="mg-step-in lg:hidden" aria-label="Récapitulatif">
                 <div className="mx-auto max-w-sm">{ticket}</div>
               </div>
+              )}
             </div>
 
             {/* Navigation */}
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-6 flex items-center justify-between max-lg:hidden">
               <button
                 type="button"
                 onClick={() => goTo(step - 1)}
@@ -1048,6 +1072,53 @@ export default function Configurateur() {
           </aside>
         </div>
       </div>
+
+      {/* Barre sticky mobile : estimation en direct + action principale */}
+      {inView && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-gold/25 bg-vanilla/95 px-4 pt-3 shadow-[0_-12px_30px_-18px_rgba(74,44,32,0.35)] backdrop-blur-md lg:hidden"
+          style={{ paddingBottom: "max(0.8rem, env(safe-area-inset-bottom))" }}
+        >
+          <div className="mx-auto flex max-w-lg items-center gap-3">
+            {step > 0 && (
+              <button
+                type="button"
+                onClick={() => goTo(step - 1)}
+                aria-label="Étape précédente"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-chocolate/20 text-lg text-chocolate"
+              >
+                ←
+              </button>
+            )}
+            <div className="min-w-0 shrink-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-grey-studio">Estimation</p>
+              <p className="font-display text-lg leading-none text-chocolate">
+                CHF {estimate.from}–{estimate.to}
+              </p>
+            </div>
+            {step < 5 && (
+              <button type="button" onClick={() => goTo(step + 1)} className="btn-primary min-h-12 flex-1 justify-center !py-3">
+                Continuer →
+              </button>
+            )}
+            {step === 5 && (
+              <button type="button" onClick={() => goTo(6)} className="btn-primary min-h-12 flex-1 justify-center !py-3">
+                Mon récap →
+              </button>
+            )}
+            {step === 6 && (
+              <button
+                type="button"
+                onClick={submit}
+                disabled={sending}
+                className="btn-primary min-h-12 flex-1 justify-center !py-3 disabled:opacity-60"
+              >
+                {sending ? "Envoi…" : "Demander mon devis"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
