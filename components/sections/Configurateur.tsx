@@ -93,6 +93,9 @@ function ChipGrid({
 const inputCls =
   "w-full rounded-xl border border-chocolate/15 bg-vanilla px-4 py-3 text-[15px] text-chocolate placeholder:text-grey-studio/70 outline-none transition-colors focus:border-gold";
 
+/** Durée de mémorisation du rattachement partenaire (?ref=CODE), en jours — réglable via env. */
+const REF_COOKIE_DAYS = Number(process.env.NEXT_PUBLIC_REF_COOKIE_DAYS ?? 90) || 90;
+
 export default function Configurateur() {
   /* ------------------------------------------------------------- état */
   const [occasion, setOccasion] = useState<string | null>(null);
@@ -183,7 +186,7 @@ export default function Configurateur() {
         setPartnerCode(ref.toUpperCase());
       } else {
         const saved = JSON.parse(localStorage.getItem("mg_ref") ?? "null");
-        if (saved?.code && Date.now() - (saved.ts ?? 0) < 90 * 86400000) setPartnerCode(saved.code);
+        if (saved?.code && Date.now() - (saved.ts ?? 0) < REF_COOKIE_DAYS * 86400000) setPartnerCode(saved.code);
       }
     } catch {}
     /* Arrivée directe avec ancre : re-caler une fois le layout stabilisé
