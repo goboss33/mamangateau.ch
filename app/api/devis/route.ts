@@ -25,7 +25,7 @@ type Payload = {
   style: string;
   themeNote?: string;
   delivery: { mode: string; address?: string; km?: number; fee?: number | null };
-  estimate: { from: number; to: number };
+  estimate: { price: number };
   contact: { firstName: string; lastName: string; phone: string; email: string };
   partnerCode?: string;
   photos?: Photo[];
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
         .join("")}
       ${row("Style", p.style + (p.themeNote ? ` — « ${p.themeNote} »` : ""))}
       ${row("Remise", deliveryTxt)}
-      ${row("Estimation", `CHF ${p.estimate.from}–${p.estimate.to}`)}
+      ${row("Estimation", `CHF ${p.estimate.price}`)}
       ${p.partnerCode ? row("Partenaire", p.partnerCode) : ""}
       ${row("Client", `${contact.firstName} ${contact.lastName}`)}
       ${row("Mobile", contact.phone)}
@@ -191,7 +191,7 @@ export async function POST(req: NextRequest) {
             deliveryMode: p.delivery?.mode ?? "retrait",
             deliveryAddress: p.delivery?.mode === "livraison" ? (p.delivery.address ?? "") : "",
             deliveryKm: p.delivery?.mode === "livraison" ? (p.delivery.km ?? null) : null,
-            priceQuoted: p.estimate?.from ?? null,
+            priceQuoted: p.estimate?.price ?? null,
             extras: p.extras ?? null,
             partnerCode: p.partnerCode || null,
           },

@@ -149,7 +149,7 @@ export const EXTRAS: readonly Extra[] = [
 
 /* ------------------------------------------------------- tarification */
 
-export const TIER2 = { surcharge: 50, floor: 180, minParts: 26 } as const;
+export const TIER2 = { surcharge: 25, minParts: 26, maxParts: 60 } as const;
 
 export const DELIVERY = {
   origin: "Pully, Suisse",
@@ -157,23 +157,45 @@ export const DELIVERY = {
   chfPerKm: 1,
 } as const;
 
-/** Tarif à la part : mariage plus travaillé (8–10 CHF), autres occasions 5–7 CHF. */
-export const PART_RATE = {
-  default: { base: 5.2, top: 1.35 },
-  mariage: { base: 8, top: 1.25 },
-} as const;
+type PriceBand = { max: number; price: number };
 
-const rateOf = (occasion?: string | null) =>
-  occasion === "mariage" ? PART_RATE.mariage : PART_RATE.default;
+/** Prix « beau décor » par nombre de parts (1 étage), dégressif — édite les valeurs ici.
+    Un seul prix affiché (pas de fourchette) : c'est la norme, Annie confirme.
+    2 étages = ce prix + TIER2.surcharge. */
+export const PRICE_BANDS: { default: PriceBand[]; mariage: PriceBand[] } = {
+  default: [
+    { max: 15, price: 100 },
+    { max: 19, price: 125 },
+    { max: 25, price: 145 },
+    { max: 30, price: 185 },
+    { max: 34, price: 210 },
+    { max: 40, price: 235 },
+    { max: 50, price: 270 },
+    { max: 60, price: 305 },
+  ],
+  mariage: [
+    { max: 15, price: 165 },
+    { max: 19, price: 200 },
+    { max: 25, price: 245 },
+    { max: 30, price: 295 },
+    { max: 34, price: 330 },
+    { max: 40, price: 375 },
+    { max: 50, price: 430 },
+    { max: 60, price: 490 },
+  ],
+};
 
-/** Base gâteau : CHF 80–150 pour 15–20 parts (voir BRAND.md). */
+const bandsFor = (occasion?: string | null) =>
+  occasion === "mariage" ? PRICE_BANDS.mariage : PRICE_BANDS.default;
+
+/** Prix du gâteau : tranche dégressive selon les parts, + supplément si 2 étages. */
 export function cakeBase(parts: number, tiers: 1 | 2, occasion?: string | null): number {
-  const round5 = (n: number) => Math.round(n / 5) * 5;
-  let base = Math.max(80, round5(parts * rateOf(occasion).base));
-  if (tiers === 2) base = Math.max(TIER2.floor, base + TIER2.surcharge);
-  return base;
+  const bands = bandsFor(occasion);
+  const band = bands.find((b) => parts <= b.max) ?? bands[bands.length - 1];
+  return band.price + (tiers === 2 ? TIER2.surcharge : 0);
 }
 
+/** Estimation finale (prix unique) = gâteau + suppléments fourrage + extras + livraison. */
 export function estimateTotal(opts: {
   parts: number;
   tiers: 1 | 2;
@@ -181,8 +203,7 @@ export function estimateTotal(opts: {
   deliveryFee: number | null; // null = à confirmer
   occasion?: string | null;
   extras?: Record<string, number>; // id -> quantité
-}): { from: number; to: number; sup: number; extrasTotal: number } {
-  const round5 = (n: number) => Math.round(n / 5) * 5;
+}): { price: number; sup: number; extrasTotal: number } {
   const base = cakeBase(opts.parts, opts.tiers, opts.occasion);
   const sup = opts.fourrages.reduce(
     (acc, id) => acc + (FOURRAGES.find((f) => f.id === id)?.sup ?? 0),
@@ -193,12 +214,7 @@ export function estimateTotal(opts: {
     0
   );
   const fee = opts.deliveryFee ?? 0;
-  return {
-    from: base + sup + extrasTotal + fee,
-    to: round5(base * rateOf(opts.occasion).top) + sup + extrasTotal + fee,
-    sup,
-    extrasTotal,
-  };
+  return { price: base + sup + extrasTotal + fee, sup, extrasTotal };
 }
 
 /* -------------------------------------------------------- témoignages */

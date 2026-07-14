@@ -127,7 +127,7 @@ export default function Configurateur() {
   const isBirthday = occasion === "anniversaire-enfant" || occasion === "anniversaire-adulte";
 
   const minParts = tiers === 2 ? TIER2.minParts : 12;
-  const maxParts = tiers === 2 ? 80 : 30;
+  const maxParts = tiers === 2 ? TIER2.maxParts : 30;
   const deliveryFee =
     deliveryMode === "retrait" ? 0 : dist.status === "ok" ? (dist.fee ?? 0) : null;
   const estimate = useMemo(
@@ -358,7 +358,7 @@ export default function Configurateur() {
             deliveryMode === "retrait"
               ? { mode: "retrait" }
               : { mode: "livraison", address: address.trim(), km: dist.km, fee: deliveryFee },
-          estimate: { from: estimate.from, to: estimate.to },
+          estimate: { price: estimate.price },
           contact,
           partnerCode: partnerCode.trim().toUpperCase(),
           photos: photos.map((p) => ({ name: p.name, data: p.dataUrl.split(",")[1] ?? "" })),
@@ -459,11 +459,12 @@ export default function Configurateur() {
           <div className="flex items-baseline justify-between pt-2">
             <span className="font-semibold text-grey-studio">Estimation</span>
             <span className="font-display text-[26px] text-chocolate">
-              CHF {estimate.from}–{estimate.to}
+              CHF {estimate.price}
             </span>
           </div>
           <p className="text-xs leading-relaxed text-grey-studio">
-            À titre indicatif — Annie confirme le devis exact selon le décor.
+            Prix pour une belle création, tout compris. Annie confirme votre devis — le plus
+            souvent identique, ajusté seulement pour un décor exceptionnel.
           </p>
         </div>
 
@@ -1096,7 +1097,7 @@ export default function Configurateur() {
             <div className="min-w-0 shrink-0">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-grey-studio">Estimation</p>
               <p className="font-display text-lg leading-none text-chocolate">
-                CHF {estimate.from}–{estimate.to}
+                CHF {estimate.price}
               </p>
             </div>
             {step < 5 && (
