@@ -188,11 +188,16 @@ export const PRICE_BANDS: { default: PriceBand[]; mariage: PriceBand[] } = {
 const bandsFor = (occasion?: string | null) =>
   occasion === "mariage" ? PRICE_BANDS.mariage : PRICE_BANDS.default;
 
-/** Prix du gâteau : tranche dégressive selon les parts, + supplément si 2 étages. */
+/** Plancher : jamais une part en dessous de ce prix (CHF), arrondi aux 5.- supérieurs. */
+export const MIN_PART_PRICE = 7;
+
+/** Prix du gâteau : tranche dégressive selon les parts, plancher à MIN_PART_PRICE/part,
+    + supplément si 2 étages. */
 export function cakeBase(parts: number, tiers: 1 | 2, occasion?: string | null): number {
   const bands = bandsFor(occasion);
   const band = bands.find((b) => parts <= b.max) ?? bands[bands.length - 1];
-  return band.price + (tiers === 2 ? TIER2.surcharge : 0);
+  const floor = Math.ceil((parts * MIN_PART_PRICE) / 5) * 5;
+  return Math.max(band.price, floor) + (tiers === 2 ? TIER2.surcharge : 0);
 }
 
 /** Estimation finale (prix unique) = gâteau + suppléments fourrage + extras + livraison. */
