@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
           "x-carnet-secret": process.env.CARNET_HOOK_SECRET,
         },
-        signal: AbortSignal.timeout(4000),
+        signal: AbortSignal.timeout(15000),
         body: JSON.stringify({
           contact: {
             firstName: contact.firstName,
@@ -195,6 +195,7 @@ export async function POST(req: NextRequest) {
             extras: p.extras ?? null,
             partnerCode: p.partnerCode || null,
           },
+          photos: attachments.map((a) => ({ name: a.name, data: a.content })),
         }),
       });
     } catch (e) {
