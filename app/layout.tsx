@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { googleRating } from "@/lib/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SITE } from "@/lib/data";
@@ -91,13 +92,23 @@ const jsonLd = {
   servesCuisine: "Pâtisserie sur mesure",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const g = await googleRating();
+  const jsonLdWithRating = {
+    ...jsonLd,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: g.rating.replace(",", "."),
+      reviewCount: g.count,
+      bestRating: "5",
+    },
+  };
   return (
     <html lang="fr-CH" className={`${quicksand.variable} ${purgatory.variable} ${gatte.variable}`}>
       <body className="grain">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWithRating) }}
         />
         {children}
       </body>

@@ -223,34 +223,39 @@ export function estimateTotal(opts: {
 }
 
 /* -------------------------------------------------------- témoignages */
-/* ⚠️ PLACEHOLDERS rédigés d'après les retours récurrents (« beau ET bon »,
-   « à l'écoute ») décrits dans docs/BRAND.md. À REMPLACER par de vrais avis
-   clients (Instagram / WhatsApp) avant la mise en ligne. */
+/* Avis Google réels (fiche Maman Gâteau, ★ 5,0) — textes repris tels quels,
+   coupés aux phrases entières quand l'avis est long. */
 
 export const TESTIMONIALS = [
   {
-    quote: "Le gâteau était magnifique, mais alors le goût… nos invités en parlent encore !",
-    author: "Claire",
-    context: "anniversaire 30 ans, Lausanne",
+    quote: "Nous faisons confiance à Annie depuis plusieurs années et, à chaque fois, elle réussit à nous impressionner. Ses gâteaux sont non seulement magnifiques, mais surtout délicieux : jamais trop sucrés, toujours réalisés avec beaucoup de soin.",
+    author: "Davide D.",
+    context: "client fidèle",
     rotate: -2.5,
   },
   {
-    quote: "Annie a compris exactement ce que j'avais en tête, avec trois photos et deux messages.",
-    author: "Sofia",
-    context: "baby shower, Pully",
+    quote: "Nous avons eu une merveille de gâteau pour l'anniversaire de ma nièce ! Une belle pièce décorée avec précision et sublime à la dégustation. Tout le monde a adoré !",
+    author: "Catherine H.",
+    context: "anniversaire de sa nièce",
     rotate: 1.8,
   },
   {
-    quote: "Aussi beau que délicieux. On a gardé le topper en souvenir, ma fille l'a accroché dans sa chambre.",
-    author: "Mélanie",
-    context: "premier anniversaire, Vevey",
+    quote: "Un excellent gâteau d'anniversaire ! Magnifique, délicieux et parfaitement réalisé. Les saveurs étaient exceptionnelles et la présentation était superbe. Toute la famille a adoré.",
+    author: "M. Berger",
+    context: "gâteau d'anniversaire",
     rotate: -1.4,
   },
   {
-    quote: "Commande passée un peu tard, réponse en dix minutes, résultat au-delà de nos espérances.",
-    author: "David",
-    context: "surprise d'équipe, Morges",
+    quote: "Gâteaux délicieux et magnifiques : même les plus complexes niveau thèmes, elle les réussit à la perfection. C'est tellement beau et succulent. Vous pouvez y aller les yeux fermés.",
+    author: "Famille Brunetti",
+    context: "habitués des thèmes",
     rotate: 2.2,
+  },
+  {
+    quote: "Superbe création et un goût exceptionnel 😊 Merci encore",
+    author: "Christine R.",
+    context: "avis Google",
+    rotate: -1.9,
   },
 ] as const;
 

@@ -11,7 +11,7 @@ import { useEffect, useRef } from "react";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { TESTIMONIALS } from "@/lib/data";
 
-export default function Temoignages() {
+export default function Temoignages({ google }: { google?: { rating: string; count: number; url: string } }) {
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,8 +68,28 @@ export default function Temoignages() {
             <span className="sr-only">— les avis de nos clients</span>
           </h2>
           <p data-reveal className="mx-auto mt-5 max-w-md leading-relaxed text-cocoa">
-            Reçus par message, gardés précieusement — comme les recettes qui marchent.
+            Publiés sur Google par de vraies clientes — vérifiables en un clic.
           </p>
+          {google && (
+            <a
+              data-reveal
+              href={google.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-chocolate/10 bg-vanilla px-5 py-2.5 shadow-[0_12px_28px_-18px_rgba(74,44,32,0.45)] transition-transform duration-300 hover:scale-[1.04]"
+            >
+              <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden>
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+              </svg>
+              <span className="text-[15px] font-semibold text-chocolate">
+                <span className="text-gold">★</span> {google.rating}
+              </span>
+              <span className="text-[13px] text-grey-studio">· {google.count} avis Google</span>
+            </a>
+          )}
         </div>
 
         <div ref={gridRef} className="grid gap-8 sm:grid-cols-2 md:gap-10 lg:px-10">
@@ -103,7 +123,16 @@ export default function Temoignages() {
         </div>
 
         <p data-reveal className="mt-20 text-center text-sm text-grey-studio sm:mt-24">
-          D'autres mots doux chaque semaine sur Instagram ♥
+          {google ? (
+            <>
+              <a href={google.url} target="_blank" rel="noopener noreferrer" className="underline decoration-gold/50 underline-offset-4 transition-colors hover:text-chocolate">
+                Lire tous les avis sur Google
+              </a>
+              {" "}· d'autres mots doux chaque semaine sur Instagram ♥
+            </>
+          ) : (
+            "D'autres mots doux chaque semaine sur Instagram ♥"
+          )}
         </p>
       </div>
     </section>

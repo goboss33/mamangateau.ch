@@ -25,7 +25,7 @@ const SKIP_SPEED = 3.6;    // accélération si l'utilisateur interagit
 const framePath = (set: "desktop" | "mobile", i: number) =>
   `/frames/${set}/frame_${String(i).padStart(3, "0")}.webp`;
 
-export default function Hero() {
+export default function Hero({ google }: { google?: { rating: string; count: number; url: string } }) {
   const sectionRef = useRef<HTMLElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -331,7 +331,7 @@ export default function Hero() {
               ★★★★★
             </span>
             <span className="mt-1 text-xs font-semibold leading-none text-chocolate/70 transition-colors group-hover:text-chocolate">
-              les mots doux de mes clientes
+              {google ? `${google.rating} · ${google.count} avis Google` : "les mots doux de mes clientes"}
             </span>
           </span>
         </a>

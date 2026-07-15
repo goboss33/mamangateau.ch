@@ -14,8 +14,10 @@ import Configurateur from "@/components/sections/Configurateur";
 import Temoignages from "@/components/sections/Temoignages";
 import Livraison from "@/components/sections/Livraison";
 import Footer from "@/components/sections/Footer";
+import { googleRating } from "@/lib/google";
 
-export default function Home() {
+export default async function Home() {
+  const google = await googleRating();
   return (
     <Experience>
       <Preloader />
@@ -24,7 +26,7 @@ export default function Home() {
       <Navbar />
       <ContactDial />
       <main>
-        <Hero />
+        <Hero google={google} />
         <Histoire />
         <Rencontre />
         <Difference />
@@ -33,7 +35,7 @@ export default function Home() {
         />
         <Portfolio />
         <Configurateur />
-        <Temoignages />
+        <Temoignages google={google} />
         <Livraison />
       </main>
       <Footer />
