@@ -40,7 +40,7 @@ const STYLES_MARIAGE = [
 const FAQ: FaqItem[] = [
   {
     q: "Combien coûte un gâteau de mariage ?",
-    a: "Entre CHF 8 et 10 la part, décor et finitions compris : CHF 295 pour 30 parts, CHF 455 pour un deux-étages de 50 parts, CHF 515 pour 60 parts — au-delà, devis personnalisé. L'installation sur votre lieu de réception est offerte. Le devis précis est gratuit et sans engagement.",
+    a: "Comptez CHF 8.50 à 10 la part sur les formats courants, décor et finitions compris : CHF 295 pour 30 parts, CHF 455 pour un deux-étages de 50 parts, CHF 515 pour 60 parts — au-delà, devis personnalisé. L'installation sur votre lieu de réception est offerte. Le devis précis est gratuit et sans engagement.",
   },
   {
     q: "Peut-on goûter avant de commander ?",
@@ -166,7 +166,7 @@ export default function Page() {
         <div className="mx-auto max-w-6xl px-6">
           <SectionHead
             eyebrow="Le prix juste"
-            title="CHF 8 à 10 la part,"
+            title="CHF 8.50 à 10 la part,"
             script="installation comprise"
             lead="Quelques repères — chaque projet reçoit ensuite son devis précis, gratuit et sans engagement."
           />

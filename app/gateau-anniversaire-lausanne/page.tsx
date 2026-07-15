@@ -55,7 +55,7 @@ const ADULTES: GalleryItem[] = [
 const FAQ: FaqItem[] = [
   {
     q: "Combien coûte un gâteau d'anniversaire sur mesure ?",
-    a: "Le prix est unique et dégressif — plus le gâteau est grand, plus la part devient douce : CHF 100 jusqu'à 15 parts, CHF 145 pour 20 parts, CHF 185 pour 30 parts, soit environ CHF 6 à 8.50 la part, beau décor compris. Un gâteau à deux étages (dès 26 parts) démarre à CHF 210. Le configurateur vous affiche le prix en direct, et je le confirme avec le devis — gratuit et sans engagement.",
+    a: "Le prix est unique et dégressif — plus le gâteau est grand, plus la part devient douce : dès CHF 100 pour 12 parts, CHF 145 pour 20 parts, CHF 210 pour 30 parts, soit CHF 7 à 8.50 la part, beau décor compris. Un gâteau à deux étages (possible dès 26 parts) ajoute CHF 25. Le configurateur vous affiche le prix en direct, et je le confirme avec le devis — gratuit et sans engagement.",
   },
   {
     q: "Combien de temps à l'avance faut-il commander ?",
@@ -136,10 +136,10 @@ export default function Page() {
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              ["12–15 parts", "CHF 100", "goûter d'anniversaire"],
+              ["12–15 parts", "dès CHF 100", "goûter d'anniversaire"],
               ["20 parts", "CHF 145", "la fête de famille"],
-              ["30 parts", "CHF 185", "la grande tablée"],
-              ["2 étages · dès 26 parts", "dès CHF 210", "l'effet waouh"],
+              ["30 parts", "CHF 210", "la grande tablée"],
+              ["2 étages · dès 26 parts", "+ CHF 25", "l'effet waouh"],
             ].map(([parts, prix, note]) => (
               <div key={parts} data-reveal className="rounded-3xl border border-chocolate/10 bg-vanilla px-6 py-7 text-center">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-grey-studio">{parts}</p>
