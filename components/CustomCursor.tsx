@@ -24,9 +24,9 @@ export default function CustomCursor() {
     const dot = dotRef.current!;
     gsap.set(dot, { xPercent: -50, yPercent: -50, opacity: 0 });
 
-    /* Suivi quasi instantané : 80 ms de lissage, imperceptible comme latence */
-    const x = gsap.quickTo(dot, "x", { duration: 0.08, ease: "power3.out" });
-    const y = gsap.quickTo(dot, "y", { duration: 0.08, ease: "power3.out" });
+    /* Suivi 1:1 — collé au pointeur, zéro lissage donc zéro latence */
+    const x = gsap.quickSetter(dot, "x", "px") as (v: number) => void;
+    const y = gsap.quickSetter(dot, "y", "px") as (v: number) => void;
 
     let seen = false;
     let hovered = false;
