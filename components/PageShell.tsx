@@ -5,7 +5,6 @@
 --------------------------------------------------------------------------- */
 
 import Experience from "@/components/Experience";
-import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
 import ContactDial from "@/components/ContactDial";
 import Footer from "@/components/sections/Footer";
@@ -13,7 +12,6 @@ import Footer from "@/components/sections/Footer";
 export default function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <Experience>
-      <CustomCursor />
       <Navbar />
       <ContactDial />
       <main>{children}</main>

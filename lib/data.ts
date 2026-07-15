@@ -128,8 +128,8 @@ export const FOURRAGES: readonly Fourrage[] = [
   { id: "creme-vanille", label: "Crème vanille", sup: 0 },
   { id: "creme-fruits-rouges", label: "Crème fruits rouges", sup: 0 },
   { id: "creme-fraise", label: "Crème fraise", sup: 0 },
-  { id: "creme-framboise", label: "Crème framboise", sup: 8 },
-  { id: "creme-noisettes", label: "Crème noisettes", sup: 8 },
+  { id: "creme-framboise", label: "Crème framboise", sup: 0 },
+  { id: "creme-noisettes", label: "Crème noisettes", sup: 0 },
   { id: "creme-oreo", label: "Crème Oreo & mascarpone", sup: 8 },
   { id: "creme-caramel", label: "Crème caramel beurre salé", sup: 8 },
   { id: "coulis", label: "Coulis fraise, framboise ou fruits rouges", sup: 10 },
@@ -228,7 +228,7 @@ export function estimateTotal(opts: {
 
 export const TESTIMONIALS = [
   {
-    quote: "Nous faisons confiance à Annie depuis plusieurs années et, à chaque fois, elle réussit à nous impressionner. Ses gâteaux sont non seulement magnifiques, mais surtout délicieux : jamais trop sucrés, toujours réalisés avec beaucoup de soin.",
+    quote: "Simplement l'une des meilleures ! Nous faisons confiance à Annie depuis plusieurs années pour nos fêtes et, à chaque fois, elle réussit à nous impressionner. Ses gâteaux sont non seulement magnifiques, mais surtout délicieux : jamais trop sucrés, préparés avec des ingrédients de qualité aux saveurs naturelles et toujours réalisés avec beaucoup de soin. Je la recommande les yeux fermés !",
     author: "Davide D.",
     context: "client fidèle",
     rotate: -2.5,
