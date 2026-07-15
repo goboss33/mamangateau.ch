@@ -87,7 +87,7 @@ const jsonLd = {
   ].map((name) => ({ "@type": "City", name })),
   email: SITE.email,
   sameAs: [SITE.instagram],
-  priceRange: "CHF 80 - CHF 150",
+  priceRange: "CHF 24 - CHF 515",
   servesCuisine: "Pâtisserie sur mesure",
 };
 

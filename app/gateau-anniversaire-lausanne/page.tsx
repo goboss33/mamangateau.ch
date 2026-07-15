@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Gâteau d'anniversaire sur mesure à Lausanne | Maman Gâteau",
   description:
-    "Gâteaux d'anniversaire personnalisés pour enfants et adultes à Lausanne, Pully et sur la Riviera : licorne, princesse, dinosaure, élégance dorée… Dès CHF 80, devis gratuit sous 24 h.",
+    "Gâteaux d'anniversaire personnalisés pour enfants et adultes à Lausanne, Pully et sur la Riviera : licorne, princesse, dinosaure, élégance dorée… Dès CHF 100, devis gratuit sous 24 h.",
   alternates: { canonical: "/gateau-anniversaire-lausanne" },
   openGraph: {
     title: "Gâteau d'anniversaire sur mesure à Lausanne | Maman Gâteau",
@@ -55,7 +55,7 @@ const ADULTES: GalleryItem[] = [
 const FAQ: FaqItem[] = [
   {
     q: "Combien coûte un gâteau d'anniversaire sur mesure ?",
-    a: "Comptez entre CHF 5 et 7 la part selon la complexité du décor : environ CHF 80–110 pour 12 à 15 parts, CHF 105–140 pour 20 parts, CHF 155–210 pour 30 parts. Un gâteau à deux étages (dès 26 parts) démarre à CHF 185. Le configurateur vous donne une estimation immédiate, et je confirme le prix exact avec le devis — gratuit et sans engagement.",
+    a: "Le prix est unique et dégressif — plus le gâteau est grand, plus la part devient douce : CHF 100 jusqu'à 15 parts, CHF 145 pour 20 parts, CHF 185 pour 30 parts, soit environ CHF 6 à 8.50 la part, beau décor compris. Un gâteau à deux étages (dès 26 parts) démarre à CHF 210. Le configurateur vous affiche le prix en direct, et je le confirme avec le devis — gratuit et sans engagement.",
   },
   {
     q: "Combien de temps à l'avance faut-il commander ?",
@@ -132,14 +132,14 @@ export default function Page() {
             eyebrow="Le prix juste"
             title="Combien coûte"
             script="un gâteau sur mesure ?"
-            lead="Entre CHF 5 et 7 la part, selon le décor. Quelques repères — le configurateur affine l'estimation en direct, et le devis reste gratuit."
+            lead="Prix unique et dégressif : plus le gâteau est grand, plus la part devient douce. Quelques repères — le configurateur affiche le prix en direct, et le devis reste gratuit."
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              ["12–15 parts", "CHF 80–110", "goûter d'anniversaire"],
-              ["20 parts", "CHF 105–140", "la fête de famille"],
-              ["30 parts", "CHF 155–210", "la grande tablée"],
-              ["2 étages · dès 26 parts", "dès CHF 185", "l'effet waouh"],
+              ["12–15 parts", "CHF 100", "goûter d'anniversaire"],
+              ["20 parts", "CHF 145", "la fête de famille"],
+              ["30 parts", "CHF 185", "la grande tablée"],
+              ["2 étages · dès 26 parts", "dès CHF 210", "l'effet waouh"],
             ].map(([parts, prix, note]) => (
               <div key={parts} data-reveal className="rounded-3xl border border-chocolate/10 bg-vanilla px-6 py-7 text-center">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-grey-studio">{parts}</p>

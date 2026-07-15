@@ -40,7 +40,7 @@ const STYLES_MARIAGE = [
 const FAQ: FaqItem[] = [
   {
     q: "Combien coûte un gâteau de mariage ?",
-    a: "Entre CHF 8 et 10 la part, décor et finitions compris : environ CHF 240 pour 30 parts, dès CHF 450 pour un deux-étages de 50 parts, dès CHF 690 pour 80 parts. L'installation sur votre lieu de réception est offerte. Le devis précis est gratuit et sans engagement.",
+    a: "Entre CHF 8 et 10 la part, décor et finitions compris : CHF 295 pour 30 parts, CHF 455 pour un deux-étages de 50 parts, CHF 515 pour 60 parts — au-delà, devis personnalisé. L'installation sur votre lieu de réception est offerte. Le devis précis est gratuit et sans engagement.",
   },
   {
     q: "Peut-on goûter avant de commander ?",
@@ -172,9 +172,9 @@ export default function Page() {
           />
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              ["30 parts", "dès CHF 240", "l'intime"],
-              ["50 parts · 2 étages", "dès CHF 450", "le classique"],
-              ["80 parts · 2 étages", "dès CHF 690", "la grande fête"],
+              ["30 parts", "CHF 295", "l'intime"],
+              ["50 parts · 2 étages", "CHF 455", "le classique"],
+              ["60 parts · 2 étages", "CHF 515", "la grande fête"],
             ].map(([parts, prix, note]) => (
               <div key={parts} data-reveal className="rounded-3xl border border-chocolate/10 bg-vanilla px-6 py-7 text-center">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-grey-studio">{parts}</p>
@@ -184,7 +184,7 @@ export default function Page() {
             ))}
           </div>
           <p data-reveal className="mt-6 text-center text-sm text-grey-studio">
-            Installation sur votre lieu de réception offerte · livraison offerte jusqu'à 10 km de Pully, puis CHF 1/km.
+            Installation sur votre lieu de réception offerte · livraison offerte jusqu'à 10 km de Pully, puis CHF 1/km. Plus de 60 parts ? Devis personnalisé.
           </p>
         </div>
       </section>
