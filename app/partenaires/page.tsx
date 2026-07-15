@@ -6,11 +6,11 @@ import PartnerForm from "@/components/pages/PartnerForm";
 export const metadata: Metadata = {
   title: "Devenir partenaire — commerces & pros | Maman Gâteau",
   description:
-    "Cafés, boulangeries, photographes, wedding planners : recommandez un cake designer de confiance à vos clients, avec vos flyers personnalisés et une contrepartie définie ensemble. Lausanne & canton de Vaud.",
+    "Cafés, boulangeries, photographes, wedding planners : recommandez un cake designer de confiance à vos clients et touchez 10 % de commission sur chaque commande apportée. Flyers personnalisés à votre code. Lausanne & canton de Vaud.",
   alternates: { canonical: "/partenaires" },
   openGraph: {
     title: "Devenir partenaire | Maman Gâteau",
-    description: "Vos clients méritent un beau gâteau — recommandez, on partage. Partenariats pros, Lausanne & Vaud.",
+    description: "Vos clients méritent un beau gâteau — recommandez, touchez 10 % de commission. Partenariats pros, Lausanne & Vaud.",
     url: "/partenaires",
   },
 };
@@ -27,7 +27,7 @@ const POUR_QUI = [
 const FAQ: FaqItem[] = [
   {
     q: "Qu'est-ce que j'y gagne concrètement ?",
-    a: "C'est défini ensemble, selon votre activité : commission sur les commandes apportées, recommandation mutuelle (je parle de vous à mes clientes), ou une autre contrepartie qui a du sens pour vous. La discussion prend dix minutes, sans engagement.",
+    a: "10 % du montant de chaque commande apportée, tout simplement. Pas de palier, pas de petites lignes : une cliente commande avec votre code, 10 % du gâteau vous reviennent — versés comme vous préférez, Twint ou virement.",
   },
   {
     q: "Comment mes recommandations sont-elles comptées ?",
@@ -58,8 +58,9 @@ export default function Page() {
           <p data-reveal className="mx-auto mt-6 max-w-2xl leading-relaxed text-cocoa">
             Vos clients fêtent des anniversaires, se marient, célèbrent — et vous demandent
             parfois une bonne adresse. Devenez partenaire de Maman Gâteau : vous recommandez
-            un cake designer de confiance, vos clients vous remercient, et chaque commande
-            apportée vous revient en partie. Simple, sans engagement, à la vaudoise.
+            un cake designer de confiance, vos clients vous remercient, et vous touchez
+            <strong className="font-semibold text-chocolate"> 10 % de commission</strong> sur
+            chaque commande apportée. Simple, transparent, sans engagement.
           </p>
           <a
             data-reveal
@@ -81,9 +82,9 @@ export default function Page() {
           />
           <Steps
             items={[
-              { title: "On fait connaissance", text: "Dix minutes au téléphone ou autour d'un café : on définit la contrepartie qui vous convient — commission, recommandation croisée ou autre." },
+              { title: "Vous postulez", text: "Deux minutes de formulaire, c'est tout. Annie valide votre candidature et vous recontacte sous 24 h — le plus souvent sur WhatsApp." },
               { title: "Vous recevez vos flyers", text: "Des flyers élégants à votre code partenaire, avec QR code personnalisé, prêts à poser sur votre comptoir ou à glisser dans vos commandes." },
-              { title: "Vos clients commandent", text: "Chaque commande passée avec votre code vous est attribuée automatiquement — et votre contrepartie suit, en toute transparence." },
+              { title: "Vous touchez 10 %", text: "Chaque commande passée avec votre code vous est attribuée automatiquement — et 10 % de son montant vous reviennent, en toute transparence." },
             ]}
           />
         </div>
@@ -95,7 +96,7 @@ export default function Page() {
             eyebrow="Pour qui ?"
             title="Vous touchez nos clientes"
             script="avant nous"
-            lead="Le partenariat s'adresse aux professionnels — commerces, artisans, prestataires de l'événement — pas aux particuliers."
+            lead="Cafés, artisans, prestataires de l'événement : si vos clients fêtent quelque chose, on a toutes les raisons de travailler ensemble."
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {POUR_QUI.map((p) => (
