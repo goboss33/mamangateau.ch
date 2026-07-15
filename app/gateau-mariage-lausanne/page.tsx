@@ -166,9 +166,9 @@ export default function Page() {
         <div className="mx-auto max-w-6xl px-6">
           <SectionHead
             eyebrow="Le prix juste"
-            title="CHF 8.50 à 10 la part,"
-            script="installation comprise"
-            lead="Quelques repères — chaque projet reçoit ensuite son devis précis, gratuit et sans engagement."
+            title="Combien coûte"
+            script="votre gâteau de mariage ?"
+            lead="Chaque mariage est unique — voici quelques repères pour vous situer, décor et installation compris. Votre projet reçoit ensuite son devis précis : gratuit et sans engagement."
           />
           <div className="grid gap-4 sm:grid-cols-3">
             {[
@@ -186,6 +186,9 @@ export default function Page() {
           <p data-reveal className="mt-6 text-center text-sm text-grey-studio">
             Installation sur votre lieu de réception offerte · livraison offerte jusqu'à 10 km de Pully, puis CHF 1/km. Plus de 60 parts ? Devis personnalisé.
           </p>
+          <div data-reveal className="mt-8 text-center">
+            <a href="/?occasion=mariage#configurateur" className="btn-primary">Composer notre gâteau</a>
+          </div>
         </div>
       </section>
 
