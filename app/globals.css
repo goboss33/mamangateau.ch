@@ -380,12 +380,12 @@ input[type="range"].mg-range::-moz-range-thumb {
   initial-value: 0deg;
   inherits: false;
 }
-.mg-beam-wrap { position: relative; border-radius: 1rem; }
+.mg-beam-wrap { position: relative; border-radius: 0.75rem; }
 .mg-beam-wrap::before {
   content: "";
   position: absolute;
   inset: -2px;
-  border-radius: 1.1rem;
+  border-radius: 0.85rem;
   padding: 2px;
   background: conic-gradient(
     from var(--mg-beam-angle),

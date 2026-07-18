@@ -301,97 +301,111 @@ export const PORTFOLIO: PortfolioItem[] = [
 ];
 
 /* ------------------------------------------------------- thèmes (étape 4) */
-/* Base de suggestions du champ thème du configurateur — volontairement très
-   fournie : personnages demandés en vrai, animaux, univers, esthétiques,
-   passions, jalons. La cliente peut aussi écrire librement (60 car. max). */
-export const THEME_SUGGESTIONS: string[] = [
-  // — indécises
-  "Carte blanche à Annie", "Surprise — je vous fais confiance",
-  // — personnages & licences enfants
-  "Pat'Patrouille", "Reine des Neiges — Elsa", "Spiderman", "Batman", "Super-héros Marvel",
-  "Pokémon — Pikachu", "Super Mario", "Sonic", "Minecraft", "Fortnite", "Roblox", "Zelda",
-  "Kirby", "Animal Crossing", "Harry Potter", "Star Wars", "Barbie", "Princesses Disney",
-  "Vaiana", "Encanto", "Stitch", "Bluey", "Peppa Pig", "La Maison de Mickey", "Winnie l'Ourson",
-  "Miraculous Ladybug", "Pyjamasques", "T'choupi", "Petit Ours Brun", "Gabby et la maison magique",
-  "Naruto", "One Piece", "Dragon Ball", "Demon Slayer", "Totoro", "Kimono anime", "Sailor Moon",
-  "Toy Story", "Cars — Flash McQueen", "La Reine des Neiges 2", "Le Roi Lion", "Simba",
-  "Nemo & Dory", "Monstres & Cie", "Vice-versa", "Kung Fu Panda", "Dragons — Krokmou",
-  "Sirène Ariel", "Raiponce", "Cendrillon", "Belle et la Bête", "Aladdin", "Mulan",
-  "Hello Kitty", "Sanrio — Cinnamoroll", "Kuromi", "Pusheen", "Among Us", "Squid Game",
-  // — Disney & Pixar (les classiques que les clientes demandent)
-  "La Petite Sirène — Ariel", "Blanche-Neige", "Aurore — Belle au bois dormant", "Jasmine",
-  "Tiana — Princesse et la Grenouille", "Pocahontas", "Merida — Rebelle", "Anna & Elsa", "Olaf",
-  "Alice au pays des merveilles", "Peter Pan", "Pinocchio", "Bambi", "Dumbo",
-  "Les 101 Dalmatiens", "Les Aristochats — Marie", "La Belle et le Clochard",
-  "Le Livre de la jungle", "Robin des Bois", "Hercule", "Tarzan", "Zootopie",
-  "Raya et le dernier dragon", "Wish", "Lilo & Stitch", "Coco", "Luca", "Alerte rouge",
-  "Là-haut", "Wall-E", "Ratatouille", "Les Indestructibles", "Buzz l'Éclair",
-  "Woody — Toy Story", "Soul", "Élémentaire", "Mickey", "Minnie", "Donald Duck", "Dingo & Pluto",
-  // — animaux
-  "Licorne", "Licorne arc-en-ciel", "Dinosaure", "T-Rex", "Axolotl", "Panda", "Panda roux",
-  "Chat", "Chaton kawaii", "Chien", "Chiot", "Lapin", "Renard", "Papillons", "Abeille",
-  "Coccinelle", "Flamant rose", "Paresseux", "Koala", "Hérisson", "Biche & forêt", "Ours",
-  "Ourson", "Lion", "Éléphant", "Girafe", "Zèbre", "Baleine", "Dauphin", "Requin", "Pieuvre",
-  "Tortue de mer", "Grenouille", "Pingouin", "Chouette", "Hibou", "Cheval", "Poney",
-  "Dragon", "Dragon chinois", "Loup", "Tigre", "Singe", "Crocodile", "Escargot", "Poisson",
-  "Poule & poussins", "Vache", "Cochon", "Mouton", "Âne", "Lama", "Alpaga", "Souris",
-  "Hamster", "Cygne", "Paon", "Perroquet", "Toucan", "Méduse", "Hippocampe", "Crabe",
-  // — univers & imaginaires
-  "Sirène", "Queue de sirène", "Pirate", "Carte au trésor", "Espace & fusée", "Astronaute",
-  "Planètes & étoiles", "Système solaire", "Fée clochette", "Fées & paillettes", "Elfe",
-  "Château de princesse", "Château fort", "Chevalier", "Viking", "Médiéval fantastique",
-  "Sorcière", "Magie & baguettes", "Danseuse étoile", "Ballerine", "Cirque", "Clown",
-  "Safari", "Jungle", "Savane", "Forêt enchantée", "Champignons & lutins", "Océan",
-  "Fond marin", "Arc-en-ciel", "Nuages & étoiles", "Montgolfière", "Camion de pompier",
-  "Police", "Ambulance", "Chantier & pelleteuse", "Tracteur", "Ferme", "Train", "Locomotive",
-  "Voiture de course", "Formule 1", "Rallye", "Moto cross", "Avion", "Hélicoptère",
-  "Bateau", "Sous-marin", "Robot", "Extraterrestre", "Zombie", "Vampire", "Squelette mexicain",
-  "Cowboy & western", "Indien & tipi", "Égypte & pharaon", "Grèce antique", "Japon & sakura",
-  "New York", "Paris & tour Eiffel", "Londres", "Tour du monde", "Plage & cocotiers",
-  // — sports & passions
-  "Football", "FC Barcelone", "Real Madrid", "PSG", "Équipe de Suisse", "Hockey sur glace",
-  "Ski", "Snowboard", "Tennis", "Basketball", "Natation", "Gymnastique", "Danse",
-  "Équitation", "Escalade", "Randonnée & montagne", "Vélo", "VTT", "Moto", "Karting",
-  "Skateboard", "Trottinette freestyle", "Pêche", "Chasse", "Jardinage", "Potager",
-  "Lecture & livres", "Musique", "Guitare", "Piano", "Batterie", "Violon", "DJ & platines",
-  "Chant & micro", "Gaming & manette", "Jeux vidéo rétro", "Échecs", "Poker", "Casino",
-  "Photographie", "Cinéma", "Théâtre", "Peinture & pinceaux", "Couture", "Tricot",
-  "Camping & van", "Voyage & valises", "Avion & passeport", "Plongée sous-marine", "Voile",
-  "Yoga", "Fitness & haltères", "Course à pied", "Marathon", "Boxe", "Judo", "Karaté",
-  // — gourmandises & boissons (thèmes déco)
-  "Chocolat gourmand", "Fraises & chantilly", "Macarons", "Donuts", "Bonbons & candy",
-  "Glaces & sundae", "Café", "Thé & tea time", "Vin & vignoble", "Bière", "Whisky",
-  "Champagne", "Cocktails", "Raclette & fromage", "Fondue", "Pizza", "Sushi",
-  // — esthétiques & styles de gâteau
-  "Pastel poudré", "Arc-en-ciel pastel", "Doré & blanc", "Rose gold", "Noir & or",
-  "Bleu nuit & étoiles", "Bohème", "Champêtre", "Champêtre chic", "Tropical", "Exotique",
-  "Minimaliste chic", "Effet couture", "Drip chocolat", "Drip caramel", "Semi-naked",
-  "Naked cake", "Fleurs fraîches", "Fleurs en sucre", "Bouquet de roses", "Pivoines",
-  "Eucalyptus", "Papillons 3D", "Géode & cristaux", "Marbré", "Ombré dégradé",
-  "Vintage rétro", "Années 80", "Années 90", "Groovy années 70", "Disco", "Néon",
-  "Terrazzo", "Aquarelle", "Peinture abstraite", "Graffiti & street art", "Dentelle",
-  "Perles & nœuds", "Ruffles — volants", "Vagues de crème", "Effet tricot", "Bois rustique",
-  // — occasions & jalons
-  "Baby shower", "Gender reveal", "Baptême", "Communion", "Confirmation",
-  "Premier anniversaire — smash cake", "18 ans", "20 ans", "30 ans", "40 ans", "50 ans",
-  "60 ans", "70 ans", "80 ans", "Retraite", "EVJF", "EVG", "Fiançailles",
-  "Anniversaire de mariage", "Noces d'or", "Pendaison de crémaillère", "Diplôme & graduation",
-  "Permis de conduire", "Départ à l'étranger", "Bienvenue bébé", "Saint-Valentin",
-  "Fête des mères", "Fête des pères", "Noël", "Nouvel An", "Halloween", "Pâques",
-  "Carnaval", "1er août — fête nationale",
-  // — mariage
-  "Mariage élégant blanc", "Mariage champêtre", "Mariage bohème", "Mariage tropical",
-  "Mariage montagne & chalet", "Mariage viking", "Mariage médiéval", "Mariage rock",
-  "Mariage cinéma", "Mariage voyage", "Mariage hiver féérique", "Mariage automne",
-  // — métiers
-  "Infirmière", "Médecin", "Sage-femme", "Pompier", "Policier", "Maîtresse d'école",
-  "Enseignant", "Coiffeuse", "Esthéticienne", "Mécanicien", "Menuisier", "Agriculteur",
-  "Cuisinier", "Pâtissière", "Avocat", "Comptable", "Informaticien", "Architecte",
-  "Vétérinaire", "Jardinier paysagiste", "Chauffeur poids lourd", "Facteur",
-  // — Suisse & région
-  "Chalet suisse", "Edelweiss", "Vache & montagne", "Drapeau suisse", "Lac Léman",
-  "Vignes de Lavaux", "Cor des Alpes", "Fête des vignerons",
+/* Base des suggestions du champ thème, groupée en sections (parcours au doigt
+   sur mobile, en-têtes collantes). THEME_SUGGESTIONS reste la liste plate
+   (API /api/themes, vigie Carnet). Saisie libre possible (60 car. max). */
+
+export type ThemeSection = { label: string; items: string[] };
+
+export const THEME_SECTIONS: ThemeSection[] = [
+  { label: "Vous hésitez ?", items: [
+    "Carte blanche à Annie", "Surprise — je vous fais confiance",
+  ] },
+  { label: "Personnages & héros", items: [
+    "Pat'Patrouille", "Reine des Neiges — Elsa", "Spiderman", "Batman", "Super-héros Marvel",
+    "Pokémon — Pikachu", "Super Mario", "Sonic", "Minecraft", "Fortnite", "Roblox", "Zelda",
+    "Kirby", "Animal Crossing", "Harry Potter", "Star Wars", "Barbie", "Princesses Disney",
+    "Vaiana", "Encanto", "Stitch", "Bluey", "Peppa Pig", "La Maison de Mickey", "Winnie l'Ourson",
+    "Miraculous Ladybug", "Pyjamasques", "T'choupi", "Petit Ours Brun",
+    "Gabby et la maison magique", "Naruto", "One Piece", "Dragon Ball", "Demon Slayer", "Totoro",
+    "Kimono anime", "Sailor Moon", "Toy Story", "Cars — Flash McQueen", "La Reine des Neiges 2",
+    "Le Roi Lion", "Simba", "Nemo & Dory", "Monstres & Cie", "Vice-versa", "Kung Fu Panda",
+    "Dragons — Krokmou", "Sirène Ariel", "Raiponce", "Cendrillon", "Belle et la Bête", "Aladdin",
+    "Mulan", "Hello Kitty", "Sanrio — Cinnamoroll", "Kuromi", "Pusheen", "Among Us", "Squid Game",
+    "La Petite Sirène — Ariel", "Blanche-Neige", "Aurore — Belle au bois dormant", "Jasmine",
+    "Tiana — Princesse et la Grenouille", "Pocahontas", "Merida — Rebelle", "Anna & Elsa", "Olaf",
+    "Alice au pays des merveilles", "Peter Pan", "Pinocchio", "Bambi", "Dumbo",
+    "Les 101 Dalmatiens", "Les Aristochats — Marie", "La Belle et le Clochard",
+    "Le Livre de la jungle", "Robin des Bois", "Hercule", "Tarzan", "Zootopie",
+    "Raya et le dernier dragon", "Wish", "Lilo & Stitch", "Coco", "Luca", "Alerte rouge", "Là-haut",
+    "Wall-E", "Ratatouille", "Les Indestructibles", "Buzz l'Éclair", "Woody — Toy Story", "Soul",
+    "Élémentaire", "Mickey", "Minnie", "Donald Duck", "Dingo & Pluto",
+  ] },
+  { label: "Animaux", items: [
+    "Licorne", "Licorne arc-en-ciel", "Dinosaure", "T-Rex", "Axolotl", "Panda", "Panda roux",
+    "Chat", "Chaton kawaii", "Chien", "Chiot", "Lapin", "Renard", "Papillons", "Abeille",
+    "Coccinelle", "Flamant rose", "Paresseux", "Koala", "Hérisson", "Biche & forêt", "Ours",
+    "Ourson", "Lion", "Éléphant", "Girafe", "Zèbre", "Baleine", "Dauphin", "Requin", "Pieuvre",
+    "Tortue de mer", "Grenouille", "Pingouin", "Chouette", "Hibou", "Cheval", "Poney", "Dragon",
+    "Dragon chinois", "Loup", "Tigre", "Singe", "Crocodile", "Escargot", "Poisson",
+    "Poule & poussins", "Vache", "Cochon", "Mouton", "Âne", "Lama", "Alpaga", "Souris", "Hamster",
+    "Cygne", "Paon", "Perroquet", "Toucan", "Méduse", "Hippocampe", "Crabe",
+  ] },
+  { label: "Univers & aventures", items: [
+    "Sirène", "Queue de sirène", "Pirate", "Carte au trésor", "Espace & fusée", "Astronaute",
+    "Planètes & étoiles", "Système solaire", "Fée clochette", "Fées & paillettes", "Elfe",
+    "Château de princesse", "Château fort", "Chevalier", "Viking", "Médiéval fantastique",
+    "Sorcière", "Magie & baguettes", "Danseuse étoile", "Ballerine", "Cirque", "Clown", "Safari",
+    "Jungle", "Savane", "Forêt enchantée", "Champignons & lutins", "Océan", "Fond marin",
+    "Arc-en-ciel", "Nuages & étoiles", "Montgolfière", "Camion de pompier", "Police", "Ambulance",
+    "Chantier & pelleteuse", "Tracteur", "Ferme", "Train", "Locomotive", "Voiture de course",
+    "Formule 1", "Rallye", "Moto cross", "Avion", "Hélicoptère", "Bateau", "Sous-marin", "Robot",
+    "Extraterrestre", "Zombie", "Vampire", "Squelette mexicain", "Cowboy & western",
+    "Indien & tipi", "Égypte & pharaon", "Grèce antique", "Japon & sakura", "New York",
+    "Paris & tour Eiffel", "Londres", "Tour du monde", "Plage & cocotiers",
+  ] },
+  { label: "Ambiances & styles", items: [
+    "Pastel poudré", "Arc-en-ciel pastel", "Doré & blanc", "Rose gold", "Noir & or",
+    "Bleu nuit & étoiles", "Bohème", "Champêtre", "Champêtre chic", "Tropical", "Exotique",
+    "Minimaliste chic", "Effet couture", "Drip chocolat", "Drip caramel", "Semi-naked",
+    "Naked cake", "Fleurs fraîches", "Fleurs en sucre", "Bouquet de roses", "Pivoines",
+    "Eucalyptus", "Papillons 3D", "Géode & cristaux", "Marbré", "Ombré dégradé", "Vintage rétro",
+    "Années 80", "Années 90", "Groovy années 70", "Disco", "Néon", "Terrazzo", "Aquarelle",
+    "Peinture abstraite", "Graffiti & street art", "Dentelle", "Perles & nœuds",
+    "Ruffles — volants", "Vagues de crème", "Effet tricot", "Bois rustique",
+  ] },
+  { label: "Occasions & jalons", items: [
+    "Baby shower", "Gender reveal", "Baptême", "Communion", "Confirmation",
+    "Premier anniversaire — smash cake", "18 ans", "20 ans", "30 ans", "40 ans", "50 ans", "60 ans",
+    "70 ans", "80 ans", "Retraite", "EVJF", "EVG", "Fiançailles", "Anniversaire de mariage",
+    "Noces d'or", "Pendaison de crémaillère", "Diplôme & graduation", "Permis de conduire",
+    "Départ à l'étranger", "Bienvenue bébé", "Saint-Valentin", "Fête des mères", "Fête des pères",
+    "Noël", "Nouvel An", "Halloween", "Pâques", "Carnaval", "1er août — fête nationale",
+  ] },
+  { label: "Mariage", items: [
+    "Mariage élégant blanc", "Mariage champêtre", "Mariage bohème", "Mariage tropical",
+    "Mariage montagne & chalet", "Mariage viking", "Mariage médiéval", "Mariage rock",
+    "Mariage cinéma", "Mariage voyage", "Mariage hiver féérique", "Mariage automne",
+  ] },
+  { label: "Passions & sports", items: [
+    "Football", "FC Barcelone", "Real Madrid", "PSG", "Équipe de Suisse", "Hockey sur glace", "Ski",
+    "Snowboard", "Tennis", "Basketball", "Natation", "Gymnastique", "Danse", "Équitation",
+    "Escalade", "Randonnée & montagne", "Vélo", "VTT", "Moto", "Karting", "Skateboard",
+    "Trottinette freestyle", "Pêche", "Chasse", "Jardinage", "Potager", "Lecture & livres",
+    "Musique", "Guitare", "Piano", "Batterie", "Violon", "DJ & platines", "Chant & micro",
+    "Gaming & manette", "Jeux vidéo rétro", "Échecs", "Poker", "Casino", "Photographie", "Cinéma",
+    "Théâtre", "Peinture & pinceaux", "Couture", "Tricot", "Camping & van", "Voyage & valises",
+    "Avion & passeport", "Plongée sous-marine", "Voile", "Yoga", "Fitness & haltères",
+    "Course à pied", "Marathon", "Boxe", "Judo", "Karaté",
+  ] },
+  { label: "Gourmandises & boissons", items: [
+    "Chocolat gourmand", "Fraises & chantilly", "Macarons", "Donuts", "Bonbons & candy",
+    "Glaces & sundae", "Café", "Thé & tea time", "Vin & vignoble", "Bière", "Whisky", "Champagne",
+    "Cocktails", "Raclette & fromage", "Fondue", "Pizza", "Sushi",
+  ] },
+  { label: "Métiers", items: [
+    "Infirmière", "Médecin", "Sage-femme", "Pompier", "Policier", "Maîtresse d'école", "Enseignant",
+    "Coiffeuse", "Esthéticienne", "Mécanicien", "Menuisier", "Agriculteur", "Cuisinier",
+    "Pâtissière", "Avocat", "Comptable", "Informaticien", "Architecte", "Vétérinaire",
+    "Jardinier paysagiste", "Chauffeur poids lourd", "Facteur",
+  ] },
+  { label: "Esprit suisse", items: [
+    "Chalet suisse", "Edelweiss", "Vache & montagne", "Drapeau suisse", "Lac Léman",
+    "Vignes de Lavaux", "Cor des Alpes", "Fête des vignerons",
+  ] },
 ];
+
+export const THEME_SUGGESTIONS: string[] = THEME_SECTIONS.flatMap((s) => s.items);
 
 /* Pastilles mises en avant dans la liste du champ thème — curatées par
    occasion (à terme : issues des vraies stats Carnet). */
