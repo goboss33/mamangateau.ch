@@ -309,7 +309,7 @@ export type ThemeSection = { label: string; items: string[] };
 
 export const THEME_SECTIONS: ThemeSection[] = [
   { label: "Vous hésitez ?", items: [
-    "Carte blanche à Annie", "Surprise — je vous fais confiance",
+    "Pas d'idée précise — je fais confiance",
   ] },
   { label: "Personnages & héros", items: [
     "Pat'Patrouille", "Reine des Neiges — Elsa", "Spiderman", "Batman", "Super-héros Marvel",
@@ -409,8 +409,6 @@ export const THEME_SUGGESTIONS: string[] = THEME_SECTIONS.flatMap((s) => s.items
 
 /* Pastilles mises en avant dans la liste du champ thème — curatées par
    occasion (à terme : issues des vraies stats Carnet). */
-export const CARTE_BLANCHE = "Carte blanche à Annie";
-
 const TOP_THEMES_BY_CONTEXT: Record<string, string[]> = {
   enfant: ["Licorne", "Dinosaure", "Pat'Patrouille", "Pokémon — Pikachu", "Reine des Neiges — Elsa"],
   ado: ["Gaming & manette", "Minecraft", "Fortnite", "Football", "Naruto"],
