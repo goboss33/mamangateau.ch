@@ -84,7 +84,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
                   className="group overflow-hidden rounded-3xl border border-chocolate/10 bg-cream transition-shadow hover:shadow-[0_24px_48px_-24px_rgba(74,44,32,0.35)]"
                 >
                   {e.cover ? (
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-[4/5] overflow-hidden">
                       <Image
                         src={e.cover.src}
                         alt={e.cover.alt}
@@ -94,7 +94,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
                       />
                     </div>
                   ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center bg-vanilla text-4xl" aria-hidden>📖</div>
+                    <div className="flex aspect-[4/5] items-center justify-center bg-vanilla text-4xl" aria-hidden>📖</div>
                   )}
                   <div className="px-6 py-5">
                     <p className="eyebrow mb-2 !text-[11px]">{CATEGORY_LABEL[e.category]}{e.type === "ARTICLE" ? " · conseil" : ""}</p>

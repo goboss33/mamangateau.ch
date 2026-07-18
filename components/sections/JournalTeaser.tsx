@@ -20,7 +20,7 @@ export default async function JournalTeaser() {
           {entries.map((e) => (
             <Link key={e.slug} href={`/${JOURNAL_SEGMENT}/${e.slug}`} data-reveal className="group overflow-hidden rounded-3xl border border-chocolate/10 bg-vanilla transition-shadow hover:shadow-[0_24px_48px_-24px_rgba(74,44,32,0.35)]">
               {e.cover && (
-                <div className="relative aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[4/5] overflow-hidden">
                   <Image src={e.cover.src} alt={e.cover.alt} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
                 </div>
               )}

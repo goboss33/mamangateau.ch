@@ -115,17 +115,29 @@ export default async function Page({ params }: Props) {
       {gallery.length > 0 && (
         <section className="bg-cream pb-6">
           <div className="mx-auto max-w-5xl px-6">
-            {e.type === "CREATION" && gallery.length > 1 ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {gallery.map((img, i) => (
-                  <div key={i} data-reveal className={`relative overflow-hidden rounded-3xl ${i === 0 ? "sm:col-span-2 aspect-[16/10]" : "aspect-[4/5]"}`}>
-                    <Image src={img.src} alt={img.alt} fill sizes={i === 0 ? "(max-width: 1024px) 100vw, 1024px" : "(max-width: 640px) 100vw, 50vw"} className="object-cover" priority={i === 0} />
+            {/* ratio natif : les photos smartphone (portrait) s'affichent entières,
+                centrées sur le fond crème — jamais recadrées, jamais de barres */}
+            <div data-reveal>
+              <Image
+                src={gallery[0].src} alt={gallery[0].alt}
+                width={gallery[0].width} height={gallery[0].height}
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                className="mx-auto h-auto max-h-[640px] w-auto rounded-3xl"
+                priority
+              />
+            </div>
+            {gallery.length > 1 && (
+              <div className="mt-4 grid items-start gap-4 sm:grid-cols-2">
+                {gallery.slice(1).map((img, i) => (
+                  <div key={i} data-reveal>
+                    <Image
+                      src={img.src} alt={img.alt}
+                      width={img.width} height={img.height}
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                      className="h-auto w-full rounded-3xl"
+                    />
                   </div>
                 ))}
-              </div>
-            ) : (
-              <div data-reveal className="relative mx-auto aspect-[16/10] max-w-4xl overflow-hidden rounded-3xl">
-                <Image src={gallery[0].src} alt={gallery[0].alt} fill sizes="(max-width: 1024px) 100vw, 1024px" className="object-cover" priority />
               </div>
             )}
           </div>
@@ -176,7 +188,7 @@ export default async function Page({ params }: Props) {
               {others.map((o) => (
                 <Link key={o.slug} href={`/${JOURNAL_SEGMENT}/${o.slug}`} data-reveal className="group overflow-hidden rounded-3xl border border-chocolate/10 bg-vanilla">
                   {o.cover && (
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div className="relative aspect-[4/5] overflow-hidden">
                       <Image src={o.cover.src} alt={o.cover.alt} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
                     </div>
                   )}
