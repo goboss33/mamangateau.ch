@@ -51,9 +51,11 @@ function inline(s: string, key: string | number = 0): React.ReactNode[] {
   return out;
 }
 function Story({ md, bodyImages = [] }: { md: string; bodyImages?: { src: string; alt: string; width: number; height: number }[] }) {
+  // un marqueur posé en tête de paragraphe (un seul saut de ligne) devient un bloc isolé
+  const normalized = md.replace(/^[ \t]*(\[\[photo:\d+(?:\|(?:left|right))?\]\])[ \t]*$/gm, "\n$1\n");
   return (
     <div className="mg-story space-y-5 leading-relaxed text-cocoa">
-      {md.split(/\n{2,}/).map((b, i) => {
+      {normalized.split(/\n{2,}/).map((b, i) => {
         const t = b.trim();
         if (!t) return null;
         const ph = t.match(/^\[\[photo:(\d+)(?:\|(left|right))?\]\]$/);
@@ -116,8 +118,8 @@ export default async function Page({ params }: Props) {
   /* Récit illustré : les photos hors couverture, dans l'ordre — indices
      alignés sur les marqueurs [[photo:N]] générés par Carnet. */
   const bodyImages = e.images.filter((img) => img.src !== e.cover?.src);
-  const hasMarkers = /\[\[photo:\d+\]\]/.test(e.story);
-  const usedIdx = new Set([...e.story.matchAll(/\[\[photo:(\d+)\]\]/g)].map((m) => Number(m[1]) - 1));
+  const hasMarkers = /\[\[photo:\d+(?:\|(?:left|right))?\]\]/.test(e.story);
+  const usedIdx = new Set([...e.story.matchAll(/\[\[photo:(\d+)(?:\|(?:left|right))?\]\]/g)].map((m) => Number(m[1]) - 1));
   const leftover = hasMarkers ? bodyImages.filter((_, i) => !usedIdx.has(i)) : [];
 
   const jsonLd = {
