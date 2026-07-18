@@ -48,13 +48,14 @@ function Story({ md, bodyImages = [] }: { md: string; bodyImages?: { src: string
         if (ph) {
           const img = bodyImages[Number(ph[1]) - 1];
           if (!img) return null; // marqueur orphelin (photo retirée) : ignoré
+          const portrait = img.height > img.width;
           return (
             <Image
               key={i}
               src={img.src} alt={img.alt}
               width={img.width} height={img.height}
               sizes="(max-width: 768px) 100vw, 672px"
-              className="!my-8 h-auto w-full rounded-3xl"
+              className={portrait ? "!my-8 mx-auto h-auto max-h-[520px] w-auto rounded-3xl" : "!my-8 h-auto w-full rounded-3xl"}
             />
           );
         }
@@ -80,6 +81,7 @@ export default async function Page({ params }: Props) {
   const others = (await journalList()).filter((o) => o.slug !== e.slug).slice(0, 3);
   const pillar = CATEGORY_PILLAR[e.category];
   const gallery = e.type === "CREATION" ? e.images : e.images.slice(0, 1);
+  const hero = e.cover ?? gallery[0] ?? null;
 
   /* Récit illustré : les photos hors couverture, dans l'ordre — indices
      alignés sur les marqueurs [[photo:N]] générés par Carnet. */
@@ -133,23 +135,23 @@ export default async function Page({ params }: Props) {
       </section>
 
       {/* -------------------------------------------------- galerie / cover */}
-      {gallery.length > 0 && (
+      {hero && (
         <section className="bg-cream pb-6">
           <div className="mx-auto max-w-5xl px-6">
             {/* ratio natif : les photos smartphone (portrait) s'affichent entières,
                 centrées sur le fond crème — jamais recadrées, jamais de barres */}
             <div data-reveal>
               <Image
-                src={gallery[0].src} alt={gallery[0].alt}
-                width={gallery[0].width} height={gallery[0].height}
+                src={hero.src} alt={hero.alt}
+                width={hero.width} height={hero.height}
                 sizes="(max-width: 1024px) 100vw, 1024px"
                 className="mx-auto h-auto max-h-[640px] w-auto rounded-3xl"
                 priority
               />
             </div>
-            {!hasMarkers && gallery.length > 1 && (
+            {!hasMarkers && gallery.filter((g) => g.src !== hero.src).length > 0 && (
               <div className="mt-4 grid items-start gap-4 sm:grid-cols-2">
-                {gallery.slice(1).map((img, i) => (
+                {gallery.filter((g) => g.src !== hero.src).map((img, i) => (
                   <div key={i} data-reveal>
                     <Image
                       src={img.src} alt={img.alt}
