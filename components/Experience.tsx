@@ -34,42 +34,63 @@ export default function Experience({ children }: { children: React.ReactNode }) 
       gsap.ticker.lagSmoothing(0);
 
       /* ----------------------------------------------- reveals génériques */
-      const targets = gsap.utils.toArray<HTMLElement>("[data-reveal]");
-      let aboveFold = 0;
-      targets.forEach((el) => {
-        /* Déjà visible au chargement (pages sans hero plein écran) :
-           entrée en cascade, pas de scrub — il n'y a pas de scroll à jouer. */
-        if (el.getBoundingClientRect().top < window.innerHeight * 0.98) {
+      /* Scan répétable : les navigations client (filtres du Journal, liens
+         internes) montent de NOUVEAUX nœuds [data-reveal] après coup — sans
+         re-scan ils restaient à opacité 0 (invisibles mais cliquables).
+         Chaque élément traité est marqué data-revealed. */
+      const revealScan = () => {
+        const targets = gsap.utils.toArray<HTMLElement>("[data-reveal]:not([data-revealed])");
+        let aboveFold = 0;
+        targets.forEach((el) => {
+          el.dataset.revealed = "1";
+          /* Déjà visible (pages sans hero plein écran, contenu re-rendu) :
+             entrée en cascade, pas de scrub — il n'y a pas de scroll à jouer. */
+          if (el.getBoundingClientRect().top < window.innerHeight * 0.98) {
+            gsap.to(el, {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              scale: 1,
+              duration: 0.9,
+              delay: 0.15 + 0.07 * aboveFold++,
+              ease: "power3.out",
+            });
+            return;
+          }
           gsap.to(el, {
             opacity: 1,
             x: 0,
             y: 0,
             scale: 1,
-            duration: 0.9,
-            delay: 0.15 + 0.07 * aboveFold++,
-            ease: "power3.out",
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "clamp(top 94%)",
+              end: "clamp(top 72%)",
+              scrub: 0.5,
+            },
           });
-          return;
-        }
-        gsap.to(el, {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scale: 1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "clamp(top 94%)",
-            end: "clamp(top 72%)",
-            scrub: 0.5,
-          },
         });
+      };
+      revealScan();
+
+      /* Nouveaux nœuds après navigation client → re-scan (débouncé) */
+      let moTimer: number | undefined;
+      const mo = new MutationObserver(() => {
+        window.clearTimeout(moTimer);
+        moTimer = window.setTimeout(() => {
+          revealScan();
+          ScrollTrigger.refresh();
+        }, 120);
       });
+      mo.observe(document.body, { childList: true, subtree: true });
 
       /* Recalibrage une fois les fonts chargées (hauteurs stables) */
       document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
       return () => {
+        mo.disconnect();
+        window.clearTimeout(moTimer);
         gsap.ticker.remove(raf);
         lenis.destroy();
         ScrollTrigger.getAll().forEach((st) => st.kill());
