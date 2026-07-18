@@ -56,10 +56,12 @@ const REVALIDATE = 3600; // filet — le webhook de Carnet rafraîchit immédiat
 
 type RawImage = { path: string; thumbPath?: string; alt: string; width: number | null; height: number | null } | null;
 
-function toImg(base: string, raw: RawImage, thumb = false): JournalImage | null {
+function toImg(raw: RawImage, thumb = false): JournalImage | null {
   if (!raw) return null;
+  const p = thumb && raw.thumbPath ? raw.thumbPath : raw.path;
   return {
-    src: `${base}${thumb && raw.thumbPath ? raw.thumbPath : raw.path}`,
+    // proxy local : le navigateur reste sur le domaine du site (cache CF)
+    src: p.replace("/api/public/journal-media/", "/api/journal-media/"),
     alt: raw.alt ?? "",
     width: raw.width ?? 1080,
     height: raw.height ?? 1350,
@@ -73,7 +75,7 @@ export async function journalList(category?: JournalCategory): Promise<JournalLi
     const res = await fetch(`${base}/api/public/journal?limit=100`, {
       next: { revalidate: REVALIDATE, tags: ["journal"] },
     });
-    if (!res.ok) return [];
+    if (!res.ok || !(res.headers.get("content-type") ?? "").includes("json")) return [];
     const j = await res.json();
     const items: JournalListItem[] = (j.entries ?? []).map((e: Record<string, unknown>) => ({
       slug: String(e.slug),
@@ -82,7 +84,7 @@ export async function journalList(category?: JournalCategory): Promise<JournalLi
       title: String(e.title ?? ""),
       metaDescription: String(e.metaDescription ?? ""),
       publishedAt: (e.publishedAt as string) ?? null,
-      cover: toImg(base, e.cover as RawImage),
+      cover: toImg(e.cover as RawImage),
     }));
     return category ? items.filter((i) => i.category === category) : items;
   } catch (e) {
@@ -98,7 +100,7 @@ export async function journalEntry(slug: string): Promise<JournalDetail | null> 
     const res = await fetch(`${base}/api/public/journal/${slug}`, {
       next: { revalidate: REVALIDATE, tags: ["journal", `journal-${slug}`] },
     });
-    if (!res.ok) return null;
+    if (!res.ok || !(res.headers.get("content-type") ?? "").includes("json")) return null;
     const e = await res.json();
     return {
       slug: String(e.slug),
@@ -111,8 +113,8 @@ export async function journalEntry(slug: string): Promise<JournalDetail | null> 
       story: String(e.story ?? ""),
       publishedAt: e.publishedAt ?? null,
       updatedAt: e.updatedAt ?? new Date().toISOString(),
-      cover: toImg(base, e.cover as RawImage),
-      images: (Array.isArray(e.images) ? e.images : []).map((i: RawImage) => toImg(base, i)).filter(Boolean) as JournalImage[],
+      cover: e.cover ? toImg(e.cover as RawImage) : null,
+      images: (Array.isArray(e.images) ? e.images : []).map((i: RawImage) => toImg(i)).filter(Boolean) as JournalImage[],
     };
   } catch (e) {
     console.error("journal entry:", e);
