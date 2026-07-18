@@ -30,6 +30,7 @@ export type JournalImage = { src: string; alt: string; width: number; height: nu
 export type JournalListItem = {
   slug: string;
   type: "CREATION" | "ARTICLE";
+  format: "ARTICLE" | "VIDEO" | "DIAPORAMA";
   category: JournalCategory;
   title: string;
   metaDescription: string;
@@ -38,6 +39,8 @@ export type JournalListItem = {
 };
 
 export type JournalDetail = JournalListItem & {
+  youtubeUrl: string;
+  video: { src: string; width: number | null; height: number | null; durationSec: number | null } | null;
   metaTitle: string;
   keywords: string[];
   story: string;
@@ -80,6 +83,7 @@ export async function journalList(category?: JournalCategory): Promise<JournalLi
     const items: JournalListItem[] = (j.entries ?? []).map((e: Record<string, unknown>) => ({
       slug: String(e.slug),
       type: e.type === "ARTICLE" ? "ARTICLE" : "CREATION",
+      format: e.format === "VIDEO" ? "VIDEO" : e.format === "DIAPORAMA" ? "DIAPORAMA" : "ARTICLE",
       category: String(e.category) as JournalCategory,
       title: String(e.title ?? ""),
       metaDescription: String(e.metaDescription ?? ""),
@@ -102,9 +106,15 @@ export async function journalEntry(slug: string): Promise<JournalDetail | null> 
     });
     if (!res.ok || !(res.headers.get("content-type") ?? "").includes("json")) return null;
     const e = await res.json();
+    const rawVideo = e.video as { path?: string; width?: number | null; height?: number | null; durationSec?: number | null } | null;
     return {
       slug: String(e.slug),
       type: e.type === "ARTICLE" ? "ARTICLE" : "CREATION",
+      format: e.format === "VIDEO" ? "VIDEO" : e.format === "DIAPORAMA" ? "DIAPORAMA" : "ARTICLE",
+      youtubeUrl: String(e.youtubeUrl ?? ""),
+      video: rawVideo?.path
+        ? { src: rawVideo.path.replace("/api/public/journal-media/", "/api/journal-media/"), width: rawVideo.width ?? null, height: rawVideo.height ?? null, durationSec: rawVideo.durationSec ?? null }
+        : null,
       category: String(e.category) as JournalCategory,
       title: String(e.title ?? ""),
       metaTitle: String(e.metaTitle ?? ""),

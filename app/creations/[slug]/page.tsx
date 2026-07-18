@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
+import YouTubeLite from "@/components/YouTubeLite";
 import { JsonLd } from "@/components/pages/blocks";
 import {
   journalEntry, journalList, CATEGORY_LABEL, CATEGORY_PILLAR, JOURNAL_SEGMENT,
@@ -132,6 +133,17 @@ export default async function Page({ params }: Props) {
     publisher: { "@type": "Organization", name: SITE.name, url: SITE.domain, logo: { "@type": "ImageObject", url: `${SITE.domain}/images/logo-carre.png` } },
     mainEntityOfPage: `${SITE.domain}/${JOURNAL_SEGMENT}/${e.slug}`,
   };
+  const videoLd = e.format === "VIDEO" && (e.youtubeUrl || e.video)
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: e.title,
+        description: e.metaDescription || e.title,
+        thumbnailUrl: e.cover ? [e.cover.src.startsWith("http") ? e.cover.src : `${SITE.domain}${e.cover.src}`] : undefined,
+        uploadDate: e.publishedAt ?? undefined,
+        ...(e.youtubeUrl ? { embedUrl: e.youtubeUrl } : { contentUrl: `${SITE.domain}${e.video!.src}` }),
+      }
+    : null;
   const breadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -144,7 +156,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <PageShell>
-      <JsonLd data={[jsonLd, breadcrumb]} />
+      <JsonLd data={videoLd ? [jsonLd, videoLd, breadcrumb] : [jsonLd, breadcrumb]} />
 
       {/* ------------------------------------------------------------ hero */}
       <section className="bg-cream pb-12 pt-36 md:pb-16 md:pt-44">
@@ -164,7 +176,23 @@ export default async function Page({ params }: Props) {
       </section>
 
       {/* -------------------------------------------------- galerie / cover */}
-      {hero && (
+      {e.format === "VIDEO" && (e.youtubeUrl || e.video) && (
+        <section className="bg-cream pb-6">
+          <div className="mx-auto max-w-5xl px-6" data-reveal>
+            {e.youtubeUrl ? (
+              <YouTubeLite url={e.youtubeUrl} title={e.title} />
+            ) : e.video ? (
+              <video
+                controls playsInline preload="metadata"
+                poster={hero?.src}
+                src={e.video.src}
+                className="mx-auto max-h-[640px] w-auto rounded-3xl bg-chocolate/5"
+              />
+            ) : null}
+          </div>
+        </section>
+      )}
+      {!(e.format === "VIDEO" && (e.youtubeUrl || e.video)) && hero && (
         <section className="bg-cream pb-6">
           <div className="mx-auto max-w-5xl px-6">
             {/* ratio natif : les photos smartphone (portrait) s'affichent entières,

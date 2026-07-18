@@ -101,6 +101,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
                     ) : (
                       <div className="flex h-full items-center justify-center text-4xl" aria-hidden>📖</div>
                     )}
+                    {e.format === "VIDEO" && (
+                      <span className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-chocolate/75 text-vanilla backdrop-blur-sm">
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="ml-0.5 size-4"><path d="M8 5.5v13l11-6.5z" /></svg>
+                      </span>
+                    )}
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-chocolate/85 via-chocolate/45 to-transparent px-4 pb-3.5 pt-10">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-vanilla/75">
                         {CATEGORY_LABEL[e.category]}{e.type === "ARTICLE" ? " · conseil" : ""}
