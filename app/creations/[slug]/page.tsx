@@ -38,12 +38,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function inline(s: string, key = 0): React.ReactNode[] {
   return s.split(/\*\*(.+?)\*\*/g).map((p, i) => (i % 2 ? <strong key={`${key}-${i}`} className="font-semibold text-chocolate">{p}</strong> : p));
 }
-function Story({ md }: { md: string }) {
+function Story({ md, bodyImages = [] }: { md: string; bodyImages?: { src: string; alt: string; width: number; height: number }[] }) {
   return (
     <div className="space-y-5 leading-relaxed text-cocoa">
       {md.split(/\n{2,}/).map((b, i) => {
         const t = b.trim();
         if (!t) return null;
+        const ph = t.match(/^\[\[photo:(\d+)\]\]$/);
+        if (ph) {
+          const img = bodyImages[Number(ph[1]) - 1];
+          if (!img) return null; // marqueur orphelin (photo retirée) : ignoré
+          return (
+            <Image
+              key={i}
+              src={img.src} alt={img.alt}
+              width={img.width} height={img.height}
+              sizes="(max-width: 768px) 100vw, 672px"
+              className="!my-8 h-auto w-full rounded-3xl"
+            />
+          );
+        }
         if (t.startsWith("## ")) return <h2 key={i} className="font-display pt-3 text-2xl text-chocolate md:text-3xl">{t.slice(3)}</h2>;
         if (t.startsWith("### ")) return <h3 key={i} className="font-display pt-2 text-xl text-chocolate">{t.slice(4)}</h3>;
         if (/^[-*] /m.test(t))
@@ -66,6 +80,13 @@ export default async function Page({ params }: Props) {
   const others = (await journalList()).filter((o) => o.slug !== e.slug).slice(0, 3);
   const pillar = CATEGORY_PILLAR[e.category];
   const gallery = e.type === "CREATION" ? e.images : e.images.slice(0, 1);
+
+  /* Récit illustré : les photos hors couverture, dans l'ordre — indices
+     alignés sur les marqueurs [[photo:N]] générés par Carnet. */
+  const bodyImages = e.images.filter((img) => img.src !== e.cover?.src);
+  const hasMarkers = /\[\[photo:\d+\]\]/.test(e.story);
+  const usedIdx = new Set([...e.story.matchAll(/\[\[photo:(\d+)\]\]/g)].map((m) => Number(m[1]) - 1));
+  const leftover = hasMarkers ? bodyImages.filter((_, i) => !usedIdx.has(i)) : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -126,7 +147,7 @@ export default async function Page({ params }: Props) {
                 priority
               />
             </div>
-            {gallery.length > 1 && (
+            {!hasMarkers && gallery.length > 1 && (
               <div className="mt-4 grid items-start gap-4 sm:grid-cols-2">
                 {gallery.slice(1).map((img, i) => (
                   <div key={i} data-reveal>
@@ -147,7 +168,14 @@ export default async function Page({ params }: Props) {
       {/* ------------------------------------------------------------ récit */}
       <section className="bg-cream py-12 md:py-16">
         <div data-reveal className="mx-auto max-w-2xl px-6 text-[17px]">
-          <Story md={e.story} />
+          <Story md={e.story} bodyImages={hasMarkers ? bodyImages : []} />
+          {leftover.length > 0 && (
+            <div className="mt-8 grid items-start gap-4 sm:grid-cols-2">
+              {leftover.map((img, i) => (
+                <Image key={i} src={img.src} alt={img.alt} width={img.width} height={img.height} sizes="(max-width: 640px) 100vw, 336px" className="h-auto w-full rounded-3xl" />
+              ))}
+            </div>
+          )}
           {pillar && (
             <p className="mt-8 rounded-2xl border border-chocolate/10 bg-vanilla px-6 py-4 text-[15px]">
               📌 <Link href={pillar.href} className="font-semibold text-chocolate underline">{pillar.label}</Link>
