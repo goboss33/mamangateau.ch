@@ -829,7 +829,7 @@ export default function Configurateur() {
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-grey-studio">
                   Le thème, l'univers, les couleurs — en quelques mots
                 </p>
-                <ThemeField value={theme} onChange={setTheme} inputCls={inputCls} />
+                <ThemeField value={theme} onChange={setTheme} inputCls={inputCls} occasion={occasion} age={isBirthday ? parseInt(age, 10) || null : null} />
                 <p className="mt-6 text-[13px] leading-relaxed text-grey-studio">
                   Tapez deux lettres et laissez-vous guider — ou écrivez votre idée librement.
                   Les détails (étages, questions…) se règlent avec Annie après le devis.

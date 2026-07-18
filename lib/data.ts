@@ -318,6 +318,15 @@ export const THEME_SUGGESTIONS: string[] = [
   "Nemo & Dory", "Monstres & Cie", "Vice-versa", "Kung Fu Panda", "Dragons — Krokmou",
   "Sirène Ariel", "Raiponce", "Cendrillon", "Belle et la Bête", "Aladdin", "Mulan",
   "Hello Kitty", "Sanrio — Cinnamoroll", "Kuromi", "Pusheen", "Among Us", "Squid Game",
+  // — Disney & Pixar (les classiques que les clientes demandent)
+  "La Petite Sirène — Ariel", "Blanche-Neige", "Aurore — Belle au bois dormant", "Jasmine",
+  "Tiana — Princesse et la Grenouille", "Pocahontas", "Merida — Rebelle", "Anna & Elsa", "Olaf",
+  "Alice au pays des merveilles", "Peter Pan", "Pinocchio", "Bambi", "Dumbo",
+  "Les 101 Dalmatiens", "Les Aristochats — Marie", "La Belle et le Clochard",
+  "Le Livre de la jungle", "Robin des Bois", "Hercule", "Tarzan", "Zootopie",
+  "Raya et le dernier dragon", "Wish", "Lilo & Stitch", "Coco", "Luca", "Alerte rouge",
+  "Là-haut", "Wall-E", "Ratatouille", "Les Indestructibles", "Buzz l'Éclair",
+  "Woody — Toy Story", "Soul", "Élémentaire", "Mickey", "Minnie", "Donald Duck", "Dingo & Pluto",
   // — animaux
   "Licorne", "Licorne arc-en-ciel", "Dinosaure", "T-Rex", "Axolotl", "Panda", "Panda roux",
   "Chat", "Chaton kawaii", "Chien", "Chiot", "Lapin", "Renard", "Papillons", "Abeille",
@@ -384,6 +393,25 @@ export const THEME_SUGGESTIONS: string[] = [
   "Vignes de Lavaux", "Cor des Alpes", "Fête des vignerons",
 ];
 
-/* Pastilles mises en avant sous le champ thème (à terme : issues des stats Carnet). */
-export const TOP_THEMES = ["Licorne", "Dinosaure", "Pat'Patrouille", "Spiderman", "Fleurs fraîches"];
+/* Pastilles mises en avant dans la liste du champ thème — curatées par
+   occasion (à terme : issues des vraies stats Carnet). */
 export const CARTE_BLANCHE = "Carte blanche à Annie";
+
+const TOP_THEMES_BY_CONTEXT: Record<string, string[]> = {
+  enfant: ["Licorne", "Dinosaure", "Pat'Patrouille", "Pokémon — Pikachu", "Reine des Neiges — Elsa"],
+  ado: ["Gaming & manette", "Minecraft", "Fortnite", "Football", "Naruto"],
+  adulte: ["Fleurs fraîches", "Drip chocolat", "Doré & blanc", "Voyage & valises", "Vin & vignoble"],
+  mariage: ["Mariage élégant blanc", "Mariage champêtre", "Mariage bohème", "Semi-naked", "Fleurs fraîches"],
+  "baby-shower": ["Arc-en-ciel pastel", "Nuages & étoiles", "Ourson", "Montgolfière", "Bienvenue bébé"],
+  entreprise: ["Logo & couleurs de l'entreprise", "Minimaliste chic", "Doré & blanc", "Drip chocolat", "Casino"],
+  defaut: ["Licorne", "Fleurs fraîches", "Drip chocolat", "Arc-en-ciel pastel", "Doré & blanc"],
+};
+
+export function topThemesFor(occasion: string | null, age: number | null): string[] {
+  if (occasion === "anniversaire-enfant") return age != null && age >= 13 ? TOP_THEMES_BY_CONTEXT.ado : TOP_THEMES_BY_CONTEXT.enfant;
+  if (occasion === "anniversaire-adulte") return TOP_THEMES_BY_CONTEXT.adulte;
+  if (occasion === "mariage") return TOP_THEMES_BY_CONTEXT.mariage;
+  if (occasion === "baby-shower") return TOP_THEMES_BY_CONTEXT["baby-shower"];
+  if (occasion === "entreprise") return TOP_THEMES_BY_CONTEXT.entreprise;
+  return TOP_THEMES_BY_CONTEXT.defaut;
+}
