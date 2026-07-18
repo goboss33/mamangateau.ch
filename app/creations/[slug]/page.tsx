@@ -4,6 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import YouTubeLite from "@/components/YouTubeLite";
+import ShareRow from "@/components/ShareRow";
 import { JsonLd } from "@/components/pages/blocks";
 import {
   journalEntry, journalList, CATEGORY_LABEL, CATEGORY_PILLAR, JOURNAL_SEGMENT,
@@ -131,7 +132,7 @@ export default async function Page({ params }: Props) {
     dateModified: e.updatedAt,
     inLanguage: "fr-CH",
     image: e.images.map((i) => i.src),
-    author: { "@type": "Person", name: "Annie", url: SITE.domain },
+    author: { "@type": "Person", name: "Annie", jobTitle: "Cake designer", url: `${SITE.domain}/#histoire`, sameAs: [SITE.instagram] },
     publisher: { "@type": "Organization", name: SITE.name, url: SITE.domain, logo: { "@type": "ImageObject", url: `${SITE.domain}/images/logo-carre.png` } },
     mainEntityOfPage: `${SITE.domain}/${JOURNAL_SEGMENT}/${e.slug}`,
   };
@@ -243,6 +244,27 @@ export default async function Page({ params }: Props) {
               {" — "}prix, saveurs, délais et toutes les réponses à vos questions.
             </p>
           )}
+
+          <ShareRow title={e.title} path={`/${JOURNAL_SEGMENT}/${e.slug}`} image={e.cover?.src} />
+
+          {/* bloc auteur — une vraie personne derrière chaque page (E-E-A-T) */}
+          <div data-reveal className="mt-8 flex items-center gap-4 rounded-3xl border border-chocolate/10 bg-vanilla px-6 py-5">
+            <Image
+              src="/images/rencontre-poster.webp"
+              alt="Annie, cake designer de Maman Gâteau, dans son atelier de Pully"
+              width={72} height={72}
+              className="size-[72px] shrink-0 rounded-full object-cover"
+            />
+            <div className="min-w-0">
+              <p className="font-display text-lg text-chocolate">Annie</p>
+              <p className="text-[13.5px] leading-snug text-cocoa">
+                Cake designer à Pully, passée par une maison étoilée — chaque gâteau de ce journal est
+                sorti de son atelier. <Link href="/#histoire" className="font-semibold text-chocolate underline">Son histoire</Link>
+                {" · "}
+                <Link href="/#configurateur" className="font-semibold text-chocolate underline">Composer le vôtre</Link>
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

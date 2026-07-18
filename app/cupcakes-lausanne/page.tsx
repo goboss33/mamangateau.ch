@@ -10,7 +10,7 @@ import {
   CrossLinks,
   JsonLd,
   faqJsonLd,
-  breadcrumbJsonLd,
+  breadcrumbJsonLd, serviceJsonLd,
   type FaqItem,
   type GalleryItem,
 } from "@/components/pages/blocks";
@@ -82,7 +82,7 @@ const WA_CUPCAKES = waLink(
 export default function Page() {
   return (
     <PageShell>
-      <JsonLd data={[faqJsonLd(FAQ), breadcrumbJsonLd("Cupcakes à Lausanne", "/cupcakes-lausanne"), ...productsJsonLd]} />
+      <JsonLd data={[faqJsonLd(FAQ), breadcrumbJsonLd("Cupcakes à Lausanne", "/cupcakes-lausanne"), ...productsJsonLd, serviceJsonLd("Cupcakes personnalisés", "Cupcakes personnalisés dès CHF 24, pour anniversaires, baby showers et événements d'entreprise — Lausanne et environs.", "/cupcakes-lausanne")]} />
 
       <LandingHero
         crumb="Cupcakes"

@@ -25,6 +25,19 @@ export function faqJsonLd(items: FaqItem[]) {
   };
 }
 
+export function serviceJsonLd(name: string, description: string, path: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name,
+    description,
+    serviceType: name,
+    url: `${SITE.domain}${path}`,
+    provider: { "@type": "Bakery", name: SITE.name, url: SITE.domain },
+    areaServed: ["Lausanne", "Pully", "Vevey", "Montreux", "Morges", "Riviera vaudoise"].map((n) => ({ "@type": "City", name: n })),
+  };
+}
+
 export function breadcrumbJsonLd(name: string, path: string) {
   return {
     "@context": "https://schema.org",

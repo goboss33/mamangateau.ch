@@ -10,7 +10,7 @@ import {
   CrossLinks,
   JsonLd,
   faqJsonLd,
-  breadcrumbJsonLd,
+  breadcrumbJsonLd, serviceJsonLd,
   type FaqItem,
 } from "@/components/pages/blocks";
 
@@ -75,7 +75,7 @@ const FAQ: FaqItem[] = [
 export default function Page() {
   return (
     <PageShell>
-      <JsonLd data={[faqJsonLd(FAQ), breadcrumbJsonLd("Gâteau de mariage — Lausanne & Vaud", "/gateau-mariage-lausanne")]} />
+      <JsonLd data={[faqJsonLd(FAQ), breadcrumbJsonLd("Gâteau de mariage — Lausanne & Vaud", "/gateau-mariage-lausanne"), serviceJsonLd("Wedding cakes sur mesure", "Gâteaux de mariage sur mesure, dégustation et installation le jour J — Lausanne, Riviera et canton de Vaud.", "/gateau-mariage-lausanne")]} />
 
       <LandingHero
         crumb="Gâteau de mariage"

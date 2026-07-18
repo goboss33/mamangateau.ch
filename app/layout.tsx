@@ -79,6 +79,7 @@ const jsonLd = {
   address: {
     "@type": "PostalAddress",
     addressLocality: "Pully",
+    postalCode: "1009",
     addressRegion: "VD",
     addressCountry: "CH",
   },
