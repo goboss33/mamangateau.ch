@@ -27,7 +27,7 @@ import {
 
 type Chip = { id: string; label: string; emoji?: string; desc?: string; sup?: number };
 
-const STEPS = ["Occasion", "Taille", "Goûts", "Style", "Remise", "Contact"] as const;
+const STEPS = ["Occasion", "Taille", "Goûts", "Thème", "Remise", "Contact"] as const;
 
 function ChipGrid({
   options,
@@ -825,7 +825,7 @@ export default function Configurateur() {
 
               {/* 04 — Style */}
               {step === 3 && (
-              <div className="mg-step-in" aria-label="Étape 4 : le style">
+              <div className="mg-step-in" aria-label="Étape 4 : le thème">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-grey-studio">
                   Le thème, l'univers, les couleurs — en quelques mots
                 </p>

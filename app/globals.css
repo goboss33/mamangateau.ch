@@ -418,3 +418,16 @@ input[type="range"].mg-range::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) {
   .mg-beam-wrap::before { animation: none; }
 }
+
+/* surcouche mobile du champ thème */
+.mg-sheet {
+  height: 100dvh;
+  animation: mg-sheet-in 0.26s ease-out both;
+}
+@keyframes mg-sheet-in {
+  from { transform: translateY(6%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mg-sheet { animation: none; }
+}
