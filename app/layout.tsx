@@ -90,6 +90,12 @@ const jsonLd = {
   email: SITE.email,
   sameAs: [SITE.instagram],
   priceRange: "CHF 24 - CHF 515",
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    opens: "09:00",
+    closes: "18:00",
+  },
   servesCuisine: "Pâtisserie sur mesure",
 };
 
