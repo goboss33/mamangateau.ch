@@ -35,20 +35,44 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /* ------------------------------------------------ markdown minimal (server) */
-function inline(s: string, key = 0): React.ReactNode[] {
-  return s.split(/\*\*(.+?)\*\*/g).map((p, i) => (i % 2 ? <strong key={`${key}-${i}`} className="font-semibold text-chocolate">{p}</strong> : p));
+function bold(s: string, key: string): React.ReactNode[] {
+  return s.split(/\*\*(.+?)\*\*/g).map((p, i) =>
+    i % 2 ? <strong key={`${key}b${i}`} className="font-semibold text-chocolate">{p}</strong> : p
+  );
+}
+function inline(s: string, key: string | number = 0): React.ReactNode[] {
+  // ==mot== → surligneur rose ; puis **gras**
+  const out: React.ReactNode[] = [];
+  s.split(/==(.+?)==/g).forEach((p, i) => {
+    if (i % 2) out.push(<span key={`${key}h${i}`} className="mg-hl">{bold(p, `${key}-${i}`)}</span>);
+    else out.push(...bold(p, `${key}-${i}`));
+  });
+  return out;
 }
 function Story({ md, bodyImages = [] }: { md: string; bodyImages?: { src: string; alt: string; width: number; height: number }[] }) {
   return (
-    <div className="space-y-5 leading-relaxed text-cocoa">
+    <div className="mg-story space-y-5 leading-relaxed text-cocoa">
       {md.split(/\n{2,}/).map((b, i) => {
         const t = b.trim();
         if (!t) return null;
-        const ph = t.match(/^\[\[photo:(\d+)\]\]$/);
+        const ph = t.match(/^\[\[photo:(\d+)(?:\|(left|right))?\]\]$/);
         if (ph) {
           const img = bodyImages[Number(ph[1]) - 1];
           if (!img) return null; // marqueur orphelin (photo retirée) : ignoré
+          const pos = ph[2];
           const portrait = img.height > img.width;
+          if (pos) {
+            // flottante : le texte habille (desktop) — pleine largeur sur mobile
+            return (
+              <Image
+                key={i}
+                src={img.src} alt={img.alt}
+                width={img.width} height={img.height}
+                sizes="(max-width: 768px) 100vw, 280px"
+                className={`!my-4 h-auto w-full rounded-3xl ${pos === "left" ? "mg-float-left" : "mg-float-right"}`}
+              />
+            );
+          }
           return (
             <Image
               key={i}
@@ -59,16 +83,21 @@ function Story({ md, bodyImages = [] }: { md: string; bodyImages?: { src: string
             />
           );
         }
-        if (t.startsWith("## ")) return <h2 key={i} className="font-display pt-3 text-2xl text-chocolate md:text-3xl">{t.slice(3)}</h2>;
-        if (t.startsWith("### ")) return <h3 key={i} className="font-display pt-2 text-xl text-chocolate">{t.slice(4)}</h3>;
+        if (t.startsWith("> ")) {
+          const inner = t.split(/\n/).map((l) => l.replace(/^>\s?/, "")).join(" ").trim();
+          return <div key={i} className="mg-note !my-7 clear-both">{inline(inner, i)}</div>;
+        }
+        if (t.startsWith("## ")) return <h2 key={i} className="font-display pt-3 text-2xl text-chocolate md:text-3xl">{inline(t.slice(3), i)}</h2>;
+        if (t.startsWith("### ")) return <h3 key={i} className="font-display pt-2 text-xl text-chocolate">{inline(t.slice(4), i)}</h3>;
         if (/^[-*] /m.test(t))
           return (
-            <ul key={i} className="list-disc space-y-1.5 pl-6">
+            <ul key={i}>
               {t.split(/\n/).filter((l) => /^[-*] /.test(l.trim())).map((l, k) => <li key={k}>{inline(l.trim().slice(2), k)}</li>)}
             </ul>
           );
         return <p key={i}>{inline(t, i)}</p>;
       })}
+      <div className="clear-both" />
     </div>
   );
 }

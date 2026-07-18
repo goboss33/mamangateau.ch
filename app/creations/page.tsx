@@ -75,34 +75,43 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
               </Link>
             </p>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {entries.map((e) => (
-                <Link
-                  key={e.slug}
-                  href={`/${JOURNAL_SEGMENT}/${e.slug}`}
-                  data-reveal
-                  className="group overflow-hidden rounded-3xl border border-chocolate/10 bg-cream transition-shadow hover:shadow-[0_24px_48px_-24px_rgba(74,44,32,0.35)]"
-                >
-                  {e.cover ? (
-                    <div className="relative aspect-[4/5] overflow-hidden">
+            <div className="grid auto-rows-[190px] grid-cols-2 gap-4 md:auto-rows-[220px] md:grid-cols-4 md:gap-5">
+              {entries.map((e, i) => {
+                /* motif bento (cycle de 6) : grande · deux petites · verticale · deux petites */
+                const m = i % 6;
+                const span =
+                  m === 0 ? "col-span-2 row-span-2" :
+                  m === 3 ? "row-span-2" : "";
+                const big = m === 0;
+                return (
+                  <Link
+                    key={e.slug}
+                    href={`/${JOURNAL_SEGMENT}/${e.slug}`}
+                    data-reveal
+                    className={`group relative overflow-hidden rounded-3xl border border-chocolate/10 bg-vanilla transition-shadow hover:shadow-[0_24px_48px_-24px_rgba(74,44,32,0.45)] ${span}`}
+                  >
+                    {e.cover ? (
                       <Image
                         src={e.cover.src}
                         alt={e.cover.alt}
                         fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        sizes={big ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                       />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-4xl" aria-hidden>📖</div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-chocolate/85 via-chocolate/45 to-transparent px-4 pb-3.5 pt-10">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-vanilla/75">
+                        {CATEGORY_LABEL[e.category]}{e.type === "ARTICLE" ? " · conseil" : ""}
+                      </p>
+                      <h2 className={`font-display leading-snug text-vanilla ${big ? "text-xl md:text-2xl" : "text-[15px] md:text-base"}`}>
+                        {e.title}
+                      </h2>
                     </div>
-                  ) : (
-                    <div className="flex aspect-[4/5] items-center justify-center bg-vanilla text-4xl" aria-hidden>📖</div>
-                  )}
-                  <div className="px-6 py-5">
-                    <p className="eyebrow mb-2 !text-[11px]">{CATEGORY_LABEL[e.category]}{e.type === "ARTICLE" ? " · conseil" : ""}</p>
-                    <h2 className="font-display text-xl leading-snug text-chocolate">{e.title}</h2>
-                    {e.metaDescription && <p className="mt-2 line-clamp-2 text-[14px] leading-relaxed text-cocoa">{e.metaDescription}</p>}
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>

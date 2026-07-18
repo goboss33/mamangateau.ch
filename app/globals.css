@@ -431,3 +431,76 @@ input[type="range"].mg-range::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) {
   .mg-sheet { animation: none; }
 }
+
+/* ---------------------------------------------------- récit du Journal */
+/* Surligneur rose façon marqueur — utilisable dans le corps et les Hn */
+.mg-hl {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-blush) 75%, transparent) 0 42%,
+    transparent 42%
+  );
+  padding: 0 0.12em;
+  border-radius: 2px;
+}
+
+/* Lettrine du premier paragraphe — « il était une fois » */
+.mg-story > p:first-of-type::first-letter {
+  font-family: var(--font-gatte), serif;
+  font-size: 3.1em;
+  line-height: 0.82;
+  float: left;
+  padding: 0.06em 0.12em 0 0;
+  color: var(--color-chocolate);
+}
+
+/* Listes : puces dorées, respiration */
+.mg-story ul {
+  list-style: none;
+  padding-left: 0.25rem;
+  display: grid;
+  gap: 0.55rem;
+}
+.mg-story ul li {
+  position: relative;
+  padding-left: 1.5rem;
+}
+.mg-story ul li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.52em;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-gold) 18%, transparent);
+}
+
+/* Encadré « Bon à savoir » */
+.mg-note {
+  position: relative;
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-blush) 22%, var(--color-vanilla)),
+    var(--color-vanilla) 70%
+  );
+  padding: 1.1rem 1.3rem 1.1rem 3rem;
+  font-size: 0.95em;
+}
+.mg-note::before {
+  content: "✨";
+  position: absolute;
+  left: 1.05rem;
+  top: 1.05rem;
+  font-size: 1.05rem;
+}
+
+/* Images flottantes du récit (desktop) — le texte habille */
+@media (min-width: 768px) {
+  .mg-float-left { float: left; width: 42%; margin: 0.35rem 1.6rem 0.8rem 0; }
+  .mg-float-right { float: right; width: 42%; margin: 0.35rem 0 0.8rem 1.6rem; }
+}
+.mg-story h2 { clear: both; }
