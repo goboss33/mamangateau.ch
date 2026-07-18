@@ -383,3 +383,7 @@ export const THEME_SUGGESTIONS: string[] = [
   "Chalet suisse", "Edelweiss", "Vache & montagne", "Drapeau suisse", "Lac Léman",
   "Vignes de Lavaux", "Cor des Alpes", "Fête des vignerons",
 ];
+
+/* Pastilles mises en avant sous le champ thème (à terme : issues des stats Carnet). */
+export const TOP_THEMES = ["Licorne", "Dinosaure", "Pat'Patrouille", "Spiderman", "Fleurs fraîches"];
+export const CARTE_BLANCHE = "Carte blanche à Annie";

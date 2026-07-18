@@ -371,3 +371,50 @@ input[type="range"].mg-range::-moz-range-thumb {
   }
 }
 [data-contact-dial] { transition: opacity 0.25s ease; }
+
+/* ------------------------------------------------- champ thème : faisceau */
+/* Faisceau doré qui tourne lentement autour du champ — discret au repos
+   (invite au clic), plus présent au focus. Dégradation : contour statique. */
+@property --mg-beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.mg-beam-wrap { position: relative; border-radius: 1rem; }
+.mg-beam-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 1.1rem;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--mg-beam-angle),
+    transparent 0deg 250deg,
+    rgba(201, 162, 75, 0.25) 300deg,
+    rgba(201, 162, 75, 0.95) 340deg,
+    #fff7e6 352deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0.55;
+  transition: opacity 0.35s ease;
+  animation: mg-beam-spin 6.5s linear infinite;
+  pointer-events: none;
+}
+.mg-beam-wrap:focus-within::before {
+  opacity: 1;
+  animation-duration: 3.2s;
+}
+.mg-beam-wrap:focus-within {
+  box-shadow: 0 10px 34px -16px rgba(201, 162, 75, 0.55);
+  transition: box-shadow 0.35s ease;
+}
+@keyframes mg-beam-spin {
+  to { --mg-beam-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mg-beam-wrap::before { animation: none; }
+}
