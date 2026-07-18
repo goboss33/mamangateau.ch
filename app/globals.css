@@ -446,12 +446,12 @@ input[type="range"].mg-range::-moz-range-thumb {
 
 /* Lettrine du premier paragraphe — « il était une fois » */
 .mg-story > p:first-of-type::first-letter {
-  font-family: var(--font-gatte), serif;
-  font-size: 3.1em;
-  line-height: 0.82;
+  font-family: var(--font-script), cursive; /* Purgatory — la signature du branding */
+  font-size: 3.6em;
+  line-height: 0.78;
   float: left;
-  padding: 0.06em 0.12em 0 0;
-  color: var(--color-chocolate);
+  padding: 0.04em 0.14em 0 0;
+  color: var(--color-gold);
 }
 
 /* Listes : puces dorées, respiration */
