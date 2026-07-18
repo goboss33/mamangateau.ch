@@ -9,6 +9,7 @@ import Histoire from "@/components/sections/Histoire";
 import Rencontre from "@/components/sections/Rencontre";
 import Difference from "@/components/sections/Difference";
 import Portfolio from "@/components/sections/Portfolio";
+import JournalTeaser from "@/components/sections/JournalTeaser";
 import Configurateur from "@/components/sections/Configurateur";
 import Temoignages from "@/components/sections/Temoignages";
 import Livraison from "@/components/sections/Livraison";
@@ -32,6 +33,7 @@ export default async function Home() {
           items={["Anniversaires", "Mariages", "Baby showers", "Événements d'entreprise"]}
         />
         <Portfolio />
+        <JournalTeaser />
         <Configurateur />
         <Temoignages google={google} />
         <Livraison />

@@ -100,6 +100,7 @@ export default function Footer() {
               <a href="/gateau-anniversaire-lausanne" className="transition-colors hover:text-gold-soft">Anniversaires</a>
               <a href="/gateau-mariage-lausanne" className="transition-colors hover:text-gold-soft">Mariage</a>
               <a href="/cupcakes-lausanne" className="transition-colors hover:text-gold-soft">Cupcakes</a>
+              <a href="/creations" className="transition-colors hover:text-gold-soft">Le journal</a>
               <a href="/partenaires" className="transition-colors hover:text-gold-soft">Devenir partenaire</a>
               <a href="/#creations" className="transition-colors hover:text-gold-soft">Créations</a>
               <a href="/#configurateur" className="transition-colors hover:text-gold-soft">Composer</a>
