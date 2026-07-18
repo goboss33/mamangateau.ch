@@ -12,10 +12,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import CakePreview from "@/components/CakePreview";
+import ThemeField from "@/components/ThemeField";
 import {
   EXTRAS,
   OCCASIONS,
-  STYLES,
   BISCUITS,
   FOURRAGES,
   MAX_FOURRAGES,
@@ -108,8 +108,7 @@ export default function Configurateur() {
   const [fourrages, setFourrages] = useState<string[]>([]);
   const [lactoseFree, setLactoseFree] = useState(false);
   const [extras, setExtras] = useState<Record<string, number>>({});
-  const [style, setStyle] = useState<string | null>(null);
-  const [themeNote, setThemeNote] = useState("");
+  const [theme, setTheme] = useState("");
   const [photos, setPhotos] = useState<{ name: string; dataUrl: string }[]>([]);
   const [deliveryMode, setDeliveryMode] = useState<"retrait" | "livraison">("retrait");
   const [address, setAddress] = useState("");
@@ -201,12 +200,12 @@ export default function Configurateur() {
   const advance = (from: number) => window.setTimeout(() => goTo(from + 1), 150);
 
   const maybeCelebrate = () => {
-    if (!celebrated && occasion && biscuit && fourrages.length && style) {
+    if (!celebrated && occasion && biscuit && fourrages.length && theme.trim().length >= 3) {
       setCelebrated(true);
       window.dispatchEvent(new CustomEvent("mg:burst"));
     }
   };
-  useEffect(maybeCelebrate, [occasion, biscuit, fourrages, style]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(maybeCelebrate, [occasion, biscuit, fourrages, theme]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ------------------------------------------------------------ photos */
   const addPhotos = async (files: FileList | null) => {
@@ -312,7 +311,7 @@ export default function Configurateur() {
     if (!occasion) return { ok: false, msg: "Choisissez l'occasion.", step: 0 };
     if (!biscuit) return { ok: false, msg: "Choisissez le biscuit.", step: 2 };
     if (!fourrages.length) return { ok: false, msg: "Choisissez au moins un fourrage.", step: 2 };
-    if (!style) return { ok: false, msg: "Choisissez un style.", step: 3 };
+    if (theme.trim().length < 3) return { ok: false, msg: "Décrivez le thème en quelques mots.", step: 3 };
     if (deliveryMode === "livraison" && address.trim().length < 5)
       return { ok: false, msg: "Indiquez l'adresse de livraison.", step: 4 };
     if (!contact.firstName.trim() || !contact.lastName.trim())
@@ -352,8 +351,7 @@ export default function Configurateur() {
             qty: extras[x.id],
             price: x.price,
           })),
-          style: labelOf(STYLES, style),
-          themeNote: style === "theme" ? themeNote.trim() : "",
+          themeNote: theme.trim(),
           delivery:
             deliveryMode === "retrait"
               ? { mode: "retrait" }
@@ -408,7 +406,7 @@ export default function Configurateur() {
                 ? fourrages.map((f) => labelOf(FOURRAGES, f)).join(" + ") + (lactoseFree ? " · sans lactose" : "")
                 : "—",
             ],
-            ["Style", labelOf(STYLES, style)],
+            ["Thème", theme.trim()],
             [
               "Remise",
               deliveryMode === "retrait"
@@ -543,7 +541,7 @@ export default function Configurateur() {
             {/* En-tête compact (mobile) : titre discret + progression nommée */}
             <div className="mb-5 flex items-center gap-3 lg:hidden">
               <div className="w-16 shrink-0">
-                <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
+                <CakePreview tiers={tiers} styleId={null} isBirthday={isBirthday} celebrant={celebrant} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
@@ -828,23 +826,14 @@ export default function Configurateur() {
               {/* 04 — Style */}
               {step === 3 && (
               <div className="mg-step-in" aria-label="Étape 4 : le style">
-                <ChipGrid
-                  name="Style"
-                  cols
-                  options={STYLES}
-                  selected={style ? [style] : []}
-                  onToggle={(id) => setStyle(id)}
-                />
-                {style === "theme" && (
-                  <textarea
-                    value={themeNote}
-                    onChange={(e) => setThemeNote(e.target.value)}
-                    placeholder="Racontez votre idée : thème, couleurs, personnages…"
-                    rows={3}
-                    maxLength={500}
-                    className={`${inputCls} mt-4 resize-none`}
-                  />
-                )}
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-grey-studio">
+                  Le thème, l'univers, les couleurs — en quelques mots
+                </p>
+                <ThemeField value={theme} onChange={setTheme} inputCls={inputCls} />
+                <p className="mt-6 text-[13px] leading-relaxed text-grey-studio">
+                  Tapez deux lettres et laissez-vous guider — ou écrivez votre idée librement.
+                  Les détails (étages, questions…) se règlent avec Annie après le devis.
+                </p>
                 <div className="mt-5">
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-grey-studio">
                     Photos d'inspiration (optionnel, max 3)
@@ -1070,7 +1059,7 @@ export default function Configurateur() {
           {/* Ticket (desktop) */}
           <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
             <div className="mx-auto mb-2 w-40">
-              <CakePreview tiers={tiers} styleId={style} isBirthday={isBirthday} celebrant={celebrant} />
+              <CakePreview tiers={tiers} styleId={null} isBirthday={isBirthday} celebrant={celebrant} />
             </div>
             {ticket}
           </aside>

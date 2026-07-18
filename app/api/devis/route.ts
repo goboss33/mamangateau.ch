@@ -22,7 +22,6 @@ type Payload = {
   fourrages: string[];
   lactoseFree: boolean;
   extras?: { label: string; qty: number; price: number }[];
-  style: string;
   themeNote?: string;
   delivery: { mode: string; address?: string; km?: number; fee?: number | null };
   estimate: { price: number };
@@ -124,7 +123,7 @@ export async function POST(req: NextRequest) {
       ${(p.extras ?? [])
         .map((x) => row("Extra", `${x.label}${x.qty > 1 ? ` × ${x.qty}` : ""} — CHF ${x.price * x.qty}`))
         .join("")}
-      ${row("Style", p.style + (p.themeNote ? ` — « ${p.themeNote} »` : ""))}
+      ${row("Thème", p.themeNote || "—")}
       ${row("Remise", deliveryTxt)}
       ${row("Estimation", `CHF ${p.estimate.price}`)}
       ${p.partnerCode ? row("Partenaire", p.partnerCode) : ""}
@@ -186,7 +185,6 @@ export async function POST(req: NextRequest) {
             tiers: p.tiers ?? null,
             biscuit: p.biscuit ?? "",
             fourrages: p.fourrages ?? [],
-            style: p.style ?? "",
             themeNote: p.themeNote ?? "",
             deliveryMode: p.delivery?.mode ?? "retrait",
             deliveryAddress: p.delivery?.mode === "livraison" ? (p.delivery.address ?? "") : "",
