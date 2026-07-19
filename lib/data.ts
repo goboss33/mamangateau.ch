@@ -228,10 +228,10 @@ export function estimateTotal(opts: {
 
 export const TESTIMONIALS = [
   {
-    quote: "Simplement l'une des meilleures ! Nous faisons confiance à Annie depuis plusieurs années pour nos fêtes et, à chaque fois, elle réussit à nous impressionner. Ses gâteaux sont non seulement magnifiques, mais surtout délicieux : jamais trop sucrés, préparés avec des ingrédients de qualité aux saveurs naturelles et toujours réalisés avec beaucoup de soin. Je la recommande les yeux fermés !",
-    author: "Davide D.",
-    context: "client fidèle",
-    rotate: -2.5,
+    quote: "Superbe création et un goût exceptionnel 😊 Merci encore",
+    author: "Christine R.",
+    context: "avis Google",
+    rotate: -1.9,
   },
   {
     quote: "Nous avons eu une merveille de gâteau pour l'anniversaire de ma nièce ! Une belle pièce décorée avec précision et sublime à la dégustation. Tout le monde a adoré !",
@@ -252,10 +252,10 @@ export const TESTIMONIALS = [
     rotate: 2.2,
   },
   {
-    quote: "Superbe création et un goût exceptionnel 😊 Merci encore",
-    author: "Christine R.",
-    context: "avis Google",
-    rotate: -1.9,
+    quote: "Simplement l'une des meilleures ! Nous faisons confiance à Annie depuis plusieurs années pour nos fêtes et, à chaque fois, elle réussit à nous impressionner. Ses gâteaux sont non seulement magnifiques, mais surtout délicieux : jamais trop sucrés, préparés avec des ingrédients de qualité aux saveurs naturelles et toujours réalisés avec beaucoup de soin. Je la recommande les yeux fermés !",
+    author: "Davide D.",
+    context: "client fidèle",
+    rotate: -2.5,
   },
 ] as const;
 

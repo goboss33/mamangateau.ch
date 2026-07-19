@@ -93,13 +93,15 @@ export default function Temoignages({ google }: { google?: { rating: string; cou
         </div>
 
         <div ref={gridRef} className="grid gap-8 sm:grid-cols-2 md:gap-10 lg:px-10">
-          {TESTIMONIALS.map((t, i) => (
+          {TESTIMONIALS.map((t, i) => {
+            const loneLast = i === TESTIMONIALS.length - 1 && TESTIMONIALS.length % 2 === 1;
+            return (
             <figure
               key={t.author}
               data-note
               data-rotate={t.rotate}
               className={`love-note px-7 py-8 will-change-transform md:px-9 md:py-10 ${
-                i % 2 === 1 ? "sm:translate-y-10" : ""
+                loneLast ? "sm:col-span-2 sm:mx-auto sm:w-[calc(50%-1.25rem)]" : i % 2 === 1 ? "sm:translate-y-10" : ""
               }`}
               style={{ "--tape-rotate": `${-t.rotate * 1.4}deg` } as React.CSSProperties}
             >
@@ -119,7 +121,8 @@ export default function Temoignages({ google }: { google?: { rating: string; cou
                 </span>
               </figcaption>
             </figure>
-          ))}
+            );
+          })}
         </div>
 
         <p data-reveal className="mt-20 text-center text-sm text-grey-studio sm:mt-24">
