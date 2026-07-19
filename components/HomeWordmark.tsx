@@ -28,8 +28,9 @@ export default function HomeWordmark() {
 
   useEffect(() => {
     let raf = 0;
+    const near = new Set<Element>(); // sections foncées proches du haut de l'écran
     let sections: Element[] = [];
-    const collect = () => { sections = Array.from(document.querySelectorAll("[data-nav-dark]")); };
+    let io: IntersectionObserver | null = null;
 
     const update = () => {
       raf = 0;
@@ -37,7 +38,8 @@ export default function HomeWordmark() {
       if (!link || !overlay) return;
       const r = link.getBoundingClientRect();
       let top: number | null = null, bottom: number | null = null;
-      for (const s of sections) {
+      // ne mesure QUE les sections signalées « proches » par l'observer
+      for (const s of near) {
         const b = s.getBoundingClientRect();
         const t = Math.max(r.top, b.top);
         const bt = Math.min(r.bottom, b.bottom);
@@ -48,20 +50,41 @@ export default function HomeWordmark() {
       }
       overlay.style.clipPath =
         top === null
-          ? "inset(0 0 100% 0)" // aucune zone foncée → vanille masquée, tout chocolat
+          ? "inset(0 0 100% 0)"
           : `inset(${Math.max(0, top - r.top)}px 0 ${Math.max(0, r.bottom - bottom!)}px 0)`;
     };
 
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    collect();
-    const t = window.setTimeout(() => { collect(); update(); }, 60); // DOM monté (après navigation)
+    const onScroll = () => { if (near.size && !raf) raf = requestAnimationFrame(update); };
+
+    const build = () => {
+      io?.disconnect();
+      near.clear();
+      sections = Array.from(document.querySelectorAll("[data-nav-dark]"));
+      // « zone d'intérêt » : les ~120 premiers px de l'écran (le logo y vit).
+      // Le clip précis ne se calcule que pendant qu'une section y transite.
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) near.add(e.target);
+            else near.delete(e.target);
+          }
+          update(); // recalage immédiat (entrée/sortie), puis rAF pendant le transit
+        },
+        { rootMargin: `0px 0px -${Math.max(0, window.innerHeight - 120)}px 0px`, threshold: 0 }
+      );
+      sections.forEach((s) => io!.observe(s));
+      update();
+    };
+
+    const t = window.setTimeout(build, 60); // DOM monté (après navigation)
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", build);
     return () => {
       window.clearTimeout(t);
       if (raf) cancelAnimationFrame(raf);
+      io?.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", build);
     };
   }, [pathname]);
 

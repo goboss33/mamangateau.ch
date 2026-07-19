@@ -18,7 +18,7 @@ import { googleRating } from "@/lib/google";
 
 // ISR : la home se régénère (avis Google + teaser Journal) et prend les
 // nouvelles pages publiées ; le webhook Carnet la rafraîchit aussi à la volée.
-export const revalidate = 3600;
+export const revalidate = 120; // court : la home se régénère vite au runtime (teaser Journal)
 
 export default async function Home() {
   const google = await googleRating();
