@@ -15,10 +15,22 @@ import Footer from "@/components/sections/Footer";
 export default function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <Experience>
+      {/* Retour accueil — pastille « maison » sur mobile (lisible sur tout
+          fond, jumelle du burger), wordmark script sur desktop */}
       <Link
         href="/"
         aria-label="Retour à l'accueil"
-        className="font-script fixed left-6 top-6 z-40 text-2xl text-chocolate/85 transition-opacity hover:opacity-70 md:left-8 md:top-7"
+        className="fixed left-4 top-4 z-40 flex h-[52px] w-[52px] items-center justify-center rounded-full border border-gold/35 bg-vanilla/85 shadow-[0_10px_30px_-14px_rgba(74,44,32,0.45)] backdrop-blur-md transition-transform duration-300 hover:scale-105 md:hidden"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="size-5 text-chocolate/80">
+          <path d="M3 11.5 12 4l9 7.5" />
+          <path d="M5.5 10v9.2h13V10" />
+        </svg>
+      </Link>
+      <Link
+        href="/"
+        aria-label="Retour à l'accueil"
+        className="font-script fixed left-8 top-7 z-40 hidden text-2xl text-chocolate/85 transition-opacity hover:opacity-70 md:block"
       >
         Maman Gâteau
       </Link>
