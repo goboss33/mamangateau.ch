@@ -87,7 +87,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
                   <Link
                     key={e.slug}
                     href={`/${JOURNAL_SEGMENT}/${e.slug}`}
-                    data-reveal
                     className={`group relative overflow-hidden rounded-3xl border border-chocolate/10 bg-vanilla transition-shadow hover:shadow-[0_24px_48px_-24px_rgba(74,44,32,0.45)] ${span}`}
                   >
                     {e.cover ? (

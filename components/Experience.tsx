@@ -34,11 +34,7 @@ export default function Experience({ children }: { children: React.ReactNode }) 
       gsap.ticker.lagSmoothing(0);
 
       /* ----------------------------------------------- reveals génériques */
-      /* Scan répétable : les navigations client (filtres du Journal, liens
-         internes) montent de NOUVEAUX nœuds [data-reveal] après coup — sans
-         re-scan ils restaient à opacité 0 (invisibles mais cliquables).
-         Chaque élément traité est marqué data-revealed. */
-      const revealScan = (): number => {
+      const revealScan = () => {
         const targets = gsap.utils.toArray<HTMLElement>("[data-reveal]:not([data-revealed])");
         let aboveFold = 0;
         targets.forEach((el) => {
@@ -71,29 +67,13 @@ export default function Experience({ children }: { children: React.ReactNode }) 
             },
           });
         });
-        return targets.length;
       };
       revealScan();
-
-      /* Nouveaux nœuds après navigation client → re-scan. On ne rafraîchit
-         ScrollTrigger QUE si de vrais nouveaux [data-reveal] sont apparus —
-         sinon chaque mutation du DOM (toasts, portails…) forçait un reflow
-         coûteux et saccadait le scroll. */
-      let moTimer: number | undefined;
-      const mo = new MutationObserver(() => {
-        window.clearTimeout(moTimer);
-        moTimer = window.setTimeout(() => {
-          if (revealScan() > 0) ScrollTrigger.refresh();
-        }, 250);
-      });
-      mo.observe(document.body, { childList: true, subtree: true });
 
       /* Recalibrage une fois les fonts chargées (hauteurs stables) */
       document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
       return () => {
-        mo.disconnect();
-        window.clearTimeout(moTimer);
         gsap.ticker.remove(raf);
         lenis.destroy();
         ScrollTrigger.getAll().forEach((st) => st.kill());
