@@ -16,6 +16,10 @@ import Livraison from "@/components/sections/Livraison";
 import Footer from "@/components/sections/Footer";
 import { googleRating } from "@/lib/google";
 
+// ISR : la home se régénère (avis Google + teaser Journal) et prend les
+// nouvelles pages publiées ; le webhook Carnet la rafraîchit aussi à la volée.
+export const revalidate = 3600;
+
 export default async function Home() {
   const google = await googleRating();
   return (
