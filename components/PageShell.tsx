@@ -30,7 +30,8 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
       <Link
         href="/"
         aria-label="Retour à l'accueil"
-        className="font-script fixed left-8 top-7 z-40 hidden text-2xl text-chocolate/85 transition-opacity hover:opacity-70 md:block"
+        style={{ mixBlendMode: "difference" }}
+        className="font-script fixed left-8 top-7 z-40 hidden text-2xl text-white transition-opacity hover:opacity-70 md:block"
       >
         Maman Gâteau
       </Link>
