@@ -5,6 +5,7 @@
    La poussière d'or se rallume ici (mg:dust).
 --------------------------------------------------------------------------- */
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 import { SITE, WA_DEFAULT, EMAIL_LINK } from "@/lib/data";
@@ -89,12 +90,12 @@ export default function Footer() {
         {/* Bas de page */}
         <div className="mt-20 border-t border-vanilla/10 pt-8 md:mt-24">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="text-center md:text-left">
-              <p className="font-script text-2xl leading-none text-vanilla">Maman Gâteau</p>
+            <Link href="/" aria-label="Retour à l'accueil" className="block text-center transition-opacity hover:opacity-80 md:text-left">
+              <p className="font-script whitespace-nowrap text-2xl leading-none text-vanilla">Maman Gâteau</p>
               <p className="mt-1.5 text-[11px] uppercase tracking-[0.22em] text-vanilla/40">
                 {SITE.tagline}
               </p>
-            </div>
+            </Link>
 
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-vanilla/60">
               <a href="/gateau-anniversaire-lausanne" className="transition-colors hover:text-gold-soft">Anniversaires</a>

@@ -9,6 +9,7 @@
 --------------------------------------------------------------------------- */
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { SITE, WA_DEFAULT, EMAIL_LINK } from "@/lib/data";
@@ -161,9 +162,9 @@ export default function Navbar() {
           >
             Maman Gâteau
           </span>
-          {/* Grain discret local */}
-          <div className="pointer-events-none absolute left-6 top-6 flex items-center gap-2.5 md:left-8 md:top-7">
-            <span className="font-script text-2xl text-chocolate/80">Maman Gâteau</span>
+          {/* Wordmark cliquable — retour accueil */}
+          <div className="absolute left-6 top-6 flex items-center gap-2.5 md:left-8 md:top-7">
+            <Link href="/" onClick={() => toggle(false)} aria-label="Retour à l'accueil" className="font-script text-2xl text-chocolate/80 transition-opacity hover:opacity-70">Maman Gâteau</Link>
           </div>
 
           <nav className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col justify-center px-8 py-28 md:px-10">
