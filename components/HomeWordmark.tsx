@@ -70,14 +70,14 @@ export default function HomeWordmark() {
       ref={linkRef}
       href="/"
       aria-label="Retour à l'accueil"
-      className="font-script fixed left-8 top-7 z-40 hidden text-2xl leading-none transition-opacity hover:opacity-70 md:block"
+      className="font-script fixed left-8 top-[1.35rem] z-40 hidden text-2xl leading-none transition-opacity hover:opacity-70 md:block"
     >
-      <span className="relative block" style={{ color: "var(--color-chocolate)" }}>
+      <span className="relative block whitespace-nowrap py-[0.28em]" style={{ color: "var(--color-chocolate)" }}>
         Maman Gâteau
         <span
           ref={overlayRef}
           aria-hidden
-          className="absolute inset-0 whitespace-nowrap"
+          className="absolute inset-0 whitespace-nowrap py-[0.28em]"
           style={{ color: "var(--color-vanilla)", clipPath: "inset(0 0 100% 0)" }}
         >
           Maman Gâteau
