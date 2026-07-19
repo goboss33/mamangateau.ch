@@ -151,7 +151,6 @@ export default function Histoire() {
                   {/* Pastille sur le fil */}
                   <span
                     data-dot
-                    data-reveal="scale"
                     className="absolute left-0 top-1 flex h-[27px] w-[27px] items-center justify-center rounded-full border border-gold/50 bg-vanilla shadow-[0_4px_14px_-6px_rgba(201,162,75,0.6)] md:left-1/2 md:-translate-x-1/2"
                     aria-hidden
                   >

@@ -38,7 +38,7 @@ export default function Experience({ children }: { children: React.ReactNode }) 
          internes) montent de NOUVEAUX nœuds [data-reveal] après coup — sans
          re-scan ils restaient à opacité 0 (invisibles mais cliquables).
          Chaque élément traité est marqué data-revealed. */
-      const revealScan = () => {
+      const revealScan = (): number => {
         const targets = gsap.utils.toArray<HTMLElement>("[data-reveal]:not([data-revealed])");
         let aboveFold = 0;
         targets.forEach((el) => {
@@ -71,17 +71,20 @@ export default function Experience({ children }: { children: React.ReactNode }) 
             },
           });
         });
+        return targets.length;
       };
       revealScan();
 
-      /* Nouveaux nœuds après navigation client → re-scan (débouncé) */
+      /* Nouveaux nœuds après navigation client → re-scan. On ne rafraîchit
+         ScrollTrigger QUE si de vrais nouveaux [data-reveal] sont apparus —
+         sinon chaque mutation du DOM (toasts, portails…) forçait un reflow
+         coûteux et saccadait le scroll. */
       let moTimer: number | undefined;
       const mo = new MutationObserver(() => {
         window.clearTimeout(moTimer);
         moTimer = window.setTimeout(() => {
-          revealScan();
-          ScrollTrigger.refresh();
-        }, 120);
+          if (revealScan() > 0) ScrollTrigger.refresh();
+        }, 250);
       });
       mo.observe(document.body, { childList: true, subtree: true });
 
