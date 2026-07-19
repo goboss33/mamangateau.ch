@@ -27,7 +27,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer id="contact" ref={ref} className="relative overflow-hidden bg-chocolate">
+    <footer id="contact" ref={ref} data-nav-dark className="relative overflow-hidden bg-chocolate">
       {/* Liseré d'or supérieur */}
       <div className="gold-rule" />
 

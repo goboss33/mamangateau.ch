@@ -8,6 +8,7 @@
 
 import Link from "next/link";
 import Experience from "@/components/Experience";
+import HomeWordmark from "@/components/HomeWordmark";
 import Navbar from "@/components/Navbar";
 import ContactDial from "@/components/ContactDial";
 import Footer from "@/components/sections/Footer";
@@ -27,14 +28,7 @@ export default function PageShell({ children }: { children: React.ReactNode }) {
           <path d="M5.5 10v9.2h13V10" />
         </svg>
       </Link>
-      <Link
-        href="/"
-        aria-label="Retour à l'accueil"
-        style={{ mixBlendMode: "difference", color: "#fcfaf6" }}
-        className="font-script fixed left-8 top-7 z-40 hidden text-2xl transition-opacity hover:opacity-70 md:block"
-      >
-        Maman Gâteau
-      </Link>
+      <HomeWordmark />
       <Navbar />
       <ContactDial />
       <main>{children}</main>

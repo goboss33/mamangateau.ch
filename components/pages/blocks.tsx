@@ -272,7 +272,7 @@ export function CtaBand({
   note: string;
 }) {
   return (
-    <section className="relative overflow-hidden bg-chocolate py-20 md:py-28">
+    <section data-nav-dark className="relative overflow-hidden bg-chocolate py-20 md:py-28">
       <div className="gold-rule absolute inset-x-0 top-0" />
       <div className="relative mx-auto max-w-3xl px-6 text-center">
         <p data-reveal className="font-script text-[clamp(2.6rem,7vw,4.4rem)] leading-[1.1] text-vanilla">
