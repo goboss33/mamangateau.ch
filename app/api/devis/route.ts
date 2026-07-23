@@ -185,6 +185,7 @@ export async function POST(req: NextRequest) {
             tiers: p.tiers ?? null,
             biscuit: p.biscuit ?? "",
             fourrages: p.fourrages ?? [],
+            lactoseFree: p.lactoseFree ?? false,
             themeNote: p.themeNote ?? "",
             deliveryMode: p.delivery?.mode ?? "retrait",
             deliveryAddress: p.delivery?.mode === "livraison" ? (p.delivery.address ?? "") : "",
