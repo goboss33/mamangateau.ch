@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "Cupcakes personnalisés à Lausanne — dès CHF 24 | Maman Gâteau",
   description:
-    "Boîtes de cupcakes et mini-cupcakes personnalisés à Lausanne et Pully : 6 cupcakes CHF 24, 12 minis CHF 28. Thème au choix, parfaits seuls ou en complément d'un gâteau.",
+    "Boîtes de cupcakes et mini-cupcakes personnalisés à Lausanne et Pully : 6 cupcakes CHF 24, 12 minis CHF 28. Thème au choix, en complément d'un gâteau ou à retirer à l'atelier.",
   alternates: { canonical: "/cupcakes-lausanne" },
   openGraph: {
     title: "Cupcakes personnalisés à Lausanne | Maman Gâteau",
@@ -42,7 +42,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Combien de temps à l'avance commander ?",
-    a: "Une à deux semaines suffisent en général pour des cupcakes seuls. Commandés avec un gâteau, tout se prépare et se livre ensemble — comptez alors 2 à 3 semaines.",
+    a: "Une à deux semaines suffisent en général pour une boîte seule, à retirer à l'atelier. Commandés avec un gâteau, tout se prépare et se livre ensemble — comptez alors 2 à 3 semaines.",
   },
   {
     q: "Le décor est-il personnalisable ?",
@@ -50,7 +50,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: "Livrez-vous les cupcakes ?",
-    a: "Oui, aux mêmes conditions que les gâteaux : livraison offerte jusqu'à 10 km de Pully, puis CHF 1 par kilomètre. Retrait à l'atelier possible, à Pully.",
+    a: "Les cupcakes voyagent avec votre gâteau : commandés ensemble, ils sont livrés ensemble, aux mêmes conditions — livraison offerte jusqu'à 10 km de Pully, puis CHF 1 par kilomètre. Une boîte seule se retire à l'atelier, à Pully : c'est ce qui me permet de garder ce format à un prix juste.",
   },
 ];
 
@@ -118,7 +118,8 @@ export default function Page() {
             ))}
           </div>
           <p data-reveal className="mt-6 text-center text-sm text-grey-studio">
-            Envie de les ajouter à un gâteau ? Ils s'ajoutent en un geste dans le configurateur, à l'étape des goûts.
+            Envie de les ajouter à un gâteau ? Ils s'ajoutent en un geste dans le configurateur, à l'étape des goûts —
+            et sont alors livrés avec lui. Commandée seule, la boîte se retire à l'atelier, à Pully.
           </p>
         </div>
       </section>
