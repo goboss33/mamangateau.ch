@@ -13,17 +13,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import CakePreview from "@/components/CakePreview";
 import ThemeField from "@/components/ThemeField";
-import {
-  EXTRAS,
-  OCCASIONS,
-  BISCUITS,
-  FOURRAGES,
-  MAX_FOURRAGES,
-  TIER2,
-  DELIVERY,
-  cakeBase,
-  estimateTotal,
-} from "@/lib/data";
+import { OCCASIONS, BISCUITS, MAX_FOURRAGES, TIER2 } from "@/lib/data";
+import { DEFAULT_TARIFS, cakeBaseT, estimateTotalT, type Tarifs } from "@/lib/tarifs";
 
 type Chip = { id: string; label: string; emoji?: string; desc?: string; sup?: number };
 
@@ -96,7 +87,10 @@ const inputCls =
 /** Durée de mémorisation du rattachement partenaire (?ref=CODE), en jours — réglable via env. */
 const REF_COOKIE_DAYS = Number(process.env.NEXT_PUBLIC_REF_COOKIE_DAYS ?? 90) || 90;
 
-export default function Configurateur() {
+export default function Configurateur({ tarifs = DEFAULT_TARIFS }: { tarifs?: Tarifs }) {
+  // Prix, goûts et forfait de livraison viennent de Carnet (voir lib/tarifs.ts).
+  const { fourrages: FOURRAGES, extras: EXTRAS } = tarifs;
+  const DELIVERY = { freeKm: tarifs.kmFree, chfPerKm: tarifs.kmRate };
   /* ------------------------------------------------------------- état */
   const [occasion, setOccasion] = useState<string | null>(null);
   const [eventDate, setEventDate] = useState("");
@@ -130,8 +124,8 @@ export default function Configurateur() {
   const deliveryFee =
     deliveryMode === "retrait" ? 0 : dist.status === "ok" ? (dist.fee ?? 0) : null;
   const estimate = useMemo(
-    () => estimateTotal({ parts, tiers, fourrages, deliveryFee, occasion, extras }),
-    [parts, tiers, fourrages, deliveryFee, occasion, extras]
+    () => estimateTotalT(tarifs, { parts, tiers, fourrages, deliveryFee, occasion, extras }),
+    [tarifs, parts, tiers, fourrages, deliveryFee, occasion, extras]
   );
 
   const labelOf = (list: readonly Chip[], id: string | null) =>
@@ -385,7 +379,7 @@ export default function Configurateur() {
   };
 
   /* ------------------------------------------------------------ ticket */
-  const base = cakeBase(parts, tiers, occasion);
+  const base = cakeBaseT(tarifs, parts, tiers, occasion);
   const ticket = (
     <>
       <div className="ticket relative px-7 pb-2 pt-7">

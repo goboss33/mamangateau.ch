@@ -15,13 +15,15 @@ import Temoignages from "@/components/sections/Temoignages";
 import Livraison from "@/components/sections/Livraison";
 import Footer from "@/components/sections/Footer";
 import { googleRating } from "@/lib/google";
+import { getTarifs } from "@/lib/tarifs";
 
 // ISR : la home se régénère (avis Google + teaser Journal) et prend les
 // nouvelles pages publiées ; le webhook Carnet la rafraîchit aussi à la volée.
 export const revalidate = 120; // court : la home se régénère vite au runtime (teaser Journal)
 
 export default async function Home() {
-  const google = await googleRating();
+  // Tarifs lus dans Carnet (repli automatique sur les valeurs locales).
+  const [google, tarifs] = await Promise.all([googleRating(), getTarifs()]);
   return (
     <Experience>
       <Preloader />
@@ -38,7 +40,7 @@ export default async function Home() {
         />
         <Portfolio />
         <JournalTeaser />
-        <Configurateur />
+        <Configurateur tarifs={tarifs} />
         <Temoignages google={google} />
         <Livraison />
       </main>

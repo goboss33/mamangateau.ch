@@ -132,7 +132,9 @@ export const FOURRAGES: readonly Fourrage[] = [
   { id: "creme-noisettes", label: "Crème noisettes", sup: 0 },
   { id: "creme-oreo", label: "Crème Oreo & mascarpone", sup: 8 },
   { id: "creme-caramel", label: "Crème caramel beurre salé", sup: 8 },
-  { id: "coulis", label: "Coulis fraise, framboise ou fruits rouges", sup: 10 },
+  { id: "coulis-fraise", label: "Coulis fraise", sup: 10 },
+  { id: "coulis-framboise", label: "Coulis framboise", sup: 10 },
+  { id: "coulis-fruits-rouges", label: "Coulis fruits rouges", sup: 10 },
   { id: "fruits-frais", label: "Fruits frais (selon saison)", sup: 10 },
 ];
 

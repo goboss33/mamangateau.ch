@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { DELIVERY } from "@/lib/data";
+import { getTarifs } from "@/lib/tarifs";
 
 /* ---------------------------------------------------------------------------
    POST /api/distance — { address } → { ok, km, fee } via Google Routes API.
@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: "no-key" });
   }
 
+  // Origine et forfait : réglés dans Carnet (repli local si indisponible).
+  const t = await getTarifs();
+
   try {
     const res = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
       method: "POST",
@@ -32,7 +35,7 @@ export async function POST(req: NextRequest) {
         "X-Goog-FieldMask": "routes.distanceMeters",
       },
       body: JSON.stringify({
-        origin: { address: DELIVERY.origin },
+        origin: { address: t.origin },
         destination: { address: `${address}, Suisse` },
         travelMode: "DRIVE",
       }),
@@ -45,7 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, reason: "not-found" });
     }
     const km = Math.ceil(meters / 1000);
-    const fee = Math.max(0, km - DELIVERY.freeKm) * DELIVERY.chfPerKm;
+    const fee = Math.round(Math.max(0, km - t.kmFree) * t.kmRate);
     return NextResponse.json({ ok: true, km, fee });
   } catch {
     return NextResponse.json({ ok: false, reason: "error" });
