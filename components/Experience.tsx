@@ -33,47 +33,34 @@ export default function Experience({ children }: { children: React.ReactNode }) 
       gsap.ticker.add(raf);
       gsap.ticker.lagSmoothing(0);
 
-      /* ----------------------------------------------- reveals génériques */
-      const revealScan = () => {
-        const targets = gsap.utils.toArray<HTMLElement>("[data-reveal]:not([data-revealed])");
-        let aboveFold = 0;
-        targets.forEach((el) => {
-          el.dataset.revealed = "1";
-          /* Déjà visible (pages sans hero plein écran, contenu re-rendu) :
-             entrée en cascade, pas de scrub — il n'y a pas de scroll à jouer. */
-          if (el.getBoundingClientRect().top < window.innerHeight * 0.98) {
-            gsap.to(el, {
-              opacity: 1,
-              x: 0,
-              y: 0,
-              scale: 1,
-              duration: 0.9,
-              delay: 0.15 + 0.07 * aboveFold++,
-              ease: "power3.out",
-            });
-            return;
+      /* ----------------------------------------------- reveals génériques
+         Un IntersectionObserver déclenche une fois l'apparition, la transition
+         CSS fait le reste (voir globals.css). L'ancienne version créait un
+         ScrollTrigger « scrub » par élément — plus de cent tweens recalculés à
+         chaque image de défilement, sur le même thread que le scroll. */
+      const io = new IntersectionObserver(
+        (entries) => {
+          let rank = 0;
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            // Cascade pour les éléments qui entrent ensemble (même écran).
+            el.style.setProperty("--reveal-delay", `${rank++ * 70}ms`);
+            el.dataset.revealed = "1";
+            io.unobserve(el);
           }
-          gsap.to(el, {
-            opacity: 1,
-            x: 0,
-            y: 0,
-            scale: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "clamp(top 94%)",
-              end: "clamp(top 72%)",
-              scrub: 0.5,
-            },
-          });
-        });
-      };
-      revealScan();
+        },
+        { rootMargin: "0px 0px -6% 0px", threshold: 0.01 }
+      );
+      document
+        .querySelectorAll<HTMLElement>("[data-reveal]:not([data-revealed])")
+        .forEach((el) => io.observe(el));
 
       /* Recalibrage une fois les fonts chargées (hauteurs stables) */
       document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
       return () => {
+        io.disconnect();
         gsap.ticker.remove(raf);
         lenis.destroy();
         ScrollTrigger.getAll().forEach((st) => st.kill());

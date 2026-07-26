@@ -17,6 +17,21 @@ const AMBIENT_DESKTOP = 620;
 const AMBIENT_MOBILE = 260;
 const BURST_POOL = 160;
 
+/* Intensité au repos, sur les fonds crème. À 0, la couche WebGL est carrément
+   décrochée du compositeur : plus une seule image calculée tant qu'aucune
+   section sombre n'est à l'écran. La poussière garde tout son effet là où elle
+   se voit vraiment (Rencontre, Footer, confettis du configurateur).
+   Remettre 0.5 pour retrouver le voile permanent d'avant. */
+const IDLE_INTENSITY = 0;
+
+/* En dessous, il n'y a plus rien à voir : on arrête de dessiner. */
+const VISIBLE_FLOOR = 0.012;
+
+/* La poussière est floue par nature : la rendre à la densité réelle de
+   l'écran (jusqu'à 1,75× auparavant) triplait le nombre de pixels à mélanger
+   pour un résultat indiscernable. */
+const PIXEL_RATIO = 1;
+
 export default function SugarDust() {
   const mountRef = useRef<HTMLDivElement>(null);
 
@@ -36,8 +51,9 @@ export default function SugarDust() {
     camera.position.z = 14;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setPixelRatio(PIXEL_RATIO);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.display = IDLE_INTENSITY > VISIBLE_FLOOR ? "block" : "none";
     mount.appendChild(renderer.domElement);
 
     /* ------------------------------------------------ texture ronde douce */
@@ -70,7 +86,7 @@ export default function SugarDust() {
 
     const uniforms = {
       uTime: { value: 0 },
-      uIntensity: { value: 0.5 },
+      uIntensity: { value: IDLE_INTENSITY },
       uTex: { value: softDot },
       uColorA: { value: new THREE.Color("#dbbf7e") }, // or doux
       uColorB: { value: new THREE.Color("#f6c9d4") }, // blush
@@ -175,7 +191,7 @@ export default function SugarDust() {
     };
 
     /* --------------------------------------------------------- pilotage */
-    let targetIntensity = 0.5;
+    let targetIntensity = IDLE_INTENSITY;
     const onDust = (e: Event) => {
       targetIntensity = (e as CustomEvent<number>).detail;
     };
@@ -188,11 +204,12 @@ export default function SugarDust() {
     let raf = 0;
     let running = true;
 
+    let shown = IDLE_INTENSITY > VISIBLE_FLOOR;
+
     const loop = () => {
       raf = requestAnimationFrame(loop);
       if (!running) return;
       const dt = Math.min(clock.getDelta(), 0.05);
-      uniforms.uTime.value += dt;
       uniforms.uIntensity.value +=
         (targetIntensity - uniforms.uIntensity.value) * 0.04;
 
@@ -206,6 +223,21 @@ export default function SugarDust() {
         bPos[i * 3 + 1] += bVel[i * 3 + 1] * dt;
         bPos[i * 3 + 2] += bVel[i * 3 + 2] * dt;
       }
+
+      /* Rien de visible et rien en vol : on décroche la couche entièrement.
+         Le contexte WebGL reste vivant (pas de recréation au retour), mais le
+         compositeur n'a plus de calque à mélanger et le GPU se repose. */
+      const visible =
+        alive ||
+        uniforms.uIntensity.value > VISIBLE_FLOOR ||
+        targetIntensity > VISIBLE_FLOOR;
+      if (visible !== shown) {
+        shown = visible;
+        renderer.domElement.style.display = visible ? "block" : "none";
+      }
+      if (!visible) return;
+
+      uniforms.uTime.value += dt;
       if (alive) {
         bGeo.attributes.position.needsUpdate = true;
         bGeo.attributes.aLife.needsUpdate = true;

@@ -25,8 +25,10 @@ export default function Rencontre() {
       end: "bottom 40%",
       onEnter: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 1.9 })),
       onEnterBack: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 1.9 })),
-      onLeave: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 0.5 })),
-      onLeaveBack: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 0.5 })),
+      // 0 = extinction complète : hors des sections sombres, SugarDust décroche
+      // sa couche WebGL au lieu de mélanger un voile qu'on ne voit pas.
+      onLeave: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 0 })),
+      onLeaveBack: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 0 })),
     });
 
     /* Le panneau recouvre la timeline en zoom-in, piloté par le scroll */

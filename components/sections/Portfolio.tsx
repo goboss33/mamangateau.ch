@@ -104,7 +104,6 @@ export default function Portfolio() {
               <figure
                 data-curtain
                 className={`group relative overflow-hidden rounded-2xl bg-vanilla shadow-[0_18px_44px_-26px_rgba(74,44,32,0.4)] ${RATIO_CLASS[item.ratio]}`}
-                style={{ clipPath: "inset(100% 0% 0% 0%)" }}
               >
                 <Image
                   src={item.src}

@@ -19,7 +19,8 @@ export default function Footer() {
       trigger: ref.current,
       start: "top 70%",
       onEnter: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 2 })),
-      onLeaveBack: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 0.5 })),
+      // 0 = extinction complète (voir SugarDust : la couche WebGL se décroche).
+      onLeaveBack: () => window.dispatchEvent(new CustomEvent("mg:dust", { detail: 0 })),
     });
     return () => st.kill();
   }, []);

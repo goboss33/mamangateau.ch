@@ -223,11 +223,19 @@ body {
 
 /* -------------------------------------------------------------- reveals */
 /* États initiaux appliqués seulement quand GSAP est actif (html.gsap) pour
-   ne jamais masquer le contenu sans JavaScript. */
+   ne jamais masquer le contenu sans JavaScript.
+
+   L'apparition est une transition CSS déclenchée une fois par
+   IntersectionObserver (data-revealed), et non plus une animation liée au
+   scroll : le navigateur la joue sur le compositeur, sans repasser par le
+   thread principal à chaque image de défilement. */
 
 html.gsap [data-reveal] {
   opacity: 0;
   transform: translateY(34px);
+  transition:
+    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
 }
 html.gsap [data-reveal="left"] {
   transform: translateX(-40px) translateY(0);
@@ -237,6 +245,17 @@ html.gsap [data-reveal="right"] {
 }
 html.gsap [data-reveal="scale"] {
   transform: scale(0.92);
+}
+html.gsap [data-reveal][data-revealed] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Galerie des créations : le rideau part fermé, mais uniquement si le moteur
+   d'animation tourne — sinon les photos resteraient invisibles (c'était le
+   cas en « animations réduites » : galerie vide). */
+html.gsap [data-curtain] {
+  clip-path: inset(100% 0% 0% 0%);
 }
 
 /* ----------------------------------------------------- carte "mot doux" */
