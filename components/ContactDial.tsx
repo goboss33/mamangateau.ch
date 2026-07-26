@@ -310,17 +310,22 @@ export default function ContactDial() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /* pointer-events : none sur le conteneur, auto sur ce qui est cliquable.
+     L'éventail replié conserve sa hauteur (il est masqué par visibility, pas
+     par display), si bien que ce conteneur transparent d'environ 180 × 230 px,
+     épinglé en bas à droite et posé en z-60, avalait les taps de tout ce qui
+     passait dessous — les pastilles de contact du hero les premières. */
   return (
     <div
       ref={rootRef}
       data-contact-dial
-      className="fixed bottom-4 right-4 z-60 flex flex-col items-end gap-3 md:bottom-6 md:right-6"
+      className="pointer-events-none fixed bottom-4 right-4 z-60 flex flex-col items-end gap-3 md:bottom-6 md:right-6"
       style={{ visibility: "hidden" }}
     >
       {/* Éventail */}
       <ul
         ref={listRef}
-        className="flex flex-col items-end gap-2.5"
+        className="pointer-events-auto flex flex-col items-end gap-2.5"
         style={{ visibility: "hidden" }}
         aria-hidden={!open}
       >
@@ -350,7 +355,7 @@ export default function ContactDial() {
         onClick={() => toggle()}
         aria-expanded={open}
         aria-label={open ? "Fermer le menu de contact" : "Ouvrir le menu de contact"}
-        className="relative flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-chocolate text-vanilla shadow-[0_16px_38px_-16px_rgba(74,44,32,0.65)] transition-[box-shadow] duration-300 will-change-transform"
+        className="pointer-events-auto relative flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-chocolate text-vanilla shadow-[0_16px_38px_-16px_rgba(74,44,32,0.65)] transition-[box-shadow] duration-300 will-change-transform"
       >
         {/* Pulsation douce — activée à l'atterrissage */}
         <span
