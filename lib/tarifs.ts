@@ -34,7 +34,10 @@ export const DEFAULT_TARIFS: Tarifs = {
   kmFree: DELIVERY.freeKm,
   kmRate: DELIVERY.chfPerKm,
   origin: DELIVERY.origin,
-  google: { rating: 5, count: 0, url: "" },
+  /* Plancher : le nombre d'avis ne redescendra jamais en dessous. Carnet reste
+     la source dès qu'il répond ; ceci ne sert qu'à ne jamais afficher moins que
+     la vérité, même sans lui. À relever quand le compteur progresse. */
+  google: { rating: 5, count: 9, url: "https://g.page/r/CTrqEo2UPv_iEAE/review" },
 };
 
 const isBands = (v: unknown): v is { max: number; price: number }[] =>
@@ -56,17 +59,18 @@ let lastGood: Tarifs | null = null;
 function mergeGoogle(raw: unknown): Tarifs["google"] {
   const g = raw as { rating?: unknown; count?: unknown; url?: unknown } | undefined;
   const n = (v: unknown, d: number) => (typeof v === "number" && isFinite(v) && v >= 0 ? v : d);
-  const count = Math.round(n(g?.count, 0));
   const known = lastGood?.google;
+  const sent = Math.round(n(g?.count, 0));
 
-  if (!count && known?.count) {
-    console.warn(`avis Google : Carnet renvoie 0, on garde ${known.count} (dernier compte connu)`);
-    return known;
-  }
+  // Zéro n'est pas une valeur, c'est une absence : base pas encore migrée,
+  // déploiement à moitié à jour, champ jamais rempli. On descend alors sur le
+  // dernier compte connu, puis sur le plancher — jamais sur rien.
+  if (!sent) console.warn("avis Google : Carnet ne renvoie pas de compte, repli sur la dernière valeur connue.");
+
   return {
-    rating: n(g?.rating, DEFAULT_TARIFS.google.rating),
-    count,
-    url: typeof g?.url === "string" && g.url ? g.url : known?.url || DEFAULT_TARIFS.google.url,
+    rating: n(g?.rating, known?.rating ?? DEFAULT_TARIFS.google.rating),
+    count: sent || known?.count || DEFAULT_TARIFS.google.count,
+    url: (typeof g?.url === "string" && g.url) || known?.url || DEFAULT_TARIFS.google.url,
   };
 }
 
