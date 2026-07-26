@@ -40,6 +40,36 @@ export const DEFAULT_TARIFS: Tarifs = {
 const isBands = (v: unknown): v is { max: number; price: number }[] =>
   Array.isArray(v) && v.length > 0 && v.every((b) => b && typeof b.max === "number" && typeof b.price === "number");
 
+/* Dernière réponse valide de Carnet, gardée en mémoire du conteneur.
+   Si Carnet redémarre ou tombe, on continue de servir ce qu'il a dit en
+   dernier plutôt que de revenir aux constantes locales : celles-ci ignorent
+   les prix du jour et le nombre d'avis, et un site qui se met soudain à
+   afficher d'anciens tarifs est pire qu'un site qui répète les bons. */
+let lastGood: Tarifs | null = null;
+
+/* Les avis méritent une protection de plus. « Carnet est joignable » ne veut
+   pas dire « Carnet connaît le nombre d'avis » : une base pas encore migrée,
+   un déploiement à moitié à jour, et il répond 0 en toute bonne foi. Or 0
+   fait disparaître la pastille du site. On préfère donc répéter le dernier
+   compte connu — mais en le disant dans les logs, pour ne pas masquer une
+   vraie panne. */
+function mergeGoogle(raw: unknown): Tarifs["google"] {
+  const g = raw as { rating?: unknown; count?: unknown; url?: unknown } | undefined;
+  const n = (v: unknown, d: number) => (typeof v === "number" && isFinite(v) && v >= 0 ? v : d);
+  const count = Math.round(n(g?.count, 0));
+  const known = lastGood?.google;
+
+  if (!count && known?.count) {
+    console.warn(`avis Google : Carnet renvoie 0, on garde ${known.count} (dernier compte connu)`);
+    return known;
+  }
+  return {
+    rating: n(g?.rating, DEFAULT_TARIFS.google.rating),
+    count,
+    url: typeof g?.url === "string" && g.url ? g.url : known?.url || DEFAULT_TARIFS.google.url,
+  };
+}
+
 /** Récupère les tarifs de Carnet (cache 5 min). Toujours un objet complet. */
 export async function getTarifs(): Promise<Tarifs> {
   const base = (process.env.CARNET_URL ?? "").replace(/\/$/, "");
@@ -56,7 +86,7 @@ export async function getTarifs(): Promise<Tarifs> {
 
     // Fusion champ par champ : une valeur douteuse retombe sur le défaut local.
     const num = (v: unknown, d: number) => (typeof v === "number" && isFinite(v) && v >= 0 ? v : d);
-    return {
+    const t: Tarifs = {
       bandsDefault: isBands(p.bandsDefault) ? p.bandsDefault : DEFAULT_TARIFS.bandsDefault,
       bandsMariage: isBands(p.bandsMariage) ? p.bandsMariage : DEFAULT_TARIFS.bandsMariage,
       minPartPrice: num(p.minPartPrice, DEFAULT_TARIFS.minPartPrice),
@@ -76,15 +106,14 @@ export async function getTarifs(): Promise<Tarifs> {
       kmFree: num(p.kmFree, DEFAULT_TARIFS.kmFree),
       kmRate: num(p.kmRate, DEFAULT_TARIFS.kmRate),
       origin: typeof p.origin === "string" && p.origin.trim() ? p.origin : DEFAULT_TARIFS.origin,
-      google: {
-        rating: num(data?.google?.rating, DEFAULT_TARIFS.google.rating),
-        count: Math.round(num(data?.google?.count, DEFAULT_TARIFS.google.count)),
-        url: typeof data?.google?.url === "string" ? data.google.url : DEFAULT_TARIFS.google.url,
-      },
+      google: mergeGoogle(data?.google),
     };
+    lastGood = t;
+    return t;
   } catch (e) {
-    console.warn("tarifs Carnet indisponibles, valeurs locales utilisées:", e instanceof Error ? e.message : e);
-    return DEFAULT_TARIFS;
+    const repli = lastGood ? "dernière réponse connue" : "valeurs locales";
+    console.warn(`tarifs Carnet indisponibles, ${repli} utilisée(s):`, e instanceof Error ? e.message : e);
+    return lastGood ?? DEFAULT_TARIFS;
   }
 }
 
