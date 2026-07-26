@@ -516,3 +516,17 @@ input[type="range"].mg-range::-moz-range-thumb {
   .mg-float-right { float: right; width: 42%; margin: 0.35rem 0 0.8rem 1.6rem; }
 }
 .mg-story h2 { clear: both; }
+
+/* ------------------------------------------------------------- curseurs */
+/* Un input[type=range] s'approprie le toucher dès que le doigt se pose : le
+   navigateur ne peut pas deviner qu'on allait balayer vers le bas, il règle
+   le curseur et avale le défilement. Une visiteuse qui fait défiler la page
+   avec le pouce sur le curseur des parts changeait donc son devis sans le
+   vouloir.
+
+   pan-y rend le déplacement vertical à la page : un balayage qui démarre sur
+   un curseur fait défiler sans rien changer, un glissement horizontal règle
+   comme avant. */
+input[type="range"] {
+  touch-action: pan-y;
+}
