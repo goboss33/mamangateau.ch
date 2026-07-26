@@ -36,6 +36,12 @@
 html {
   scroll-behavior: auto; /* Lenis pilote le scroll */
   overflow-x: clip; /* la bande marquee inclinée ne doit jamais élargir le viewport */
+  /* La gouttière est réservée en permanence : le préchargeur bloque le
+     défilement le temps de son rideau, et sans cette ligne la barre disparaît
+     puis revient — toute la page se décalait d'une quinzaine de pixels au
+     moment où le rideau se lève. Sans effet là où les barres sont flottantes
+     (macOS, mobile). */
+  scrollbar-gutter: stable;
 }
 
 body {

@@ -257,25 +257,35 @@ export default function Hero({ google }: { google?: { rating: string; count: num
       onEnter: () => gsap.to(cueRef.current, { autoAlpha: 0, duration: 0.3 }),
     });
 
-    /* --------------------------------------------------------- resize */
-    let lastW = window.innerWidth;
-    let lastH = window.innerHeight;
-    const onResize = () => {
-      if (retired) return; // le canvas n'existe plus, l'<img> se redimensionne seule
-      if (window.innerWidth === lastW && Math.abs(window.innerHeight - lastH) < 130) return;
-      lastW = window.innerWidth;
-      lastH = window.innerHeight;
+    /* --------------------------------------------------------- resize
+       On observe la SECTION, pas la fenêtre. Le cas qui nous a piégés : le
+       préchargeur bloque le défilement (overflow hidden) pendant qu'il est
+       affiché, donc la barre de défilement est absente au moment où le canvas
+       se dimensionne. Quand le rideau se lève, la barre revient et la section
+       perd sa quinzaine de pixels — sans qu'aucun « resize » de fenêtre ne se
+       déclenche, puisque window.innerWidth, lui, n'a pas bougé. Le canvas
+       restait donc trop large jusqu'à l'échange final.
+
+       Un ResizeObserver voit ce changement-là, et tous les autres. */
+    let lastW = 0;
+    let lastH = 0;
+    const ro = new ResizeObserver(() => {
+      if (retired || disposed) return; // le canvas n'existe plus, l'<img> se redimensionne seule
+      const { width, height } = section.getBoundingClientRect();
+      if (Math.abs(width - lastW) < 0.5 && Math.abs(height - lastH) < 0.5) return;
+      lastW = width;
+      lastH = height;
       size();
       draw();
-    };
-    window.addEventListener("resize", onResize);
+    });
+    ro.observe(section);
 
     return () => {
       disposed = true;
       clearTimeout(failsafe);
       removeSkip();
       window.removeEventListener("mg:ready", onReady);
-      window.removeEventListener("resize", onResize);
+      ro.disconnect();
       parallax.scrollTrigger?.kill();
       parallax.kill();
       cueFade.kill();
