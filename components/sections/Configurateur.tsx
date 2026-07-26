@@ -97,7 +97,9 @@ export default function Configurateur({ tarifs = DEFAULT_TARIFS }: { tarifs?: Ta
   const [celebrant, setCelebrant] = useState("");
   const [age, setAge] = useState("");
   const [tiers, setTiers] = useState<1 | 2>(1);
-  const [parts, setParts] = useState(20);
+  // 14 parts : encore dans la première tranche (≤ 15), donc le configurateur
+  // s'ouvre sur le prix d'entrée, et le curseur n'est pas collé à sa butée.
+  const [parts, setParts] = useState(14);
   const [biscuit, setBiscuit] = useState<string | null>(null);
   const [fourrages, setFourrages] = useState<string[]>([]);
   const [lactoseFree, setLactoseFree] = useState(false);
