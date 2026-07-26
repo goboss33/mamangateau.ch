@@ -73,7 +73,13 @@ function mergeGoogle(raw: unknown): Tarifs["google"] {
 /** Récupère les tarifs de Carnet (cache 5 min). Toujours un objet complet. */
 export async function getTarifs(): Promise<Tarifs> {
   const base = (process.env.CARNET_URL ?? "").replace(/\/$/, "");
-  if (!base) return DEFAULT_TARIFS;
+  if (!base) {
+    // Ne jamais sortir en silence : c'est ce qui rend ce genre de panne
+    // invisible pendant des semaines (prix locaux servis, pastille d'avis
+    // absente, et pas une ligne dans les logs pour le dire).
+    console.warn("CARNET_URL absente : prix et avis servis depuis les valeurs locales du site.");
+    return lastGood ?? DEFAULT_TARIFS;
+  }
   try {
     const res = await fetch(`${base}/api/tarifs`, {
       next: { revalidate: 300 },

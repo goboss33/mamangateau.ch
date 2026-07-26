@@ -68,7 +68,8 @@ export default function Temoignages({ google }: { google?: { rating: string; cou
             <span className="sr-only">— les avis de nos clients</span>
           </h2>
           <p data-reveal className="mx-auto mt-5 max-w-md leading-relaxed text-cocoa">
-            Publiés sur Google par de vraies clientes — vérifiables en un clic.
+            Le message qui arrive le lendemain de la fête, c&apos;est mon moment préféré.
+            En voici quelques-uns.
           </p>
           {google && (
             <a
