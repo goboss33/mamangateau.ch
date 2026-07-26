@@ -54,6 +54,9 @@ export default function Hero({ google }: { google?: { rating: string; count: num
     const images: (HTMLImageElement | null)[] = Array(FRAME_COUNT).fill(null);
     const loaded: boolean[] = Array(FRAME_COUNT).fill(false);
     let disposed = false;
+    /* Passe à vrai en fin de générique : le canvas et les frames sont libérés,
+       plus rien ne doit les repeupler (les vagues de chargement continuent). */
+    let retired = false;
 
     /* ------------------------------------------------------ chargement */
     const critical = new Set<number>([0, FRAME_COUNT - 1]);
@@ -62,11 +65,12 @@ export default function Hero({ google }: { google?: { rating: string; count: num
 
     const load = (i: number) =>
       new Promise<void>((resolve) => {
-        if (loaded[i] || disposed) return resolve();
+        if (loaded[i] || disposed || retired) return resolve();
         const img = new window.Image();
         img.decoding = "async";
         img.src = framePath(set, i);
         img.onload = () => {
+          if (disposed || retired) return resolve();
           images[i] = img;
           loaded[i] = true;
           if (critical.has(i)) {
@@ -135,12 +139,52 @@ export default function Hero({ google }: { google?: { rating: string; count: num
       if (posterRef.current && idx > 0) posterRef.current.style.opacity = "0";
     }
 
+    /* ------------------------------------------- retrait de fin de générique
+       Le dézoom ne se joue qu'une fois : passé la dernière image, le canvas
+       n'est plus qu'une photo figée. Le garder coûte pourtant une texture
+       plein écran (largeur × densité, jusqu'à 33 Mo) et maintient les 96
+       frames en mémoire — c'est ce que le navigateur doit restaurer à chaque
+       réveil de l'onglet. On repasse donc sur la balise <img> déjà présente,
+       avec exactement la même image, puis on rend tout le reste. */
+    let retireRetry = true;
+    function retire() {
+      const poster = posterRef.current;
+      if (retired || disposed || !poster) return;
+      /* Générique écourté par le filet de sécurité : la dernière image peut
+         manquer. On la réclame une fois, puis on renonce (pas de boucle). */
+      if (!loaded[FRAME_COUNT - 1]) {
+        if (!retireRetry) return;
+        retireRetry = false;
+        void load(FRAME_COUNT - 1).then(retire);
+        return;
+      }
+      retired = true;
+
+      poster.onload = () => {
+        /* La photo est identique à celle du canvas : on la montre sans fondu,
+           puis on retire le canvas à l'image suivante. Aucune couture. */
+        poster.style.transition = "none";
+        poster.style.opacity = "1";
+        requestAnimationFrame(() => {
+          canvas.style.display = "none";
+          canvas.width = 0; // libère réellement le tampon (display:none ne le fait pas)
+          canvas.height = 0;
+          images.fill(null);
+          loaded.fill(false);
+        });
+      };
+      poster.onerror = () => {
+        retired = false; // on garde le canvas plutôt qu'un hero vide
+      };
+      poster.src = framePath(set, FRAME_COUNT - 1); // déjà en cache
+    }
+
     /* ------------------------------------------------ timeline autoplay */
     const titleEls = titleRef.current!.querySelectorAll("[data-hero-fade]");
     gsap.set(titleEls, { autoAlpha: 0, y: 44 });
     gsap.set(cueRef.current, { autoAlpha: 0 });
 
-    const tl = gsap.timeline({ paused: true });
+    const tl = gsap.timeline({ paused: true, onComplete: retire });
     tl.to(state, {
       frame: FRAME_COUNT - 1,
       duration: PLAY_DURATION,
@@ -169,15 +213,24 @@ export default function Hero({ google }: { google?: { rating: string; count: num
       if (started || disposed) return;
       started = true;
       /* Si on arrive déjà scrollé (restauration navigateur), pas de cinéma */
-      if (window.scrollY > window.innerHeight * 0.4) tl.progress(1);
+      if (window.scrollY > window.innerHeight * 0.4) {
+        tl.progress(1);
+        retire(); // progress() ne déclenche pas onComplete
+        return;
+      }
       tl.play();
     };
     const onReady = () => start();
     window.addEventListener("mg:ready", onReady);
     const failsafe = setTimeout(start, 7500);
 
-    /* -------------------------------------------- micro-parallax média */
-    const parallax = gsap.to(mediaRef.current, {
+    /* -------------------------------------------- micro-parallax média
+       will-change n'est posé QUE pendant la traversée du hero : laissé en
+       permanence (comme il l'était en classe CSS), il force le navigateur à
+       garder un calque prêt même quand la section est loin — un calque de
+       plus à reconstruire au réveil de l'onglet. */
+    const media = mediaRef.current!;
+    const parallax = gsap.to(media, {
       yPercent: 20,
       ease: "none",
       scrollTrigger: {
@@ -185,6 +238,9 @@ export default function Hero({ google }: { google?: { rating: string; count: num
         start: "top top",
         end: "bottom top",
         scrub: true,
+        onToggle: (self) => {
+          media.style.willChange = self.isActive ? "transform" : "auto";
+        },
       },
     });
 
@@ -198,6 +254,7 @@ export default function Hero({ google }: { google?: { rating: string; count: num
     let lastW = window.innerWidth;
     let lastH = window.innerHeight;
     const onResize = () => {
+      if (retired) return; // le canvas n'existe plus, l'<img> se redimensionne seule
       if (window.innerWidth === lastW && Math.abs(window.innerHeight - lastH) < 130) return;
       lastW = window.innerWidth;
       lastH = window.innerHeight;
@@ -227,7 +284,7 @@ export default function Hero({ google }: { google?: { rating: string; count: num
       className="relative h-svh overflow-hidden bg-[#dbd2cc]"
     >
       {/* Média (poster LCP + canvas) — seul ce calque prend le parallax */}
-      <div ref={mediaRef} className="absolute inset-0 will-change-transform">
+      <div ref={mediaRef} className="absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           ref={posterRef}
