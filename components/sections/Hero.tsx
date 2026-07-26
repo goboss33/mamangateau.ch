@@ -337,11 +337,21 @@ export default function Hero({ google }: { google?: { rating: string; count: num
             d'événement sur mesure par Maman Gâteau.
           </span>
         </h1>
-        <div id="hero-cta-row" data-hero-fade className="mb-7 flex items-center justify-center gap-3 md:justify-start">
+        {/* Sur mobile, l'appel à l'action prend sa propre ligne. En une seule
+            rangée, il ne restait que 162 px une fois les trois pastilles
+            placées, pour un bouton qui en demande 225 : il se faisait
+            comprimer et, comme il masque son débordement pour l'animation de
+            la bulle, il coupait son libellé en silence. */}
+        <div
+          id="hero-cta-row"
+          data-hero-fade
+          className="mb-7 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-3 md:justify-start"
+        >
           <a data-cta-pill href="#configurateur" className="btn-primary relative overflow-hidden !py-3">
             <span data-pill-label className="whitespace-nowrap">Composer mon gâteau</span>
           </a>
-          <a
+          <div className="flex items-center gap-3">
+            <a
             data-cta
             href={WA_DEFAULT}
             target="_blank"
@@ -378,10 +388,13 @@ export default function Hero({ google }: { google?: { rating: string; count: num
               <path d="m3.5 7 7.2 5.4a2.2 2.2 0 0 0 2.6 0L20.5 7" />
             </svg>
           </a>
+          </div>
         </div>
 
-        <p data-hero-fade className="mb-5 -mt-3 text-xs font-medium text-chocolate/60 max-md:text-center">
-          Devis gratuit sous 24 h — sans engagement
+        {/* Le configurateur donne le prix tout de suite : promettre 24 h
+            enterrait l'argument, et contredisait le flyer qui amène ici. */}
+        <p data-hero-fade className="mb-5 -mt-1 text-xs font-medium text-chocolate/60 max-md:text-center sm:-mt-3">
+          Voir mon prix en 2 minutes, sans engagement
         </p>
         <a
           data-hero-fade

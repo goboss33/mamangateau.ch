@@ -111,17 +111,20 @@ export default function ContactDial() {
     let pillHalfW = 80;
 
     const measure = (self?: ScrollTrigger) => {
-      const st = self ?? tl.scrollTrigger;
+      const st = self ?? tlRef?.scrollTrigger;
       if (!st) return;
-      const rowRect = row.getBoundingClientRect();
-      const rowDocTop = rowRect.top + window.scrollY;
-      /* centre du pill (coordonnées document, hors transforms) */
-      const pillCx = rowRect.left + pill.offsetLeft + pill.offsetWidth / 2;
-      const pillDocCy = rowDocTop + pill.offsetTop + pill.offsetHeight / 2;
-      /* centre du bouton bulle (fixe) */
-      const rootRect = root.getBoundingClientRect();
-      const btnCx = rootRect.left + btn.offsetLeft + btn.offsetWidth / 2;
-      const btnCy = rootRect.top + btn.offsetTop + btn.offsetHeight / 2;
+      /* Rectangles réels plutôt que offsetLeft/offsetTop : ceux-ci se comptent
+         depuis le premier ancêtre positionné, pas depuis la rangée — dès que
+         les pastilles passent sur une seconde ligne, le calcul dérive.
+         La mesure est prise après remise à zéro (onRefreshInit), donc aucune
+         transformation en cours ne la fausse. */
+      const pillRect = pill.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      const pillCx = pillRect.left + pillRect.width / 2;
+      const pillDocCy = pillRect.top + window.scrollY + pillRect.height / 2;
+      /* centre du bouton bulle (position fixe : coordonnées écran) */
+      const btnCx = btnRect.left + btnRect.width / 2;
+      const btnCy = btnRect.top + btnRect.height / 2;
       /* scroll au moment du hand-off (55 % de la fenêtre) */
       const sStar = st.start + (st.end - st.start) * 0.55;
       dx = pillCx - btnCx;
@@ -137,13 +140,27 @@ export default function ContactDial() {
     gsap.set(pill, { transformOrigin: "50% 50%" });
     gsap.set(pulseRef.current, { opacity: 0 });
 
-    /* Remise à zéro franche : au-dessus du start, aucun résidu de morph
-       (le scrub rapide laissait parfois les ronds figés à mi-course). */
+    /* Remise à zéro franche : au-dessus du start, aucun résidu de morph. */
     const resetHero = () => {
-      gsap.set(rounds, { x: 0, scale: 1, autoAlpha: 1, clearProps: "transform,opacity,visibility" });
-      gsap.set(pill, { scaleX: 1, scaleY: 1, clearProps: "transform" });
+      gsap.set(rounds, { clearProps: "transform,opacity,visibility" });
+      gsap.set(pill, { clearProps: "transform,opacity,visibility" });
       pill.style.borderRadius = "";
-      if (label) gsap.set(label, { opacity: 1, clearProps: "opacity" });
+      if (label) gsap.set(label, { clearProps: "opacity" });
+      gsap.set(row, { clearProps: "pointerEvents" });
+      gsap.set(btn, { clearProps: "transform", autoAlpha: 0, pointerEvents: "none" });
+      gsap.set(pulseRef.current, { opacity: 0 });
+    };
+
+    /* Le nettoyage doit être AUTORITAIRE : le scrub garde une traîne d'une
+       demi-seconde après le dernier événement de défilement et réappliquerait
+       ses valeurs par-dessus la remise à zéro. On termine donc sa course, on
+       ramène la timeline à son origine, puis on nettoie. */
+    let tlRef: gsap.core.Timeline | null = null;
+    const hardReset = (self?: ScrollTrigger) => {
+      const st = self ?? tlRef?.scrollTrigger;
+      st?.getTween?.()?.progress(1);
+      tlRef?.progress(0);
+      resetHero();
     };
 
     const tl = gsap.timeline({
@@ -153,14 +170,21 @@ export default function ContactDial() {
         end: "bottom 20%",
         scrub: 0.5,
         invalidateOnRefresh: true,
+        /* Le piège de invalidateOnRefresh : GSAP relit les valeurs de départ
+           sur l'état courant des éléments. Si un rafraîchissement tombe en
+           plein morphing, l'état déformé DEVIENT l'origine — et revenir en
+           haut de page restaure alors la déformation, définitivement. D'où la
+           remise à zéro avant que la relecture n'ait lieu. */
+        onRefreshInit: () => hardReset(),
         onRefresh: (self) => measure(self),
-        onLeaveBack: () => resetHero(),
+        onLeaveBack: (self) => hardReset(self),
         onUpdate: (self) => {
           if (self.progress === 0) resetHero();
         },
       },
       defaults: { ease: "power2.inOut" },
     });
+    tlRef = tl;
 
     /* 1. Les ronds convergent dans le pill et s'y fondent */
     rounds.forEach((r, i) => {
