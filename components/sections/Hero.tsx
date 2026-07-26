@@ -325,9 +325,13 @@ export default function Hero({ google }: { google?: { rating: string; count: num
         <p data-hero-fade className="mb-3 hidden text-xs font-bold uppercase tracking-[0.3em] text-chocolate/80 md:block">
           Cake design sur mesure — Lausanne · Riviera
         </p>
+        {/* Encre plus profonde (3,9:1 → 4,8:1 sur la bande rose du gâteau) et
+            traits épaissis au filet plutôt qu'au font-weight : GatteModern
+            n'existe qu'en une graisse, un 600 déclencherait le faux gras du
+            navigateur, qui empâte les déliés d'une police de titrage. */}
         <h1
           data-hero-fade
-          className="font-display mb-6 text-[clamp(1.9rem,6.6vw,3.5rem)] leading-[1.1] text-chocolate [text-shadow:0_1px_16px_rgba(253,251,247,0.95),0_0_36px_rgba(253,251,247,0.7)] md:[text-shadow:none]"
+          className="font-display mb-6 text-[clamp(1.9rem,6.6vw,3.5rem)] leading-[1.1] text-chocolate-deep [-webkit-text-stroke:0.5px_currentColor] [text-shadow:0_1px_16px_rgba(253,251,247,0.95),0_0_36px_rgba(253,251,247,0.7)] md:[-webkit-text-stroke:0.4px_currentColor] md:[text-shadow:none]"
         >
           Des gâteaux aussi beaux{" "}
           <br className="max-md:hidden" />
@@ -391,11 +395,6 @@ export default function Hero({ google }: { google?: { rating: string; count: num
           </div>
         </div>
 
-        {/* Le configurateur donne le prix tout de suite : promettre 24 h
-            enterrait l'argument, et contredisait le flyer qui amène ici. */}
-        <p data-hero-fade className="mb-5 -mt-1 text-xs font-medium text-chocolate/60 max-md:text-center sm:-mt-3">
-          Voir mon prix en 2 minutes, sans engagement
-        </p>
         <a
           data-hero-fade
           href="#temoignages"
