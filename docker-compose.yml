@@ -12,6 +12,10 @@ services:
     restart: unless-stopped
     mem_limit: 512m
     environment:
+      # Tarifs et avis lus dans Carnet (source de vérité). Sans cette variable,
+      # le site sert silencieusement les valeurs figées de lib/data.ts : une
+      # hausse de prix saisie dans Carnet ne part jamais en ligne.
+      - CARNET_URL=${CARNET_URL:-}
       # E-mail des devis (Brevo) — requis pour le configurateur
       - BREVO_API_KEY=${BREVO_API_KEY:-}
       - CARNET_HOOK_URL=${CARNET_HOOK_URL:-}
