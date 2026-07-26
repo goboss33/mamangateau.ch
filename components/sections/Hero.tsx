@@ -106,11 +106,18 @@ export default function Hero({ google }: { google?: { rating: string; count: num
     const state = { frame: 0 };
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+    /* Le canvas se cale sur la section, pas sur la fenêtre : window.innerWidth
+       inclut la barre de défilement (une quinzaine de pixels sous Windows) et
+       innerHeight ne vaut pas h-svh sur mobile. Le canvas était donc un peu
+       plus large que la balise <img> posée dessous, et comme les deux centrent
+       leur image en « cover » dans leur propre boîte, l'échange de fin de
+       générique décalait la photo. Même boîte des deux côtés, même cadrage. */
     function size() {
-      canvas.width = Math.round(window.innerWidth * dpr);
-      canvas.height = Math.round(window.innerHeight * dpr);
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
+      const { width, height } = section.getBoundingClientRect();
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
     }
     size();
 
