@@ -92,9 +92,12 @@ export default function Preloader() {
       className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-cream"
       aria-hidden
     >
+      {/* text-center : sur un écran étroit le wordmark passe sur deux lignes.
+          items-center ne centre que la boîte, pas les lignes à l'intérieur —
+          « Gâteau » se calait donc à gauche sous « Maman ». */}
       <span
         ref={wordRef}
-        className="font-script text-gold"
+        className="font-script text-center leading-[1.05] text-gold"
         style={{ fontSize: "clamp(2.6rem, 9vw, 5.5rem)" }}
       >
         Maman Gâteau
