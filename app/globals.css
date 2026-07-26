@@ -76,26 +76,19 @@ body {
 /* ------------------------------------------------------- grain de papier */
 /* Léger bruit photographique : évite l'effet "aplat numérique" (voir BRAND :
    exécution léchée, pas de décor sans fonction — ici il unifie les fonds). */
+/* Calque strictement de la taille de l'écran, et immobile. Il couvrait
+   auparavant 200 % × 200 % (quatre fois la surface visible) avec un transform
+   animé en boucle : tout ce que la page affiche devant être mélangé à travers
+   lui, le compositeur repayait ce quadruple plein écran à chaque défilement.
+   À 0,028 d'opacité, le mouvement n'était de toute façon pas perceptible. */
 .grain::after {
   content: "";
   position: fixed;
-  inset: -50%;
-  width: 200%;
-  height: 200%;
+  inset: 0;
   pointer-events: none;
   z-index: 60;
   opacity: 0.028;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain-shift 9s steps(6) infinite;
-}
-
-@keyframes grain-shift {
-  0%, 100% { transform: translate(0, 0); }
-  17% { transform: translate(-2%, 1%); }
-  33% { transform: translate(1%, -2%); }
-  50% { transform: translate(-1%, 2%); }
-  67% { transform: translate(2%, 1%); }
-  83% { transform: translate(-2%, -1%); }
 }
 
 @media (prefers-reduced-motion: reduce) {

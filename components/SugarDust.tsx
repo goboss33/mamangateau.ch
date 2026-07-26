@@ -27,10 +27,18 @@ const IDLE_INTENSITY = 0;
 /* En dessous, il n'y a plus rien à voir : on arrête de dessiner. */
 const VISIBLE_FLOOR = 0.012;
 
-/* La poussière est floue par nature : la rendre à la densité réelle de
-   l'écran (jusqu'à 1,75× auparavant) triplait le nombre de pixels à mélanger
-   pour un résultat indiscernable. */
-const PIXEL_RATIO = 1;
+/* Le vrai coût de cet effet n'est pas les particules — elles font quelques
+   pixels — mais le calque plein écran redessiné et recomposé à chaque image :
+   ~8 Mo par image en 1920×1080, soit un demi-gigaoctet par seconde de bande
+   passante sur une puce graphique intégrée. On rend donc à mi-résolution (le
+   navigateur réétire, invisible sur des points diffus) et à 30 images par
+   seconde : huit fois moins de travail, même rendu. */
+const PIXEL_RATIO = 0.5;
+const RENDER_INTERVAL = 1 / 30;
+
+/* Constante de temps du fondu d'intensité, en secondes — exprimée en temps
+   réel et non « par image », pour rester identique quelle que soit la cadence. */
+const SMOOTH_TAU = 0.42;
 
 export default function SugarDust() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -205,13 +213,14 @@ export default function SugarDust() {
     let running = true;
 
     let shown = IDLE_INTENSITY > VISIBLE_FLOOR;
+    let sinceRender = 0;
 
     const loop = () => {
       raf = requestAnimationFrame(loop);
       if (!running) return;
       const dt = Math.min(clock.getDelta(), 0.05);
       uniforms.uIntensity.value +=
-        (targetIntensity - uniforms.uIntensity.value) * 0.04;
+        (targetIntensity - uniforms.uIntensity.value) * (1 - Math.exp(-dt / SMOOTH_TAU));
 
       let alive = false;
       for (let i = 0; i < BURST_POOL; i++) {
@@ -235,9 +244,19 @@ export default function SugarDust() {
         shown = visible;
         renderer.domElement.style.display = visible ? "block" : "none";
       }
-      if (!visible) return;
+      if (!visible) {
+        sinceRender = 0;
+        return;
+      }
 
       uniforms.uTime.value += dt;
+
+      /* Cadence bridée pour le voile ambiant, pleine cadence pendant les
+         confettis : eux sont rapides, on les verrait sauter. */
+      sinceRender += dt;
+      if (!alive && sinceRender < RENDER_INTERVAL) return;
+      sinceRender = 0;
+
       if (alive) {
         bGeo.attributes.position.needsUpdate = true;
         bGeo.attributes.aLife.needsUpdate = true;
