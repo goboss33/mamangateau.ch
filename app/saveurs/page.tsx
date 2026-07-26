@@ -15,6 +15,10 @@ import { SectionHead, CtaBand, CrossLinks, JsonLd, breadcrumbJsonLd } from "@/co
 --------------------------------------------------------------------------- */
 
 const CARD = "/images/saveurs-maman-gateau.jpeg";
+/* Aperçu de lien à part : la carte est un portrait 1536×2752, format que
+   WhatsApp et Facebook réduisent en vignette carrée illisible. Ils attendent
+   du 1200×630 — d'où cette version paysage, où le titre reste lisible. */
+const OG = "/images/og-saveurs.jpg";
 
 export const revalidate = 300; // suit les tarifs réglés dans Carnet
 
@@ -27,8 +31,9 @@ export const metadata: Metadata = {
     title: "Les saveurs — Maman Gâteau",
     description: "Choisissez un biscuit et jusqu'à deux fourrages : ganaches, crèmes, coulis de fruits frais.",
     url: "/saveurs",
-    images: [{ url: CARD, width: 1536, height: 2752, alt: "Carte des saveurs Maman Gâteau : biscuits et fourrages" }],
+    images: [{ url: OG, width: 1200, height: 630, alt: "Carte des saveurs Maman Gâteau : 6 biscuits et 14 fourrages" }],
   },
+  twitter: { card: "summary_large_image", images: [OG] },
 };
 
 const WA = waLink("Bonjour Annie ! J'ai vu votre carte des saveurs et j'aimerais un gâteau sur mesure.");
