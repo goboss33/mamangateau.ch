@@ -101,15 +101,20 @@ const jsonLd = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const g = await googleRating();
-  const jsonLdWithRating = {
-    ...jsonLd,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: g.rating.replace(",", "."),
-      reviewCount: g.count,
-      bestRating: "5",
-    },
-  };
+  /* Pas d'aggregateRating tant qu'aucun avis n'est renseigné : Google pénalise
+     les données structurées inventées, et un « 0 avis » balisé serait pire que
+     l'absence de balise. */
+  const jsonLdWithRating = g
+    ? {
+        ...jsonLd,
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: g.rating.replace(",", "."),
+          reviewCount: g.count,
+          bestRating: "5",
+        },
+      }
+    : jsonLd;
   return (
     <html lang="fr-CH" className={`${quicksand.variable} ${purgatory.variable} ${gatte.variable}`}>
       <body className="grain">

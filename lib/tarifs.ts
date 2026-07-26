@@ -19,6 +19,8 @@ export type Tarifs = {
   kmFree: number;
   kmRate: number;
   origin: string;
+  /* Avis Google saisis dans Carnet (voir lib/google.ts pour le pourquoi). */
+  google: { rating: number; count: number; url: string };
 };
 
 /** Valeurs locales : ce que le site a toujours utilisé (et le filet de sécurité). */
@@ -32,6 +34,7 @@ export const DEFAULT_TARIFS: Tarifs = {
   kmFree: DELIVERY.freeKm,
   kmRate: DELIVERY.chfPerKm,
   origin: DELIVERY.origin,
+  google: { rating: 5, count: 0, url: "" },
 };
 
 const isBands = (v: unknown): v is { max: number; price: number }[] =>
@@ -73,6 +76,11 @@ export async function getTarifs(): Promise<Tarifs> {
       kmFree: num(p.kmFree, DEFAULT_TARIFS.kmFree),
       kmRate: num(p.kmRate, DEFAULT_TARIFS.kmRate),
       origin: typeof p.origin === "string" && p.origin.trim() ? p.origin : DEFAULT_TARIFS.origin,
+      google: {
+        rating: num(data?.google?.rating, DEFAULT_TARIFS.google.rating),
+        count: Math.round(num(data?.google?.count, DEFAULT_TARIFS.google.count)),
+        url: typeof data?.google?.url === "string" ? data.google.url : DEFAULT_TARIFS.google.url,
+      },
     };
   } catch (e) {
     console.warn("tarifs Carnet indisponibles, valeurs locales utilisées:", e instanceof Error ? e.message : e);

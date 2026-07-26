@@ -23,7 +23,9 @@ export const revalidate = 120; // court : la home se régénère vite au runtime
 
 export default async function Home() {
   // Tarifs lus dans Carnet (repli automatique sur les valeurs locales).
-  const [google, tarifs] = await Promise.all([googleRating(), getTarifs()]);
+  // Les deux viennent du même appel à Carnet (mis en cache) : pas de double requête.
+  const [g, tarifs] = await Promise.all([googleRating(), getTarifs()]);
+  const google = g ?? undefined;
   return (
     <Experience>
       <Preloader />

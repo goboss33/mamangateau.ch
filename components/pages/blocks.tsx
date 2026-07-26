@@ -241,17 +241,19 @@ export async function Faq({ items }: { items: FaqItem[] }) {
           <p className="pb-5 leading-relaxed text-cocoa">{f.a}</p>
         </details>
       ))}
-      <p data-reveal className="pt-5 text-center text-sm text-grey-studio">
-        <a
-          href={google.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 underline decoration-gold/50 underline-offset-4 transition-colors hover:text-chocolate"
-        >
-          <span className="text-gold" aria-hidden>★</span>
-          {google.rating} · {google.count} avis Google — voir la fiche
-        </a>
-      </p>
+      {google && (
+        <p data-reveal className="pt-5 text-center text-sm text-grey-studio">
+          <a
+            href={google.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 underline decoration-gold/50 underline-offset-4 transition-colors hover:text-chocolate"
+          >
+            <span className="text-gold" aria-hidden>★</span>
+            {google.rating} · {google.count} avis Google — voir la fiche
+          </a>
+        </p>
+      )}
     </div>
   );
 }
